@@ -154,7 +154,7 @@ export default class System extends Publisher<System>
      * @param {string} name Optional name for the entity.
      * @returns {Entity}
      */
-    createEntity(name?: string)
+    createEntity(name?: string): Entity
     {
         const entity = this.doCreateEntity();
 
@@ -163,6 +163,16 @@ export default class System extends Publisher<System>
         }
 
         return entity;
+    }
+
+    findOrCreateEntity(name: string): Entity
+    {
+        const entity = this.findEntityByName(name);
+        if (entity) {
+            return entity;
+        }
+
+        return this.createEntity(name);
     }
 
     /**
@@ -192,6 +202,24 @@ export default class System extends Publisher<System>
     }
 
     /**
+     * Creates a new component of the given type only if a component of this type doesn't exist yet in the system.
+     * Otherwise returns the existing component.
+     * @param {Entity} entity The entity the new component is added to.
+     * @param {ComponentOrType<T>} componentOrType Type of the component to create.
+     * @param {string} name Optional name for the component.
+     * @returns {T} The created component.
+     */
+    getOrCreateComponent<T extends Component>(entity: Entity, componentOrType: ComponentOrType<T>, name?: string): T | undefined
+    {
+        const component = this.getComponent(componentOrType);
+        if (component) {
+            return component;
+        }
+
+        return this.createComponent(entity, componentOrType, name);
+    }
+
+    /**
      * Adds an entity to the system. Automatically called by the entity constructor.
      * @param {Entity} entity
      */
@@ -211,6 +239,21 @@ export default class System extends Publisher<System>
         this.willRemoveEntity(entity);
         delete this._entitiesById[entity.id];
         this.emit<ISystemEntityEvent>("entity", { add: false, remove: true, entity });
+    }
+
+    findEntityByName(name: string): Entity | null
+    {
+        const entities = this._entitiesById;
+        const ids = Object.keys(entities);
+
+        for (let i = 0, n = ids.length; i < n; ++i) {
+            const entity = entities[ids[i]];
+            if (entity.name === name) {
+                return entity;
+            }
+        }
+
+        return null;
     }
 
     /**

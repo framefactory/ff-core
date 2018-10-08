@@ -5,7 +5,9 @@
  * License: MIT
  */
 
-import Property, { IPropertySchema } from "./Property";
+import { TypeOf } from "../types";
+import Property, { IPropertySchema, PresetOrSchema } from "./Property";
+import PropertyObject from "./PropertyObject";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -23,8 +25,6 @@ export namespace Schemas
     export const ColorRGBA: IPropertySchema<Vector4> = { preset: [1, 1, 1, 1], semantic: "color" };
 }
 
-type PresetOrSchema<T> = T | IPropertySchema<T>;
-
 export default {
     Property: <T>(path: string, presetOrSchema: PresetOrSchema<T>, preset?: T) =>
         new Property<T>(path, presetOrSchema, preset),
@@ -41,8 +41,8 @@ export default {
     Enum: (path: string, options: string[], preset?: number) =>
         new Property<number>(path, { options, preset: preset || 0 }),
 
-    Object: (path: string, presetOrSchema?: PresetOrSchema<object>, preset?: object) =>
-        new Property<object>(path, presetOrSchema || null, preset),
+    Object: <T>(path: string, type?: TypeOf<PropertyObject<T>>) =>
+        new Property<PropertyObject<T>>(path, type || null),
 
     Vector2: (path: string, presetOrSchema?: PresetOrSchema<Vector2>, preset?: Vector2) =>
         new Property<Vector2>(path, presetOrSchema || [0, 0], preset),

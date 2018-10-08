@@ -5,16 +5,17 @@
  * License: MIT
  */
 
-import { Readonly } from "../types";
+import { Readonly, TypeOf } from "../types";
 import { ValueType, canConvert } from "./convert";
 import Properties from "./Properties";
 import PropertyLink from "./PropertyLink";
+import PropertyObject from "./PropertyObject";
 
 /////////////////////////////////////////////////////////////////////////////////
 
 export type PropertyType = ValueType;
 
-export type PresetOrSchema<T> = T | IPropertySchema<T>;
+export type PresetOrSchema<T> = T | IPropertySchema<T> | TypeOf<T>;
 
 export interface IPropertySchema<T = any>
 {
@@ -24,6 +25,7 @@ export interface IPropertySchema<T = any>
     step?: number;
     options?: string[];
     labels?: string[];
+    objectType?: TypeOf<T>;
     multi?: boolean;
     semantic?: string;
 }
@@ -38,6 +40,9 @@ export interface ISerializedProperty
     value?: any;
 }
 
+/**
+ * Linkable property.
+ */
 export default class Property<T = any>
 {
     parent: Properties;
@@ -55,10 +60,28 @@ export default class Property<T = any>
     readonly inLinks: PropertyLink[];
     readonly outLinks: PropertyLink[];
 
+    /**
+     * Creates a new linkable property.
+     * @param {string} path The path name of this property.
+     * @param {PresetOrSchema<T>} presetOrSchema For primitive values (number, boolean, string),
+     * this can be a preset value or a schema including a preset value. For objects, this should be
+     * the constructor of a class derived from PropertyObject, defining the type of objects that
+     * can be assigned to this property.
+     * @param {T} preset Optional, if given, replaces the preset value given in the schema.
+     */
     constructor(path: string, presetOrSchema: PresetOrSchema<T>, preset?: T)
     {
-        const isSchema = typeof presetOrSchema === "object" && presetOrSchema !== null && !Array.isArray(presetOrSchema);
-        const schema = isSchema ? presetOrSchema as IPropertySchema<T> : { preset: presetOrSchema as T };
+        let schema: IPropertySchema;
+
+        const objectType = presetOrSchema as TypeOf<T>;
+        if (objectType.prototype instanceof PropertyObject) {
+            schema = { objectType, preset: null };
+        }
+        else {
+            const isSchema = typeof presetOrSchema === "object" && presetOrSchema !== null && !Array.isArray(presetOrSchema);
+            schema = isSchema ? presetOrSchema as IPropertySchema<T> : { preset: presetOrSchema as T };
+        }
+
         preset = preset !== undefined ? preset : schema.preset;
         const isArray = Array.isArray(preset);
 
@@ -228,6 +251,12 @@ export default class Property<T = any>
         }
         if (srcIsArray && source.elements !== this.elements) {
             return false;
+        }
+
+        if (source.type === "object" && this.type === "object") {
+            if (source.schema.objectType !== this.schema.objectType) {
+                return false;
+            }
         }
 
         return canConvert(source.type, this.type);

@@ -149,6 +149,23 @@ export default class Entity extends Publisher<Entity>
     }
 
     /**
+     * Creates a new component only if a component of this type doesn't exist yet in this entity.
+     * Otherwise returns the existing component.
+     * @param {ComponentOrType<T>} componentOrType Type of the component to create.
+     * @param {string} name Optional name for the component.
+     * @returns {T} The created component.
+     */
+    getOrCreateComponent<T extends Component>(componentOrType: ComponentOrType<T>, name?: string)
+    {
+        const component = this.getComponent(componentOrType);
+        if (component) {
+            return component;
+        }
+
+        return this.createComponent(componentOrType, name);
+    }
+
+    /**
      * Adds a component to this entity. Called automatically by the component's constructor.
      * @param {Component} component
      */

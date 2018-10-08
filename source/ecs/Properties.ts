@@ -147,6 +147,12 @@ export default class Properties extends Publisher<Properties>
         return property.value;
     }
 
+    hasChanged(path: string): boolean
+    {
+        const { property } = this.getProperty(path);
+        return property.changed;
+    }
+
     linkTo(sourcePath: string, targetProps: Properties, targetPath: string)
     {
         targetProps.linkFrom(this, sourcePath, targetPath);

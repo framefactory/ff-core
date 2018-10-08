@@ -90,6 +90,7 @@ export default class Property<T = any>
             outLinks[i].push();
         }
 
+        this.parent.linkable.changed = true;
         this.parent.emitAny("value", this);
     }
 

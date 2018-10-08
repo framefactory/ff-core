@@ -57,6 +57,10 @@ export class ComponentTracker<T extends Component = Component>
         this.component = owner.getComponent(componentOrType);
         this.didAdd = didAdd;
         this.willRemove = willRemove;
+
+        if (this.component && didAdd) {
+            didAdd(this.component);
+        }
     }
 
     /** The component being tracked. */

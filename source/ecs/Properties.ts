@@ -12,6 +12,8 @@ import Property from "./Property";
 
 ////////////////////////////////////////////////////////////////////////////////
 
+const _rePath = /^(\S*?)(\[(\d+)\])*$/;
+
 /**
  * To use linkable properties, classes must implement this interface.
  */
@@ -105,15 +107,31 @@ export default class Properties extends Publisher<Properties>
 
         delete this._propsByPath[property.path];
     }
-    
-    setValue(path: string, value: any)
+
+    getProperty(path: string): { property: Property, index?: number }
     {
-        const prop = this._propsByPath[path];
-        if (!prop) {
+        const parts = path.match(_rePath);
+        if (!parts) {
+            throw new Error(`malformed path '${path}'`);
+        }
+
+        const property = this._propsByPath[parts[1]];
+        if (!property) {
             throw new Error(`no property found at path '${path}'`);
         }
 
-        prop.setValue(value);
+        const result: any = { property };
+        if (parts[2] !== undefined) {
+            result.index = parseInt(parts[2]);
+        }
+
+        return result;
+    }
+    
+    setValue(path: string, value: any)
+    {
+        const { property } = this.getProperty(path);
+        property.setValue(value);
     }
 
     setValues(values: Dictionary<any>)
@@ -125,11 +143,34 @@ export default class Properties extends Publisher<Properties>
 
     getValue(path: string)
     {
-        const prop = this._propsByPath[path];
-        if (!prop) {
-            throw new Error(`no property found at path '${path}'`);
-        }
-
-        return prop.value;
+        const { property } = this.getProperty(path);
+        return property.value;
     }
+
+    linkTo(sourcePath: string, targetProps: Properties, targetPath: string)
+    {
+        targetProps.linkFrom(this, sourcePath, targetPath);
+    }
+
+    linkFrom(sourceProps: Properties, sourcePath: string, targetPath: string)
+    {
+        const source = sourceProps.getProperty(sourcePath);
+        const target = this.getProperty(targetPath);
+
+        target.property.linkFrom(source.property, source.index, target.index);
+    }
+
+    unlinkTo(sourcePath: string, targetProps: Properties, targetPath: string)
+    {
+        targetProps.unlinkFrom(this, sourcePath, targetPath);
+    }
+
+    unlinkFrom(sourceProps: Properties, sourcePath: string, targetPath: string)
+    {
+        const source = sourceProps.getProperty(sourcePath);
+        const target = this.getProperty(targetPath);
+
+        target.property.unlinkFrom(source.property, source.index, target.index);
+    }
+
 }

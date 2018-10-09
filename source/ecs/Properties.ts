@@ -82,6 +82,10 @@ export default class Properties extends Publisher<Properties>
 
     add(key: string, property: Property): this
     {
+        if (this[key]) {
+            throw new Error(`key already exists in properties: '${key}'`);
+        }
+
         property.parent = this;
         property.key = key;
 
@@ -139,6 +143,14 @@ export default class Properties extends Publisher<Properties>
         Object.keys(values).forEach(
             key => this[key].setValue(values[key])
         );
+    }
+
+    pushAll()
+    {
+        const props = this.properties;
+        for (let i = 0, n = props.length; i < n; ++i) {
+            props[i].push();
+        }
     }
 
     getValue(path: string)

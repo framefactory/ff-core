@@ -10,6 +10,7 @@ import Publisher, { IPublisherEvent } from "../Publisher";
 import Component, { ComponentOrType, getType, Entity } from "./Component";
 import Registry from "./Registry";
 import LinkableSorter from "./LinkableSorter";
+import Hierarchy from "./Hierarchy";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +47,7 @@ export default class System extends Publisher<System>
     private _componentsByType: { [type: string]: Component[] };
     private _componentsById: { [id: string]: Component };
     private _componentList: Component[];
-    private _initList: Component[];
+
     private _updateWaitList: any[];
 
     private _sorter: LinkableSorter;
@@ -63,28 +64,14 @@ export default class System extends Publisher<System>
         this._componentsByType = {};
         this._componentsById = {};
         this._componentList = [];
-        this._initList = [];
+
         this._updateWaitList = [];
 
         this._sorter = new LinkableSorter();
     }
 
-    create()
-    {
-        const context = this.context;
-        const components = this._initList;
-
-        for (let i = 0, n = components.length; i < n; ++i) {
-            components[i].create(context);
-        }
-        components.length = 0;
-    }
-
     update()
     {
-        // initialize any new components first
-        this.create();
-
         // call update on components in topological sort order
         const context = this.context;
         const components = this._componentList;
@@ -157,6 +144,7 @@ export default class System extends Publisher<System>
     createEntity(name?: string): Entity
     {
         const entity = this.doCreateEntity();
+        entity.init(this);
 
         if (name) {
             entity.name = name;
@@ -191,7 +179,8 @@ export default class System extends Publisher<System>
         }
         else {
             const Ctor = (componentOrType instanceof Component ? componentOrType.constructor : componentOrType) as typeof Component;
-            component = new Ctor(entity);
+            component = new Ctor();
+            component.init(entity);
         }
 
         if (component && name) {
@@ -267,12 +256,31 @@ export default class System extends Publisher<System>
     }
 
     /**
+     * Returns all entities not containing a hierarchy component with a parent.
+     */
+    getRootEntities()
+    {
+        const entities = this._entitiesById;
+        const ids = Object.keys(entities);
+        const result = [];
+
+        for (let i = 0, n = ids.length; i < n; ++i) {
+            const entity = entities[ids[i]];
+            const hierarchy = entity.getComponent(Hierarchy);
+            if (!hierarchy || !hierarchy.parent) {
+                result.push(entity);
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Adds a new component to the system. Called automatically by the component's constructor.
      * @param {Component} component
      */
     addComponent(component: Component)
     {
-        this._initList.push(component);
         this._componentList.push(component);
         this._componentsById[component.id] = component;
         this.getComponentArrayByType(component.type).push(component);
@@ -300,11 +308,6 @@ export default class System extends Publisher<System>
 
         let index = this._componentList.indexOf(component);
         this._componentList.splice(index, 1);
-
-        index = this._initList.indexOf(component);
-        if (index >= 0) {
-            this._initList.splice(index, 1);
-        }
 
         const components = this._componentsByType[component.type];
         index = components.indexOf(component);
@@ -419,7 +422,7 @@ export default class System extends Publisher<System>
         const numEntities = entityKeys.length;
         const numComponents = this._componentList.length;
 
-        const text = `EntityManager - ${numEntities} entities, ${numComponents} components.`;
+        const text = `System - ${numEntities} entities, ${numComponents} components.`;
 
         if (verbose) {
             return text + "\n" + entityKeys.map(key => this._entitiesById[key].toString(true)).join("\n");
@@ -434,7 +437,7 @@ export default class System extends Publisher<System>
      */
     protected doCreateEntity(): Entity
     {
-        return new Entity(this);
+        return new Entity();
     }
 
     /**

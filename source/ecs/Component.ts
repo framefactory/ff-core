@@ -129,7 +129,7 @@ export default class Component extends Publisher<Component> implements ILinkable
     static readonly isSystemSingleton: boolean = false;
 
     readonly id: string;
-    readonly entity: Entity;
+    entity: Entity;
 
     ins: Properties = new Properties(this);
     outs: Properties = new Properties(this);
@@ -140,20 +140,21 @@ export default class Component extends Publisher<Component> implements ILinkable
     private _tracked: Dictionary<ComponentTracker> = {};
 
 
-    constructor(entity: Entity, id?: string)
+    constructor(id?: string)
     {
         super();
         this.addEvents("change", "dispose");
 
         this.id = id || uniqueId();
+        this.entity = null;
+    }
+
+    init(entity: Entity)
+    {
         this.entity = entity;
+        entity.addComponent(this);
 
-        this.entity.addComponent(this);
-
-        let baseType = Object.getPrototypeOf(this);
-        while((baseType = Object.getPrototypeOf(baseType)).type !== Component.type) {
-            this.entity.addBaseComponent(this, baseType);
-        }
+        this.create(this.system.context);
     }
 
     /**
@@ -223,11 +224,6 @@ export default class Component extends Publisher<Component> implements ILinkable
         this.destroy(this.system.context);
         this.unlink();
         
-        let baseType = Object.getPrototypeOf(this);
-        while((baseType = Object.getPrototypeOf(baseType)).typeId !== Component.type) {
-            this.entity.removeBaseComponent(this, baseType);
-        }
-
         this.emit<IComponentDisposeEvent>("dispose");
         this.entity.removeComponent(this);
     }
@@ -240,6 +236,16 @@ export default class Component extends Publisher<Component> implements ILinkable
     deflate()
     {
 
+    }
+
+    in(path: string)
+    {
+        return this.ins.getProperty(path).property;
+    }
+
+    out(path: string)
+    {
+        return this.outs.getProperty(path).property;
     }
 
     setValue(path: string, value: any)

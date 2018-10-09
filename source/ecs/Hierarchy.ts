@@ -48,7 +48,7 @@ export default class Hierarchy extends Component
      */
     get children(): Readonly<Hierarchy[]>
     {
-        return this._children;
+        return this._children || [];
     }
 
     dispose()
@@ -143,6 +143,6 @@ export default class Hierarchy extends Component
      */
     toString()
     {
-        return super.toString() + ` - children: ${this._children.length}`;
+        return super.toString() + ` - children: ${this.children.length}`;
     }
 }

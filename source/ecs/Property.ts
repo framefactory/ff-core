@@ -113,11 +113,13 @@ export default class Property<T = any>
             outLinks[i].push();
         }
 
-        this.parent.linkable.changed = true;
-        this.parent.emitAny("value", this);
+        if (this.parent) {
+            this.parent.linkable.changed = true;
+            this.parent.emitAny("value", this);
+        }
     }
 
-    setChanged()
+    push()
     {
         this.changed = true;
 
@@ -268,11 +270,13 @@ export default class Property<T = any>
             throw new Error("can't reset property with input links");
         }
 
+        let value;
+
         if (this.isMulti()) {
             let multiArray: T[] = this.value as any;
 
             if (!multiArray) {
-                this.value = multiArray = [] as any;
+                value = multiArray = [] as any;
             }
             else {
                 multiArray.length = 1;
@@ -281,11 +285,11 @@ export default class Property<T = any>
             multiArray[0] = this.clonePreset();
         }
         else {
-            this.value = this.clonePreset();
+            value = this.clonePreset();
         }
 
         // set changed flag and push to output links
-        this.setChanged();
+        this.setValue(value);
     }
 
     setMultiChannelCount(count: number)

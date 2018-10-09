@@ -62,34 +62,31 @@ export interface ISerializedEntity
  */
 export default class Entity extends Publisher<Entity>
 {
-    static fromJSON(system: System, dict: Dictionary<Component>, json: ISerializedEntity): Entity
-    {
-        const entity = new Entity(system, json.id);
-        entity._name = json.name;
-        return entity;
-    }
-
     public readonly id: string;
-    public readonly system: System;
+    public system: System;
 
     private _name: string;
 
     private _componentList: Component[];
     private _componentsByType: { [id:string]: Component[] };
 
-    constructor(system: System, id?: string)
+    constructor(id?: string)
     {
         super();
         this.addEvents("component", "change", "dispose");
 
         this.id = id || uniqueId(8);
-        this.system = system;
+        this.system = null;
 
         this._name = "";
 
         this._componentList = [];
         this._componentsByType = {};
+    }
 
+    init(system: System)
+    {
+        this.system = system;
         system.addEntity(this);
     }
 
@@ -178,11 +175,20 @@ export default class Entity extends Publisher<Entity>
             throw new Error(`only one component of type '${component.type}' allowed per entity`);
         }
 
+        // add component base types
+        let baseType = Object.getPrototypeOf(component);
+        while((baseType = Object.getPrototypeOf(baseType)).type !== Component.type) {
+            this.addBaseComponent(component, baseType);
+        }
+
+        // add component and actual type
         this._componentList.push(component);
         this.getComponentArrayByType(component.type).push(component);
 
+        // add to system
         this.system.addComponent(component);
 
+        // notify sibling components in entity
         this._componentList.forEach(sibling => {
             if (sibling !== component) {
                 sibling.didAddComponent(component);
@@ -199,56 +205,38 @@ export default class Entity extends Publisher<Entity>
      */
     removeComponent(component: Component): boolean
     {
+        // ensure component is registered
         let index = this._componentList.indexOf(component);
         if (index < 0) {
             return false;
         }
 
+        // notify sibling components in entity
         this._componentList.forEach(sibling => {
             if (sibling !== component) {
                 sibling.willRemoveComponent(component);
             }
         });
 
+        // remove from system
+        this.system.removeComponent(component);
+
+        // remove component and actual type
         this._componentList.splice(index, 1);
 
         const components = this._componentsByType[component.type];
         index = components.indexOf(component);
         components.splice(index, 1);
 
-        this.system.removeComponent(component);
+        // remove component base types
+        let baseType = Object.getPrototypeOf(component);
+        while((baseType = Object.getPrototypeOf(baseType)).typeId !== Component.type) {
+            this.removeBaseComponent(component, baseType);
+        }
 
         this.emit<IEntityComponentEvent>("component", { add: false, remove: true, component });
 
         return true;
-    }
-
-    /**
-     * Registers a component under the given base class. The component can then also be
-     * retrieved by specifying the base class in getComponent(s) methods.
-     * Called by a component's base class constructor.
-     * @param {Component} component
-     * @param {ComponentOrType} baseType
-     */
-    addBaseComponent(component: Component, baseType: ComponentOrType)
-    {
-        this.getComponentArrayByType(getType(baseType)).push(component);
-        this.system.addBaseComponent(component, baseType);
-    }
-
-    /**
-     * Unregisters the base class of a component.
-     * Called by a component's base class dispose method.
-     * @param {Component} component
-     * @param {ComponentOrType} baseType
-     */
-    removeBaseComponent(component: Component, baseType: ComponentOrType)
-    {
-        const components = this._componentsByType[getType(baseType)];
-        const index = components.indexOf(component);
-        components.splice(index, 1);
-
-        this.system.removeBaseComponent(component, baseType);
     }
 
     /**
@@ -368,6 +356,34 @@ export default class Entity extends Publisher<Entity>
         }
 
         return text;
+    }
+
+    /**
+     * Registers a component under the given base class. The component can then also be
+     * retrieved by specifying the base class in getComponent(s) methods.
+     * Called by a component's base class constructor.
+     * @param {Component} component
+     * @param {ComponentOrType} baseType
+     */
+    protected addBaseComponent(component: Component, baseType: ComponentOrType)
+    {
+        this.getComponentArrayByType(getType(baseType)).push(component);
+        this.system.addBaseComponent(component, baseType);
+    }
+
+    /**
+     * Unregisters the base class of a component.
+     * Called by a component's base class dispose method.
+     * @param {Component} component
+     * @param {ComponentOrType} baseType
+     */
+    protected removeBaseComponent(component: Component, baseType: ComponentOrType)
+    {
+        const components = this._componentsByType[getType(baseType)];
+        const index = components.indexOf(component);
+        components.splice(index, 1);
+
+        this.system.removeBaseComponent(component, baseType);
     }
 
     protected getComponentArrayByType(type: string): Component[]

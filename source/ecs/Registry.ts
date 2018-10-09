@@ -27,7 +27,10 @@ export default class Registry
     createComponent(type: string, entity: Entity, instanceId?: string): Component
     {
         const componentType = this.getComponentType(type) as TypeOf<Component>;
-        return new componentType(entity, instanceId);
+        const component = new componentType(instanceId);
+        component.init(entity);
+
+        return component;
     }
 
     getComponentType<T extends Component>(type: string): TypeOf<T>

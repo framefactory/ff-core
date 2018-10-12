@@ -9,7 +9,7 @@ import { Dictionary, Readonly, TypeOf } from "../types";
 import uniqueId from "../uniqueId";
 import Publisher, { IPublisherEvent } from "../Publisher";
 
-import System, { ISystemContext } from "./System";
+import System, { ISystemComponentEvent, ISystemContext } from "./System";
 import Entity from "./Entity";
 import Properties, { ILinkable } from "./Properties";
 import Property, { ISerializedProperty } from "./Property";
@@ -51,24 +51,25 @@ export function getType<T extends Component>(componentOrType: ComponentOrType<T>
  */
 export class ComponentTracker<T extends Component = Component>
 {
-    constructor(owner: Component, componentOrType: ComponentOrType<T>,
-        didAdd?: (component: T) => void, willRemove?: (component: T) => void) {
-
-        this.component = owner.getComponent(componentOrType);
-        this.didAdd = didAdd;
-        this.willRemove = willRemove;
-
-        if (this.component && didAdd) {
-            didAdd(this.component);
-        }
-    }
-
     /** The component being tracked. */
     component: T;
     /** Called after a component has been assigned to the tracker. */
     didAdd: (component: T) => void;
     /** Called before a component is removed from the tracker. */
     willRemove: (component: T) => void;
+
+    constructor(owner: Component, componentOrType: ComponentOrType<T>,
+        didAdd?: (component: T) => void, willRemove?: (component: T) => void) {
+
+        this.didAdd = didAdd;
+        this.willRemove = willRemove;
+
+        this.component = owner.getComponent(componentOrType);
+
+        if (this.component && didAdd) {
+            didAdd(this.component);
+        }
+    }
 }
 
 /**
@@ -221,10 +222,10 @@ export default class Component extends Publisher<Component> implements ILinkable
      */
     dispose()
     {
+        this.emit<IComponentDisposeEvent>("dispose");
+
         this.destroy(this.system.context);
         this.unlink();
-        
-        this.emit<IComponentDisposeEvent>("dispose");
         this.entity.removeComponent(this);
     }
 
@@ -362,8 +363,13 @@ export default class Component extends Publisher<Component> implements ILinkable
     trackComponent<T extends Component>(componentOrType: ComponentOrType<T>,
         didAdd?: (component: T) => void, willRemove?: (component: T) => void): ComponentTracker<T>
     {
+        const type = getType(componentOrType);
+        if (this._tracked[type]) {
+            throw new Error(`component type already tracked: '${type}'`);
+        }
+
         const tracker = new ComponentTracker(this, componentOrType, didAdd, willRemove);
-        this._tracked[getType(componentOrType)] = tracker;
+        this._tracked[type] = tracker;
         return tracker;
     }
 

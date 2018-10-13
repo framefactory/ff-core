@@ -9,7 +9,7 @@ import { Dictionary, Readonly, TypeOf } from "../types";
 import uniqueId from "../uniqueId";
 import Publisher, { IPublisherEvent } from "../Publisher";
 
-import System, { ISystemComponentEvent, ISystemContext } from "./System";
+import System, { ISystemContext } from "./System";
 import Entity from "./Entity";
 import Properties, { ILinkable } from "./Properties";
 import Property, { ISerializedProperty } from "./Property";
@@ -155,7 +155,7 @@ export default class Component extends Publisher<Component> implements ILinkable
         this.entity = entity;
         entity.addComponent(this);
 
-        this.create(this.system.context);
+        this.create();
     }
 
     /**
@@ -200,7 +200,7 @@ export default class Component extends Publisher<Component> implements ILinkable
      * Called after construction of the component.
      * Perform initialization tasks where you need access to other components.
      */
-    create(context: ISystemContext)
+    create()
     {
     }
 
@@ -212,7 +212,7 @@ export default class Component extends Publisher<Component> implements ILinkable
     {
     }
 
-    destroy(context: ISystemContext)
+    destroy()
     {
     }
 
@@ -224,7 +224,7 @@ export default class Component extends Publisher<Component> implements ILinkable
     {
         this.emit<IComponentDisposeEvent>("dispose");
 
-        this.destroy(this.system.context);
+        this.destroy();
         this.unlink();
         this.entity.removeComponent(this);
     }

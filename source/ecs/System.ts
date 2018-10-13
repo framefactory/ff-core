@@ -40,7 +40,6 @@ export interface ISystemContext
 export default class System extends Publisher<System>
 {
     readonly registry: Registry;
-    readonly context: ISystemContext;
 
     private _entitiesById: { [id: string]: Entity };
 
@@ -58,7 +57,6 @@ export default class System extends Publisher<System>
         this.addEvents("entity", "component");
 
         this.registry = registry || new Registry();
-        this.context = {};
 
         this._entitiesById = {};
         this._componentsByType = {};
@@ -70,10 +68,9 @@ export default class System extends Publisher<System>
         this._sorter = new LinkableSorter();
     }
 
-    update()
+    update(context: ISystemContext)
     {
         // call update on components in topological sort order
-        const context = this.context;
         const components = this._componentList;
 
         for (let i = 0, n = components.length; i < n; ++i) {
@@ -89,9 +86,8 @@ export default class System extends Publisher<System>
         this._updateWaitList.length = 0;
     }
 
-    tick()
+    tick(context: ISystemContext)
     {
-        const context = this.context;
         const components = this._componentList;
 
         for (let i = 0, n = components.length; i < n; ++i) {

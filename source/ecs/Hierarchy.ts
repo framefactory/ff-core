@@ -6,7 +6,41 @@
  */
 
 import { Readonly } from "../types";
-import Component, { ComponentType, IComponentChangeEvent } from "./Component";
+import Component, { ComponentOrType, IComponentChangeEvent } from "./Component";
+
+////////////////////////////////////////////////////////////////////////////////
+
+const _findOne = <T extends Component>(hierarchy: Hierarchy, componentOrType: ComponentOrType<T>): T | null => {
+    const sibling = hierarchy.getComponent(componentOrType);
+    if (sibling) {
+        return sibling;
+    }
+
+    const children = hierarchy.children;
+    for (let i = 0, n = children.length; i < n; ++i) {
+        const descendant = _findOne(children[i], componentOrType);
+        if (descendant) {
+            return descendant;
+        }
+    }
+
+    return null;
+};
+
+const _findAll = <T extends Component>(hierarchy: Hierarchy, componentOrType: ComponentOrType<T>): T[] => {
+
+    let result = hierarchy.getComponents(componentOrType);
+
+    const children = hierarchy.children;
+    for (let i = 0, n = children.length; i < n; ++i) {
+        const descendants = _findAll(children[i], componentOrType);
+        if (descendants.length > 0) {
+            result = result.concat(descendants);
+        }
+    }
+
+    return result;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -118,19 +152,34 @@ export default class Hierarchy extends Component
         return root;
     }
 
+    getComponentInSubtree<T extends Component>(componentOrType: ComponentOrType<T>): T | null
+    {
+        return _findOne(this, componentOrType);
+    }
+
+    getComponentsInSubtree<T extends Component>(componentOrType: ComponentOrType<T>): T[]
+    {
+        return _findAll(this, componentOrType);
+    }
+
+    hasComponentsInSubtree<T extends Component>(componentOrType: ComponentOrType<T>): boolean
+    {
+        return !!_findOne(this, componentOrType);
+    }
+
     /**
      * Searches for the given component type in this entity and then recursively
      * in all parent entities.
-     * @param {ComponentType<T>} componentType
+     * @param {ComponentOrType<T>} componentOrType
      * @returns {T | undefined} The component if found or undefined else.
      */
-    getNearestAncestor<T extends Component>(componentType: ComponentType<T>): T | undefined
+    getNearestAncestor<T extends Component>(componentOrType: ComponentOrType<T>): T | undefined
     {
         let root: Hierarchy = this;
         let component = undefined;
 
         while(!component && root) {
-            component = root.getComponent(componentType);
+            component = root.getComponent(componentOrType);
             root = root._parent;
         }
 

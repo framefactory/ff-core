@@ -119,6 +119,19 @@ export default class Property<T = any>
         }
     }
 
+    set()
+    {
+        const outLinks = this.outLinks;
+        for (let i = 0, n = outLinks.length; i < n; ++i) {
+            outLinks[i].push();
+        }
+
+        if (this.parent) {
+            this.parent.linkable.changed = true;
+            this.parent.emitAny("value", this);
+        }
+    }
+
     push()
     {
         this.changed = true;

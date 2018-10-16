@@ -19,6 +19,14 @@ import Property, { ISerializedProperty } from "./Property";
 export { Entity };
 
 /**
+ * Base class for custom component events.
+ * @event
+ */
+export interface IComponentEvent<T extends Component = Component> extends IPublisherEvent<T>
+{
+}
+
+/**
  * Emitted by [[Component]] after the instance's state has changed.
  * @event
  */
@@ -212,10 +220,6 @@ export default class Component extends Publisher<Component> implements ILinkable
     {
     }
 
-    destroy()
-    {
-    }
-
     /**
      * Removes the component from its entity and deletes it.
      * Emits an [[IComponentDisposeEvent]] before disposal.
@@ -224,7 +228,6 @@ export default class Component extends Publisher<Component> implements ILinkable
     {
         this.emit<IComponentDisposeEvent>("dispose");
 
-        this.destroy();
         this.unlink();
         this.entity.removeComponent(this);
     }

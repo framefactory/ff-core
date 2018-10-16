@@ -6,9 +6,26 @@
  */
 
 import { Readonly } from "../types";
+import Entity from "./Entity";
 import Component, { ComponentOrType, IComponentChangeEvent } from "./Component";
 
 ////////////////////////////////////////////////////////////////////////////////
+
+const _findEntity = (hierarchy: Hierarchy, name: string): Entity | null => {
+    if (hierarchy.entity.name === name) {
+        return hierarchy.entity;
+    }
+
+    const children = hierarchy.children;
+    for (let i = 0, n = children.length; i < n; ++i) {
+        const descendant = _findEntity(children[i], name);
+        if (descendant) {
+            return descendant;
+        }
+    }
+
+    return null;
+};
 
 const _findOne = <T extends Component>(hierarchy: Hierarchy, componentOrType: ComponentOrType<T>): T | null => {
     const sibling = hierarchy.getComponent(componentOrType);
@@ -150,6 +167,11 @@ export default class Hierarchy extends Component
         }
 
         return root;
+    }
+
+    findEntityInSubtree(name: string): Entity | null
+    {
+        return _findEntity(this, name);
     }
 
     getComponentInSubtree<T extends Component>(componentOrType: ComponentOrType<T>): T | null

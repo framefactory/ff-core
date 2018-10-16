@@ -42,6 +42,7 @@ export default class System extends Publisher<System>
     readonly registry: Registry;
 
     private _entitiesById: { [id: string]: Entity };
+    private _entityList: Entity[];
 
     private _componentsByType: { [type: string]: Component[] };
     private _componentsById: { [id: string]: Component };
@@ -59,6 +60,8 @@ export default class System extends Publisher<System>
         this.registry = registry || new Registry();
 
         this._entitiesById = {};
+        this._entityList = [];
+
         this._componentsByType = {};
         this._componentsById = {};
         this._componentList = [];
@@ -211,6 +214,8 @@ export default class System extends Publisher<System>
     addEntity(entity: Entity)
     {
         this._entitiesById[entity.id] = entity;
+        this._entityList.push(entity);
+
         this.didAddEntity(entity);
         this.emit<ISystemEntityEvent>("entity", { add: true, remove: false, entity });
     }
@@ -222,19 +227,26 @@ export default class System extends Publisher<System>
     removeEntity(entity: Entity)
     {
         this.willRemoveEntity(entity);
+
         delete this._entitiesById[entity.id];
+        const index = this._entityList.indexOf(entity);
+        this._entityList.splice(index, 1);
+
         this.emit<ISystemEntityEvent>("entity", { add: false, remove: true, entity });
+    }
+
+    getEntities()
+    {
+        return this._entityList;
     }
 
     findEntityByName(name: string): Entity | null
     {
-        const entities = this._entitiesById;
-        const ids = Object.keys(entities);
+        const entities = this._entityList;
 
-        for (let i = 0, n = ids.length; i < n; ++i) {
-            const entity = entities[ids[i]];
-            if (entity.name === name) {
-                return entity;
+        for (let i = 0, n = entities.length; i < n; ++i) {
+            if (entities[i].name === name) {
+                return entities[i];
             }
         }
 
@@ -256,15 +268,13 @@ export default class System extends Publisher<System>
      */
     getRootEntities()
     {
-        const entities = this._entitiesById;
-        const ids = Object.keys(entities);
+        const entities = this._entityList;
         const result = [];
 
-        for (let i = 0, n = ids.length; i < n; ++i) {
-            const entity = entities[ids[i]];
-            const hierarchy = entity.getComponent(Hierarchy);
+        for (let i = 0, n = entities.length; i < n; ++i) {
+            const hierarchy = entities[i].getComponent(Hierarchy);
             if (!hierarchy || !hierarchy.parent) {
-                result.push(entity);
+                result.push(entities[i]);
             }
         }
 
@@ -414,14 +424,13 @@ export default class System extends Publisher<System>
 
     toString(verbose: boolean = false)
     {
-        const entityKeys = Object.keys(this._entitiesById);
-        const numEntities = entityKeys.length;
+        const entities = this._entityList;
         const numComponents = this._componentList.length;
 
-        const text = `System - ${numEntities} entities, ${numComponents} components.`;
+        const text = `System - ${entities.length} entities, ${numComponents} components.`;
 
         if (verbose) {
-            return text + "\n" + entityKeys.map(key => this._entitiesById[key].toString(true)).join("\n");
+            return text + "\n" + entities.map(entity => entity.toString(true)).join("\n");
         }
 
         return text;

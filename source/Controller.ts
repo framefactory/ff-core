@@ -11,6 +11,7 @@ import Commander from "./Commander";
 
 ////////////////////////////////////////////////////////////////////////////////
 
+export { Commander };
 export type Actions<T extends Controller<any>> = ReturnType<T["createActions"]>;
 
 export default abstract class Controller<T extends Controller<any>> extends Publisher<T>

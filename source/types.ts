@@ -39,3 +39,10 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 export type Subtract<T, U> = Pick<T, Exclude<keyof T, keyof U>>
 
+////////////////////////////////////////////////////////////////////////////////
+// ENUM HELPER FUNCTIONS
+
+export const enumToArray = function(e: any)
+{
+    return Object.keys(e).filter(key => isNaN(Number(key)));
+}

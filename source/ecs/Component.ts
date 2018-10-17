@@ -11,7 +11,7 @@ import Publisher, { IPublisherEvent } from "../Publisher";
 
 import System, { ISystemContext } from "./System";
 import Entity from "./Entity";
-import Properties, { ILinkable } from "./Properties";
+import PropertySet, { ILinkable } from "./PropertySet";
 import Property, { ISerializedProperty } from "./Property";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,8 +140,8 @@ export default class Component extends Publisher<Component> implements ILinkable
     readonly id: string;
     entity: Entity;
 
-    ins: Properties = new Properties(this);
-    outs: Properties = new Properties(this);
+    ins: PropertySet = new PropertySet(this);
+    outs: PropertySet = new PropertySet(this);
 
     changed: boolean = true;
     private _name: string = "";
@@ -459,13 +459,13 @@ export default class Component extends Publisher<Component> implements ILinkable
         return `${this.type}${this.name ? " (" + this.name + ")" : ""}`;
     }
 
-    protected makeProps<T extends Dictionary<Property>>(props: T): Properties & T
+    protected makeProps<T extends Dictionary<Property>>(props: T): PropertySet & T
     {
-        return new Properties(this, props) as Properties & T;
+        return new PropertySet(this, props) as PropertySet & T;
     }
 
-    protected mergeProps<T extends Dictionary<Property>, U extends Dictionary<Property>>(propsA: Properties & T, propsB: U): Properties & T & U
+    protected mergeProps<T extends Dictionary<Property>, U extends Dictionary<Property>>(propsA: PropertySet & T, propsB: U): PropertySet & T & U
     {
-        return propsA.merge(propsB) as Properties & T & U
+        return propsA.merge(propsB) as PropertySet & T & U
     }
 }

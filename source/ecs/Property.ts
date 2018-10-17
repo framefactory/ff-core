@@ -7,7 +7,7 @@
 
 import { Readonly, TypeOf } from "../types";
 import { ValueType, canConvert } from "./convert";
-import Properties from "./Properties";
+import PropertySet from "./PropertySet";
 import PropertyLink from "./PropertyLink";
 import PropertyObject from "./PropertyObject";
 
@@ -45,7 +45,7 @@ export interface ISerializedProperty
  */
 export default class Property<T = any>
 {
-    parent: Properties;
+    props: PropertySet;
     key: string;
 
     value: T;
@@ -85,7 +85,7 @@ export default class Property<T = any>
         preset = preset !== undefined ? preset : schema.preset;
         const isArray = Array.isArray(preset);
 
-        this.parent = null;
+        this.props = null;
         this.key = null;
 
         this.value = null;
@@ -113,9 +113,9 @@ export default class Property<T = any>
             outLinks[i].push();
         }
 
-        if (this.parent) {
-            this.parent.linkable.changed = true;
-            this.parent.emitAny("value", this);
+        if (this.props) {
+            this.props.linkable.changed = true;
+            this.props.emitAny("value", this);
         }
     }
 
@@ -126,9 +126,9 @@ export default class Property<T = any>
             outLinks[i].push();
         }
 
-        if (this.parent) {
-            this.parent.linkable.changed = true;
-            this.parent.emitAny("value", this);
+        if (this.props) {
+            this.props.linkable.changed = true;
+            this.props.emitAny("value", this);
         }
     }
 
@@ -244,7 +244,7 @@ export default class Property<T = any>
     canLinkFrom(source: Property, sourceIndex?: number, destinationIndex?: number): boolean
     {
         // can't link to an output property
-        if (this.parent !== this.parent.linkable.ins) {
+        if (this.props !== this.props.linkable.ins) {
             return false;
         }
 
@@ -322,6 +322,11 @@ export default class Property<T = any>
         this.changed = true;
     }
 
+    isArray(): boolean
+    {
+        return Array.isArray(this.preset);
+    }
+
     isMulti(): boolean
     {
         return !!this.schema.multi;
@@ -382,7 +387,7 @@ export default class Property<T = any>
 
         if (this.hasOutLinks()) {
             json.links = this.outLinks.map(link => ({
-                component: link.destination.parent.linkable.id,
+                component: link.destination.props.linkable.id,
                 key: link.destination.key
             }));
         }
@@ -393,14 +398,15 @@ export default class Property<T = any>
 
     }
 
+    copyValue(): T
+    {
+        const value = this.value;
+        return Array.isArray(value) ? value.slice() as any : value;
+    }
+
     protected clonePreset(): T
     {
         const preset = this.preset;
-
-        if (Array.isArray(preset)) {
-            return preset.slice() as any;
-        }
-
-        return preset;
+        return Array.isArray(preset) ? preset.slice() as any : preset;
     }
 }

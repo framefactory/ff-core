@@ -86,7 +86,7 @@ export default class Properties extends Publisher<Properties>
             throw new Error(`key already exists in properties: '${key}'`);
         }
 
-        property.parent = this;
+        property.props = this;
         property.key = key;
 
         this[key] = property;

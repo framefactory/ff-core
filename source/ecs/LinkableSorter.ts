@@ -6,7 +6,7 @@
  */
 
 import { Dictionary } from "../types";
-import { ILinkable } from "./Properties";
+import { ILinkable } from "./PropertySet";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -57,14 +57,14 @@ export default class LinkableSorter
         for (let i0 = 0, n0 = outProps.length; i0 < n0; ++i0) {
             const outLinks = outProps[i0].outLinks;
             for (let i1 = 0, n1 = outLinks.length; i1 < n1; ++i1) {
-                const ins = outLinks[i1].destination.parent;
+                const ins = outLinks[i1].destination.props;
 
                 // follow outgoing links at input properties
                 const inProps = ins.properties;
                 for (let i2 = 0, n2 = inProps.length; i2 < n2; ++i2) {
                     const links = inProps[i2].outLinks;
                     for (let i3 = 0, n3 = links.length; i3 < n3; ++i3) {
-                        const linkedIns = links[i3].destination.parent;
+                        const linkedIns = links[i3].destination.props;
                         this.visit(linkedIns.linkable);
                     }
                 }

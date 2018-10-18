@@ -50,7 +50,8 @@ export default class Registry
         }
         else {
             if (this.types[componentType.type]) {
-                throw new Error(`component type already registered: ${componentType.type}`);
+                console.warn(componentType);
+                throw new Error(`component type already registered: '${componentType.type}'`);
             }
 
             this.types[componentType.type] = componentType;

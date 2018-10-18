@@ -5,6 +5,7 @@
  * License: MIT
  */
 
+import Publisher from "../Publisher";
 import { Readonly, TypeOf } from "../types";
 import { ValueType, canConvert } from "./convert";
 import PropertySet from "./PropertySet";
@@ -43,7 +44,7 @@ export interface ISerializedProperty
 /**
  * Linkable property.
  */
-export default class Property<T = any>
+export default class Property<T = any> extends Publisher<Property<T>>
 {
     props: PropertySet;
     key: string;
@@ -71,6 +72,9 @@ export default class Property<T = any>
      */
     constructor(path: string, presetOrSchema: PresetOrSchema<T>, preset?: T)
     {
+        super();
+        this.addEvent("value");
+
         let schema: IPropertySchema;
 
         const objectType = presetOrSchema as TypeOf<T>;
@@ -113,6 +117,8 @@ export default class Property<T = any>
             outLinks[i].push();
         }
 
+        this.emitAny("value", value);
+
         if (this.props) {
             this.props.linkable.changed = true;
             this.props.emitAny("value", this);
@@ -125,6 +131,8 @@ export default class Property<T = any>
         for (let i = 0, n = outLinks.length; i < n; ++i) {
             outLinks[i].push();
         }
+
+        this.emitAny("value", this.value);
 
         if (this.props) {
             this.props.linkable.changed = true;
@@ -140,6 +148,8 @@ export default class Property<T = any>
         for (let i = 0, n = outLinks.length; i < n; ++i) {
             outLinks[i].push();
         }
+
+        this.emitAny("value", this.value);
     }
 
     linkTo(destination: Property, sourceIndex?: number, destinationIndex?: number)

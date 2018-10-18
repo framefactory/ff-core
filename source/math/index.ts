@@ -21,12 +21,6 @@ const math = {
         return v < min ? min : (v > max ? max : v);
     },
 
-    select: function(arr: any[], index: number) {
-        const n = arr.length;
-        const i = Math.trunc(index);
-        return arr[i < 0 ? 0 : (i > n ? n : i)];
-    },
-    
     normalize: (v, min, max) => (v - min) / (max - min),
 
     normalizeLimit: (v, min, max) => {

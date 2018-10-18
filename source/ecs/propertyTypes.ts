@@ -5,7 +5,8 @@
  * License: MIT
  */
 
-import { TypeOf } from "../types";
+import { enumToArray, TypeOf, PropOf } from "../types";
+
 import Property, { IPropertySchema, PresetOrSchema } from "./Property";
 import PropertyObject from "./PropertyObject";
 
@@ -27,6 +28,36 @@ export namespace Schemas
 }
 
 export default {
+    getOptionIndex: function(arr: any[], index: number): number {
+        const n = arr.length;
+        const i = Math.trunc(index);
+        return i < 0 ? 0 : (i > n ? 0 : i);
+    },
+
+    getOptionValue: function<T>(arr: T[], index: number): T {
+        const n = arr.length;
+        const i = Math.trunc(index);
+        return arr[i < 0 ? 0 : (i > n ? 0 : i)];
+    },
+
+    getEnumEntry: function<T>(e: T, index: any): PropOf<T> {
+        const i = Math.trunc(index);
+        return (e[i] ? i : 0) as any as PropOf<T>;
+    },
+
+    getEnumName: function<T>(e: T, index: any): string {
+        const i = Math.trunc(index);
+        return e[i] || e[0];
+    },
+
+    isEnumEntry: function<T>(enumeration: number, index: number): boolean {
+        return enumeration === Math.trunc(index);
+    },
+
+    toInt: function(v: any) {
+        return Math.trunc(v);
+    },
+
     Property: <T>(path: string, presetOrSchema: PresetOrSchema<T>, preset?: T) =>
         new Property<T>(path, presetOrSchema, preset),
 
@@ -39,7 +70,10 @@ export default {
     String: (path: string, presetOrSchema?: PresetOrSchema<string>, preset?: string) =>
         new Property<string>(path, presetOrSchema || "", preset),
 
-    Enum: (path: string, options: string[], preset?: number) =>
+    Enum: <T>(path: string, enumeration: T, preset?: number) =>
+        new Property<PropOf<T>>(path, { options: enumToArray(enumeration), preset: (preset || 0) as any as PropOf<T> }),
+
+    Option: (path: string, options: string[], preset?: number) =>
         new Property<number>(path, { options, preset: preset || 0 }),
 
     Object: <T>(path: string, type?: TypeOf<PropertyObject<T>>) =>

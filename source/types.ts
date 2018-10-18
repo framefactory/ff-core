@@ -16,6 +16,8 @@ export interface TypeOf<T> extends Function {
     new (...args: any[]): T;
 }
 
+export type PropOf<T> = T extends {} ? T[keyof T] : never;
+
 export type ReturnType<T extends Function> =
     T extends (...args: any[]) => infer returnType ? returnType : never
 
@@ -38,6 +40,10 @@ export type Readonly<T> = { readonly [P in keyof T]: T[P]; };
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 export type Subtract<T, U> = Pick<T, Exclude<keyof T, keyof U>>
+
+export type Record<K extends keyof any, T> = { [P in K]: T; };
+
+export type Enum<E> = Record<keyof E, number | string> & { [k: number]: string };
 
 ////////////////////////////////////////////////////////////////////////////////
 // ENUM HELPER FUNCTIONS

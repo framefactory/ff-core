@@ -61,6 +61,9 @@ export default {
     Property: <T>(path: string, presetOrSchema: PresetOrSchema<T>, preset?: T) =>
         new Property<T>(path, presetOrSchema, preset),
 
+    Event: (path: string) =>
+        new Property<number>(path, { event: true, preset: 0 }),
+
     Number: (path: string, presetOrSchema?: PresetOrSchema<number>, preset?: number) =>
         new Property<number>(path, presetOrSchema || 0, preset),
 

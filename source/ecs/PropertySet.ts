@@ -58,7 +58,7 @@ export default class Properties extends Publisher<Properties>
     constructor(linkable: ILinkable, props?: Dictionary<Property>)
     {
         super();
-        this.addEvents("change", "value");
+        this.addEvents("change");
 
         this.linkable = linkable;
         this.properties = [];
@@ -143,6 +143,14 @@ export default class Properties extends Publisher<Properties>
         Object.keys(values).forEach(
             key => this[key].setValue(values[key])
         );
+    }
+
+    setAll()
+    {
+        const props = this.properties;
+        for (let i = 0, n = props.length; i < n; ++i) {
+            props[i].set();
+        }
     }
 
     pushAll()

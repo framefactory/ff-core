@@ -28,6 +28,7 @@ export interface IPropertySchema<T = any>
     labels?: string[];
     objectType?: TypeOf<T>;
     multi?: boolean;
+    event?: boolean;
     semantic?: string;
 }
 
@@ -92,14 +93,14 @@ export default class Property<T = any> extends Publisher<Property<T>>
         this.props = null;
         this.key = null;
 
-        this.value = null;
-        this.changed = true;
-
         this.path = path;
         this.preset = preset;
         this.elements = isArray ? (preset as any).length : 1;
         this.type = typeof (isArray ? preset[0] : preset) as PropertyType;
         this.schema = schema;
+
+        this.value = null;
+        this.changed = !schema.event;
 
         this.inLinks = [];
         this.outLinks = [];
@@ -121,12 +122,13 @@ export default class Property<T = any> extends Publisher<Property<T>>
 
         if (this.props) {
             this.props.linkable.changed = true;
-            this.props.emitAny("value", this);
         }
     }
 
     set()
     {
+        this.changed = true;
+
         const outLinks = this.outLinks;
         for (let i = 0, n = outLinks.length; i < n; ++i) {
             outLinks[i].push();
@@ -136,8 +138,20 @@ export default class Property<T = any> extends Publisher<Property<T>>
 
         if (this.props) {
             this.props.linkable.changed = true;
-            this.props.emitAny("value", this);
         }
+    }
+
+    pushValue(value: T)
+    {
+        this.value = value;
+        this.changed = true;
+
+        const outLinks = this.outLinks;
+        for (let i = 0, n = outLinks.length; i < n; ++i) {
+            outLinks[i].push();
+        }
+
+        this.emitAny("value", this.value);
     }
 
     push()

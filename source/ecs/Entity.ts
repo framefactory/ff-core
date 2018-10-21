@@ -230,7 +230,7 @@ export default class Entity extends Publisher<Entity>
 
         // remove component base types
         let baseType = Object.getPrototypeOf(component);
-        while((baseType = Object.getPrototypeOf(baseType)).typeId !== Component.type) {
+        while((baseType = Object.getPrototypeOf(baseType)).type !== Component.type) {
             this.removeBaseComponent(component, baseType);
         }
 
@@ -380,6 +380,10 @@ export default class Entity extends Publisher<Entity>
     protected removeBaseComponent(component: Component, baseType: ComponentOrType)
     {
         const components = this._componentsByType[getType(baseType)];
+        if (!components) {
+            throw new Error(`can't remove unregistered base: '${getType(baseType)}' of component: '${getType(component)}'`)
+        }
+
         const index = components.indexOf(component);
         components.splice(index, 1);
 

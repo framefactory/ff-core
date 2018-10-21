@@ -151,7 +151,7 @@ export default class Hierarchy extends Component
         component._parent = null;
 
         component.emit<IHierarchyChangeEvent>("change", { what: "remove-parent", component: this });
-        this.emit<IHierarchyChangeEvent>("changed", { what: "remove-child", component });
+        this.emit<IHierarchyChangeEvent>("change", { what: "remove-child", component });
     }
 
     /**

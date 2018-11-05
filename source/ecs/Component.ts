@@ -16,7 +16,7 @@ import Property, { ISerializedProperty } from "./Property";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export { Entity };
+export { Entity, IPublisherEvent };
 
 /**
  * Base class for custom component events.

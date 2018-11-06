@@ -30,6 +30,14 @@ const math = {
 
     denormalize: (t, min, max) => (min + t) * (max - min),
 
+    scale: (v, minIn, maxIn, minOut, maxOut) =>
+        minOut + (v - minIn) / (maxIn - minIn) * (maxOut - minOut),
+
+    scaleLimit: (v, minIn, maxIn, minOut, maxOut) => {
+        v = v < minIn ? minIn : (v > maxIn ? maxIn : v);
+        return minOut + (v - minIn) / (maxIn - minIn) * (maxOut - minOut);
+    },
+
     deg2rad: function(degrees) {
         return degrees * 0.01745329251994329576923690768489;
     },

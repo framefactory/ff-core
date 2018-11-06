@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import { Dictionary, Readonly, TypeOf } from "../types";
+import { Readonly } from "../types";
 import uniqueId from "../uniqueId";
 import Publisher, { IPublisherEvent } from "../Publisher";
 

@@ -109,8 +109,8 @@ export default class Hierarchy extends Component
             this._parent.removeChild(this);
         }
 
-        // detach children
-        this._children.slice().forEach(child => this.removeChild(child));
+        // dispose of children
+        this._children.slice().forEach(child => child.entity.dispose());
 
         super.dispose();
     }

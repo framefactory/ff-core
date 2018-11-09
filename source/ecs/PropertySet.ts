@@ -34,9 +34,9 @@ export interface ILinkable
  * Emitted by [[Properties]] after changes in the properties configuration.
  * @event
  */
-export interface IPropertiesChangeEvent extends IPublisherEvent<Properties>
+export interface IPropertySetChangeEvent extends IPublisherEvent<Properties>
 {
-    what: "add" | "remove";
+    what: "add" | "remove" | "update";
     property: Property;
 }
 
@@ -45,8 +45,7 @@ export interface IPropertiesChangeEvent extends IPublisherEvent<Properties>
  * To make use of linkable properties, classes must implement the [[ILinkable]] interface.
  *
  * ### Events
- * - *"change"* - emits [[IPropertiesChangeEvent]] after the properties' state has changed.
- * - *"value"* - emits [[Property]] after the value of a property has changed.
+ * - *"change"* - emits [[IPropertiesChangeEvent]] after properties have been added, removed, or renamed.
  */
 export default class Properties extends Publisher<Properties>
 {
@@ -93,6 +92,8 @@ export default class Properties extends Publisher<Properties>
         this.properties.push(property);
         this._propsByPath[property.path] = property;
 
+        this.emit<IPropertySetChangeEvent>("change", { what: "add", property });
+
         return this;
     }
 
@@ -110,6 +111,8 @@ export default class Properties extends Publisher<Properties>
         props.slice(index, 1);
 
         delete this._propsByPath[property.path];
+
+        this.emit<IPropertySetChangeEvent>("change", { what: "remove", property });
     }
 
     getProperty(path: string): { property: Property, index?: number }

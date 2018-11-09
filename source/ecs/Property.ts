@@ -24,6 +24,9 @@ export interface IPropertySchema<T = any>
     min?: number;
     max?: number;
     step?: number;
+    precision?: number;
+    bar?: boolean;
+    percent?: boolean;
     options?: string[];
     labels?: string[];
     objectType?: TypeOf<T>;
@@ -113,15 +116,15 @@ export default class Property<T = any> extends Publisher<Property<T>>
         this.value = value;
         this.changed = true;
 
-        const outLinks = this.outLinks;
-        for (let i = 0, n = outLinks.length; i < n; ++i) {
-            outLinks[i].push();
+        if (this.props) {
+            this.props.linkable.changed = true;
         }
 
         this.emitAny("value", value);
 
-        if (this.props) {
-            this.props.linkable.changed = true;
+        const outLinks = this.outLinks;
+        for (let i = 0, n = outLinks.length; i < n; ++i) {
+            outLinks[i].push();
         }
     }
 
@@ -129,15 +132,15 @@ export default class Property<T = any> extends Publisher<Property<T>>
     {
         this.changed = true;
 
-        const outLinks = this.outLinks;
-        for (let i = 0, n = outLinks.length; i < n; ++i) {
-            outLinks[i].push();
+        if (this.props) {
+            this.props.linkable.changed = true;
         }
 
         this.emitAny("value", this.value);
 
-        if (this.props) {
-            this.props.linkable.changed = true;
+        const outLinks = this.outLinks;
+        for (let i = 0, n = outLinks.length; i < n; ++i) {
+            outLinks[i].push();
         }
     }
 
@@ -146,24 +149,24 @@ export default class Property<T = any> extends Publisher<Property<T>>
         this.value = value;
         this.changed = true;
 
+        this.emitAny("value", this.value);
+
         const outLinks = this.outLinks;
         for (let i = 0, n = outLinks.length; i < n; ++i) {
             outLinks[i].push();
         }
-
-        this.emitAny("value", this.value);
     }
 
     push()
     {
         this.changed = true;
 
+        this.emitAny("value", this.value);
+
         const outLinks = this.outLinks;
         for (let i = 0, n = outLinks.length; i < n; ++i) {
             outLinks[i].push();
         }
-
-        this.emitAny("value", this.value);
     }
 
     linkTo(destination: Property, sourceIndex?: number, destinationIndex?: number)

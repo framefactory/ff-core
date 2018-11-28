@@ -6,9 +6,9 @@
  */
 
 import Publisher from "../Publisher";
-import { Readonly, TypeOf } from "../types";
+import { Dictionary, Readonly, TypeOf } from "../types";
 import { ValueType, canConvert } from "./convert";
-import PropertySet from "./PropertySet";
+import PropertySet, { ILinkable } from "./PropertySet";
 import PropertyLink from "./PropertyLink";
 import PropertyObject from "./PropertyObject";
 
@@ -61,6 +61,7 @@ export default class Property<T = any> extends Publisher<Property<T>>
     readonly elements: number;
     readonly type: PropertyType;
     readonly schema: Readonly<IPropertySchema<T>>;
+    readonly user: boolean;
 
     readonly inLinks: PropertyLink[];
     readonly outLinks: PropertyLink[];
@@ -73,8 +74,9 @@ export default class Property<T = any> extends Publisher<Property<T>>
      * the constructor of a class derived from PropertyObject, defining the type of objects that
      * can be assigned to this property.
      * @param {T} preset Optional, if given, replaces the preset value given in the schema.
+     * @param {boolean} user Marks the property as user-defined if set to true.
      */
-    constructor(path: string, presetOrSchema: PresetOrSchema<T>, preset?: T)
+    constructor(path: string, presetOrSchema: PresetOrSchema<T>, preset?: T, user?: boolean)
     {
         super();
         this.addEvent("value");
@@ -101,6 +103,7 @@ export default class Property<T = any> extends Publisher<Property<T>>
         this.elements = isArray ? (preset as any).length : 1;
         this.type = typeof (isArray ? preset[0] : preset) as PropertyType;
         this.schema = schema;
+        this.user = user || false;
 
         this.value = null;
         this.changed = !schema.event;
@@ -402,21 +405,51 @@ export default class Property<T = any> extends Publisher<Property<T>>
         return this.outLinks.length;
     }
 
-    toJSON()
+    deflate()
     {
-        const json: any = {
-            key: this.key
-        };
+        let json: any = this.user ? {
+            path: this.path,
+            schema: this.cloneSchemaWithoutPreset(),
+            preset: this.preset
+        } : null;
 
-        if (!this.hasInLinks() && !this.isDefault()) {
+        if (!this.hasInLinks() && !this.isDefault() && this.type !== "object") {
+            json = json || {};
             json.value = this.value;
         }
 
-        if (this.hasOutLinks()) {
-            json.links = this.outLinks.map(link => ({
-                component: link.destination.props.linkable.id,
-                key: link.destination.key
-            }));
+        if (this.outLinks.length > 0) {
+            json = json || {};
+            json.links = this.outLinks.map(link => {
+                const jsonLink: any = {
+                    id: link.destination.props.linkable.id,
+                    key: link.destination.key
+                };
+                if (link.sourceIndex >= 0) {
+                    jsonLink.si = link.sourceIndex;
+                }
+                if (link.destinationIndex >= 0) {
+                    jsonLink.di = link.destinationIndex;
+                }
+                return jsonLink;
+            });
+        }
+
+        return json;
+    }
+
+    inflate(json: any, linkableDict: Dictionary<ILinkable>)
+    {
+        if (json.value !== undefined) {
+            this.value = json.value;
+        }
+
+        if (json.links !== undefined) {
+            json.links.forEach(link => {
+                const target = linkableDict[link.id];
+                const property = target.ins[link.key];
+                property.linkFrom(this, link.si, link.di);
+            });
         }
     }
 
@@ -435,5 +468,12 @@ export default class Property<T = any> extends Publisher<Property<T>>
     {
         const preset = this.preset;
         return Array.isArray(preset) ? preset.slice() as any : preset;
+    }
+
+    protected cloneSchemaWithoutPreset()
+    {
+        const clone = Object.assign({}, this.schema) as IPropertySchema;
+        delete clone.preset;
+        return clone;
     }
 }

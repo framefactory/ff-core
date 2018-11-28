@@ -422,6 +422,34 @@ export default class System extends Publisher<System>
         ) as T;
     }
 
+    deflate()
+    {
+        const json: any = {};
+
+        if (this._entityList.length > 0) {
+            json.entities = this._entityList.map(entity => entity.deflate());
+        }
+
+        return json;
+    }
+
+    inflate(json)
+    {
+        if (json.entities) {
+            const linkableDict = {};
+
+            json.entities.forEach(jsonEntity => {
+                const entity = this.doCreateEntity(jsonEntity.id);
+                entity.init(this);
+                entity.inflate(json, linkableDict);
+            });
+            json.entities.forEach(jsonEntity => {
+                const entity = this.getEntityById(jsonEntity.id);
+                entity.inflateLinks(jsonEntity, linkableDict);
+            })
+        }
+    }
+
     toString(verbose: boolean = false)
     {
         const entities = this._entityList;
@@ -440,9 +468,9 @@ export default class System extends Publisher<System>
      * Override to create a custom entity type derived from [[Entity]].
      * @returns {Entity}
      */
-    protected doCreateEntity(): Entity
+    protected doCreateEntity(id?: string): Entity
     {
-        return new Entity();
+        return new Entity(id);
     }
 
     /**

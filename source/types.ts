@@ -12,6 +12,10 @@ export type Index = number;
 
 export type Identifier = string;
 
+export type Constructor<T> = {
+    new (...args: any[]): T;
+}
+
 export interface TypeOf<T> extends Function {
     new (...args: any[]): T;
 }

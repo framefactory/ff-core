@@ -5,12 +5,13 @@
  * License: MIT
  */
 
-import { Readonly } from "../types";
+import { Dictionary, Readonly } from "../types";
 import uniqueId from "../uniqueId";
 import Publisher, { IPublisherEvent } from "../Publisher";
 
 import Component, { ComponentOrType, getType } from "./Component";
 import System from "./System";
+import { ILinkable } from "./PropertySet";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -344,6 +345,48 @@ export default class Entity extends Publisher<Entity>
         return {
             id: this.id,
             name: this._name
+        }
+    }
+
+    deflate()
+    {
+        const json: any = {
+            id: this.id
+        };
+
+        if (this.name) {
+            json.name = this.name;
+        }
+
+        if (this._componentList.length > 0) {
+            json.components = this._componentList.map(component => component.deflate());
+        }
+
+        return json;
+    }
+
+    inflate(json, linkableDict: Dictionary<ILinkable>)
+    {
+        if (json.name) {
+            this.name = json.name;
+        }
+
+        if (json.components) {
+            json.components.forEach(jsonComp => {
+                const component = this.system.registry.createComponent(jsonComp.type, this, jsonComp.id);
+                component.inflate(jsonComp);
+                linkableDict[jsonComp.id] = component;
+            });
+        }
+    }
+
+    inflateLinks(json, linkableDict: Dictionary<ILinkable>)
+    {
+        if (json.components) {
+            json.components.forEach(jsonComp => {
+                const component = this.getComponentById(jsonComp.id);
+                component.inflateLinks(jsonComp, linkableDict);
+            });
         }
     }
 

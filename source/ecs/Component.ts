@@ -232,24 +232,14 @@ export default class Component extends Publisher<Component> implements ILinkable
         this.entity.removeComponent(this);
     }
 
-    inflate()
-    {
-
-    }
-
-    deflate()
-    {
-
-    }
-
     in(path: string)
     {
-        return this.ins.getProperty(path).property;
+        return this.ins.getProperty(path);
     }
 
     out(path: string)
     {
-        return this.outs.getProperty(path).property;
+        return this.outs.getProperty(path);
     }
 
     setValue(path: string, value: any)
@@ -451,21 +441,69 @@ export default class Component extends Publisher<Component> implements ILinkable
     }
 
     /**
+     * Use "this.ins.append" instead.
+     * @deprecated
+     * @param {T} props
+     * @returns {PropertySet & T}
+     */
+    protected makeProps<T extends Dictionary<Property>>(props: T): PropertySet & T
+    {
+        const set = new PropertySet(this);
+        set.append(props);
+        return set as PropertySet & T;
+    }
+
+    deflate()
+    {
+        const json: any = {
+            type: this.type,
+            id: this.id
+        };
+
+        if (this.name) {
+            json.name = this.name;
+        }
+        const jsonIns = this.ins.deflate();
+        if (jsonIns) {
+            json.ins = jsonIns;
+        }
+        const jsonOuts = this.outs.deflate();
+        if (jsonOuts) {
+            json.outs = jsonOuts;
+        }
+
+        return json;
+    }
+
+    inflate(json: any)
+    {
+        if (json.name) {
+            this.name = json.name;
+        }
+        if (json.ins) {
+            this.ins.inflate(json.ins);
+        }
+        if (json.outs) {
+            this.outs.inflate(json.outs);
+        }
+    }
+
+    inflateLinks(json: any, linkableDict: Dictionary<ILinkable>)
+    {
+        if (json.ins) {
+            this.ins.inflateLinks(json, linkableDict);
+        }
+        if (json.outs) {
+            this.outs.inflateLinks(json, linkableDict);
+        }
+    }
+
+    /**
      * Returns a text representation of this object.
      * @returns {string}
      */
     toString()
     {
         return `${this.type}${this.name ? " (" + this.name + ")" : ""}`;
-    }
-
-    protected makeProps<T extends Dictionary<Property>>(props: T): PropertySet & T
-    {
-        return new PropertySet(this, props) as PropertySet & T;
-    }
-
-    protected mergeProps<T extends Dictionary<Property>, U extends Dictionary<Property>>(propsA: PropertySet & T, propsB: U): PropertySet & T & U
-    {
-        return propsA.merge(propsB) as PropertySet & T & U
     }
 }

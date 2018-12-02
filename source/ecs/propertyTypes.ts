@@ -14,18 +14,21 @@ import PropertyObject from "./PropertyObject";
 
 type Vector<T = number> = T[];
 type Matrix<T = number> = T[];
-//type Vector2<T = number> = [T, T];
-//type Vector3<T = number> = [T, T, T];
-//type Vector4<T = number> = [T, T, T, T];
-//type Matrix3<T = number> = [T, T, T, T, T, T, T, T, T];
-//type Matrix4<T = number> = [T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T];
 
-export namespace Schemas
-{
-    export const Integer: IPropertySchema<number> = { preset: 0, step: 1 };
-    export const ColorRGB: IPropertySchema<Vector> = { preset: [1, 1, 1], semantic: "color" };
-    export const ColorRGBA: IPropertySchema<Vector> = { preset: [1, 1, 1, 1], semantic: "color" };
-}
+export const schemas = {
+    vector2: { preset: [0, 0] },
+    vector2_ones: { preset: [1, 1] },
+    vector3: { preset: [0, 0, 0] },
+    vector3_ones: { preset: [1, 1, 1] },
+    vector4: { preset: [0, 0, 0, 0] },
+    vector4_ones: { preset: [1, 1, 1, 1] },
+    matrix2: { preset: [1, 0, 0, 1] },
+    matrix3: { preset: [1, 0, 0, 0, 1, 0, 0, 0, 1] },
+    matrix4: { preset: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    integer: { preset: 0, step: 1 } as IPropertySchema<number>,
+    colorRGB: { preset: [1, 1, 1], semantic: "color" } as IPropertySchema<Vector>,
+    colorRGBA: { preset: [1, 1, 1, 1], semantic: "color" } as IPropertySchema<Vector>
+};
 
 export default {
     getOptionIndex: function(arr: any[], index: number): number {
@@ -83,23 +86,29 @@ export default {
         new Property<PropertyObject<T>>(path, type || null),
 
     Vector2: (path: string, presetOrSchema?: PresetOrSchema<Vector>, preset?: Vector) =>
-        new Property<Vector>(path, presetOrSchema || [0, 0], preset),
+        new Property<Vector>(path, presetOrSchema || schemas.vector2, preset),
+
+    Vector2_Ones: (path: string, presetOrSchema?: PresetOrSchema<Vector>, preset?: Vector) =>
+        new Property<Vector>(path, presetOrSchema || schemas.vector2_ones, preset),
 
     Vector3: (path: string, presetOrSchema?: PresetOrSchema<Vector>, preset?: Vector) =>
-        new Property<Vector>(path, presetOrSchema || [0, 0, 0], preset),
+        new Property<Vector>(path, presetOrSchema || schemas.vector3, preset),
+
+    Vector3_Ones: (path: string, presetOrSchema?: PresetOrSchema<Vector>, preset?: Vector) =>
+        new Property<Vector>(path, presetOrSchema || schemas.vector3_ones, preset),
 
     Vector4: (path: string, presetOrSchema?: PresetOrSchema<Vector>, preset?: Vector) =>
-        new Property<Vector>(path, presetOrSchema || [0, 0, 0, 0], preset),
+        new Property<Vector>(path, presetOrSchema || schemas.vector4, preset),
 
     Matrix3: (path: string) =>
-        new Property<Matrix>(path, [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ]),
+        new Property<Matrix>(path, schemas.matrix3),
 
     Matrix4: (path: string) =>
-        new Property<Matrix>(path, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ]),
+        new Property<Matrix>(path, schemas.matrix4),
 
     ColorRGB: (path: string, preset?: Vector) =>
-        new Property<Vector>(path, Schemas.ColorRGB, preset),
+        new Property<Vector>(path, schemas.colorRGB, preset),
 
     ColorRGBA: (path: string, preset?: Vector) =>
-        new Property<Vector>(path, Schemas.ColorRGBA, preset),
+        new Property<Vector>(path, schemas.colorRGBA, preset),
 };

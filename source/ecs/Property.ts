@@ -58,7 +58,7 @@ export default class Property<T = any> extends Publisher<Property<T>>
 
     readonly path: string;
     readonly preset: T;
-    readonly elements: number;
+    readonly elementCount: number;
     readonly type: PropertyType;
     readonly schema: Readonly<IPropertySchema<T>>;
     readonly user: boolean;
@@ -100,7 +100,7 @@ export default class Property<T = any> extends Publisher<Property<T>>
 
         this.path = path;
         this.preset = preset;
-        this.elements = isArray ? (preset as any).length : 1;
+        this.elementCount = isArray ? (preset as any).length : 1;
         this.type = typeof (isArray ? preset[0] : preset) as PropertyType;
         this.schema = schema;
         this.user = user || false;
@@ -281,20 +281,20 @@ export default class Property<T = any> extends Publisher<Property<T>>
         const validSrcIndex = sourceIndex >= 0;
         const validDstIndex = destinationIndex >= 0;
 
-        if (source.elements === 1 && validSrcIndex) {
+        if (source.elementCount === 1 && validSrcIndex) {
             throw new Error("non-array source property; can't link to element");
         }
-        if (this.elements === 1 && validDstIndex) {
+        if (this.elementCount === 1 && validDstIndex) {
             throw new Error("non-array destination property; can't link to element");
         }
 
-        const srcIsArray = source.elements > 1 && !validSrcIndex;
-        const dstIsArray = this.elements > 1 && !validDstIndex;
+        const srcIsArray = source.elementCount > 1 && !validSrcIndex;
+        const dstIsArray = this.elementCount > 1 && !validDstIndex;
 
         if (srcIsArray !== dstIsArray) {
             return false;
         }
-        if (srcIsArray && source.elements !== this.elements) {
+        if (srcIsArray && source.elementCount !== this.elementCount) {
             return false;
         }
 

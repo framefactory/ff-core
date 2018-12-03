@@ -147,6 +147,17 @@ export default class PropertySet extends Publisher<PropertySet>
     }
 
     /**
+     * Sets the values of multiple properties.
+     * @param values Dictionary of property key/value pairs.
+     */
+    setValues(values: Dictionary<any>)
+    {
+        Object.keys(values).forEach(
+            key => this[key].setValue(values[key])
+        );
+    }
+
+    /**
      * Sets the value of a property by path.
      * @param {string} path The path of the property whose value should be set.
      * @param value

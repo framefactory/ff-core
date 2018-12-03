@@ -25,10 +25,10 @@ export default class PropertyLink
 
     constructor(source: Property, destination: Property, sourceIndex?: number, destinationIndex?: number)
     {
-        if (source.elements === 1 && sourceIndex >= 0) {
+        if (source.elementCount === 1 && sourceIndex >= 0) {
             throw new Error("non-array source property; can't link to element");
         }
-        if (destination.elements === 1 && destinationIndex >= 0) {
+        if (destination.elementCount === 1 && destinationIndex >= 0) {
             throw new Error("non-array destination property; can't link to element");
         }
 
@@ -40,7 +40,7 @@ export default class PropertyLink
 
         const srcIndex = sourceIndex === undefined ? -1 : sourceIndex;
         const dstIndex = destinationIndex === undefined ? -1 : destinationIndex;
-        const isArray = source.elements > 1 && srcIndex < 0 && dstIndex < 0;
+        const isArray = source.elementCount > 1 && srcIndex < 0 && dstIndex < 0;
 
         this.fnConvert = getConversionFunction(source.type, destination.type, isArray);
         const fnElementCopy = getElementCopyFunction(srcIndex, dstIndex, this.fnConvert);

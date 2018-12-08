@@ -11,22 +11,20 @@ import Pulse from "./Pulse";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export interface IPerformerRenderEvent extends IPublisherEvent<Performer>
+export interface IHeartbeatPulseEvent extends IPublisherEvent<Heartbeat>
 {
-    system: System;
-    pulse: Pulse;
     dirty: boolean;
 }
 
-export default class Performer extends Publisher<Performer>
+export default class Heartbeat extends Publisher<Heartbeat>
 {
-    system: System;
+    readonly system: System;
+    readonly pulse: Pulse;
 
-    protected pulse: Pulse;
     protected animHandler: number;
-    protected renderEvent: IPerformerRenderEvent;
+    protected event: IHeartbeatPulseEvent;
 
-    constructor(system?: System)
+    constructor(system: System)
     {
         super();
         this.addEvent("render");
@@ -35,8 +33,9 @@ export default class Performer extends Publisher<Performer>
 
         this.system = system;
         this.pulse = new Pulse();
+
         this.animHandler = 0;
-        this.renderEvent = { system, pulse: this.pulse, sender: this, dirty: true };
+        this.event = { sender: this, dirty: true };
     }
 
     start()
@@ -59,11 +58,9 @@ export default class Performer extends Publisher<Performer>
     protected advance()
     {
         this.pulse.advance();
+        this.system.advance(this.pulse);
 
-        this.system.update(this.pulse);
-        this.system.tick(this.pulse);
-
-        this.emit("render", this.renderEvent);
+        this.emit("pulse", this.event);
     }
 
     protected onAnimationFrame()

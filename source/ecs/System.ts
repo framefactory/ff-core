@@ -71,7 +71,13 @@ export default class System extends Publisher<System>
         this._sorter = new LinkableSorter();
     }
 
-    update(context: ISystemContext)
+    advance(context: ISystemContext)
+    {
+        this.update(context);
+        this.tick(context);
+    }
+
+    protected update(context: ISystemContext)
     {
         // call update on components in topological sort order
         const components = this._componentList;
@@ -89,7 +95,7 @@ export default class System extends Publisher<System>
         this._updateWaitList.length = 0;
     }
 
-    tick(context: ISystemContext)
+    protected tick(context: ISystemContext)
     {
         const components = this._componentList;
 

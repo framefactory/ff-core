@@ -147,13 +147,28 @@ export default class PropertySet extends Publisher<PropertySet>
     }
 
     /**
-     * Sets the values of multiple properties.
+     * Returns a property by key.
+     * @param {string} key The key of the property to be returned.
+     * @returns {Property}
+     */
+    getPropertyByKey(key: string)
+    {
+        const property = this[key];
+        if (!property) {
+            throw new Error(`no property found with key '${key}'`);
+        }
+
+        return property;
+    }
+
+    /**
+     * Sets the values of multiple properties. Properties are identified by key.
      * @param values Dictionary of property key/value pairs.
      */
-    setValues(values: Dictionary<any>)
+    setValuesByKey(values: Dictionary<any>)
     {
         Object.keys(values).forEach(
-            key => this[key].setValue(values[key])
+            key => this.getPropertyByKey(key).setValue(values[key])
         );
     }
 

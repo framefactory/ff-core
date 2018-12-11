@@ -18,6 +18,8 @@ export interface IHeartbeatPulseEvent extends IPublisherEvent<Heartbeat>
 
 export default class Heartbeat extends Publisher<Heartbeat>
 {
+    static readonly pulseEvent = "pulse";
+
     readonly system: System;
     readonly pulse: Pulse;
 
@@ -27,7 +29,7 @@ export default class Heartbeat extends Publisher<Heartbeat>
     constructor(system: System)
     {
         super();
-        this.addEvent("render");
+        this.addEvent(Heartbeat.pulseEvent);
 
         this.onAnimationFrame = this.onAnimationFrame.bind(this);
 
@@ -60,7 +62,7 @@ export default class Heartbeat extends Publisher<Heartbeat>
         this.pulse.advance();
         this.system.advance(this.pulse);
 
-        this.emit("pulse", this.event);
+        this.emit(Heartbeat.pulseEvent, this.event);
     }
 
     protected onAnimationFrame()

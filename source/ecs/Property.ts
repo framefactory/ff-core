@@ -5,8 +5,9 @@
  * License: MIT
  */
 
-import Publisher from "../Publisher";
 import { Dictionary, Readonly, TypeOf } from "../types";
+import Publisher from "../Publisher";
+
 import { ValueType, canConvert } from "./convert";
 import PropertySet, { ILinkable } from "./PropertySet";
 import PropertyLink from "./PropertyLink";
@@ -35,21 +36,13 @@ export interface IPropertySchema<T = any>
     semantic?: string;
 }
 
-export interface ISerializedProperty
-{
-    path?: string;
-    key?: string;
-    schema?: IPropertySchema;
-    inLinks?: string[];
-    outLinks?: string[];
-    value?: any;
-}
-
 /**
  * Linkable property.
  */
 export default class Property<T = any> extends Publisher<Property<T>>
 {
+    static readonly valueEvent = "value";
+
     props: PropertySet;
     key: string;
 
@@ -79,7 +72,7 @@ export default class Property<T = any> extends Publisher<Property<T>>
     constructor(path: string, presetOrSchema: PresetOrSchema<T>, preset?: T, user?: boolean)
     {
         super();
-        this.addEvent("value");
+        this.addEvent(Property.valueEvent);
 
         let schema: IPropertySchema;
 

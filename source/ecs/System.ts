@@ -5,18 +5,18 @@
  * License: MIT
  */
 
-import { Readonly } from "../types";
 import Publisher, { IPublisherEvent } from "../Publisher";
-import Component, { ComponentOrType, getType, Entity } from "./Component";
+
+import Component, { ComponentOrType, getType } from "./Component";
+import ComponentSet, { IComponentTypeEvent } from "./ComponentSet";
+import Entity from "./Entity";
+import EntitySet from "./EntitySet";
+import Module from "./Module";
 import Registry from "./Registry";
-import LinkableSorter from "./LinkableSorter";
-import Hierarchy from "./Hierarchy";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const _EMPTY_ARRAY = [];
-
-export { Entity, Component };
+export { IComponentTypeEvent };
 
 export interface ISystemEntityEvent extends IPublisherEvent<System>
 {
@@ -33,75 +33,74 @@ export interface ISystemComponentEvent<T extends Component = Component>
     component: T;
 }
 
-export interface ISystemContext
+export interface IUpdateContext
+{
+}
+
+export interface IRenderContext
 {
 }
 
 export default class System extends Publisher<System>
 {
+    static readonly entityEvent = "entity";
+    static readonly componentEvent = "component";
+
     readonly registry: Registry;
-
-    private _entitiesById: { [id: string]: Entity };
-    private _entityList: Entity[];
-
-    private _componentsByType: { [type: string]: Component[] };
-    private _componentsById: { [id: string]: Component };
-    private _componentList: Component[];
+    readonly entities: EntitySet;
+    readonly components: ComponentSet;
+    readonly module: Module;
 
     private _updateWaitList: any[];
 
-    private _sorter: LinkableSorter;
 
     constructor(registry?: Registry)
     {
-        super({ knownEvents: false });
-        this.addEvents("entity", "component");
+        super();
+        this.addEvents(System.entityEvent, System.componentEvent);
 
         this.registry = registry || new Registry();
-
-        this._entitiesById = {};
-        this._entityList = [];
-
-        this._componentsByType = {};
-        this._componentsById = {};
-        this._componentList = [];
+        this.entities = new EntitySet();
+        this.components = new ComponentSet();
+        this.module = new Module(this);
 
         this._updateWaitList = [];
-
-        this._sorter = new LinkableSorter();
     }
 
-    advance(context: ISystemContext)
+    /**
+     * Calls update() on all components in the system whose changed flag is set.
+     * @param context
+     * @returns true if the state of at least one component has changed.
+     */
+    update(context: IUpdateContext): boolean
     {
-        this.update(context);
-        this.tick(context);
-    }
+        const dirty = this.module.update(context);
 
-    protected update(context: ISystemContext)
-    {
-        // call update on components in topological sort order
-        const components = this._componentList;
-
-        for (let i = 0, n = components.length; i < n; ++i) {
-            const component = components[i];
-            if (component.changed) {
-                component.update(context);
-                component.resetChanged();
-            }
-        }
-
-        // call pending callbacks on update waitlist
+        // call pending callbacks on update wait list
         this._updateWaitList.forEach(resolve => resolve());
         this._updateWaitList.length = 0;
+
+        return dirty;
     }
 
-    protected tick(context: ISystemContext)
+    /**
+     * Calls tick() on all components in the system.
+     * @param context
+     * @returns true if the state of at least one component has changed.
+     */
+    tick(context: IUpdateContext): boolean
     {
-        const components = this._componentList;
+        return this.module.tick(context);
+    }
 
-        for (let i = 0, n = components.length; i < n; ++i) {
-            components[i].tick(context);
-        }
+    preRender(context: IRenderContext)
+    {
+        this.module.preRender(context);
+    }
+
+    postRender(context: IRenderContext)
+    {
+        this.module.postRender(context);
     }
 
     waitForUpdate(): Promise<void>
@@ -111,355 +110,44 @@ export default class System extends Publisher<System>
         });
     }
 
-    sort()
-    {
-        // perform topological sort
-        this._componentList = this._sorter.sort(this._componentList) as Component[];
-    }
-
     /**
      * Adds a listener for component add/remove events for a specific component type.
-     * @param {ComponentOrType<T>} componentOrType
-     * @param {(event: IManagerComponentEvent<T extends Component>) => void} callback
-     * @param context
+     * @param componentOrType The component type as example object, constructor function or string.
+     * @param callback Event handler function.
+     * @param context Optional context object on which to call the event handler function.
      */
-    addComponentEventListener<T extends Component>(
-        componentOrType: ComponentOrType<T>, callback: (event: ISystemComponentEvent<T>) => void, context?: any)
+    addComponentTypeListener<T extends Component>(
+        componentOrType: ComponentOrType<T>, callback: (event: IComponentTypeEvent<T>) => void, context?: any)
     {
-        this.on(getType(componentOrType), callback, context);
+        this.components.on(getType(componentOrType), callback, context);
     }
 
     /**
      * Removes a listener for component add/remove events for a specific component type.
-     * @param {ComponentOrType<T>} componentOrType
-     * @param {(event: IManagerComponentEvent<T extends Component>) => void} callback
-     * @param context
+     * @param componentOrType The component type as example object, constructor function or string.
+     * @param callback Event handler function.
+     * @param context Optional context object on which to call the event handler function.
      */
-    removeComponentEventListener<T extends Component>(
-        componentOrType: ComponentOrType<T>, callback: (event: ISystemComponentEvent<T>) => void, context?: any)
+    removeComponentTypeListener<T extends Component>(
+        componentOrType: ComponentOrType<T>, callback: (event: IComponentTypeEvent<T>) => void, context?: any)
     {
-        this.off(getType(componentOrType), callback, context);
-    }
-
-    /**
-     * Creates a new entity. The entity is added to this system and returned.
-     * @param {string} name Optional name for the entity.
-     * @returns {Entity}
-     */
-    createEntity(name?: string): Entity
-    {
-        const entity = this.doCreateEntity();
-        entity.init(this);
-
-        if (name) {
-            entity.name = name;
-        }
-
-        return entity;
-    }
-
-    findOrCreateEntity(name: string): Entity
-    {
-        const entity = this.findEntityByName(name);
-        if (entity) {
-            return entity;
-        }
-
-        return this.createEntity(name);
-    }
-
-    /**
-     * Creates a new component of the given type and adds it to the given entity.
-     * @param {Entity} entity The entity the new component is added to.
-     * @param {ComponentOrType<T>} componentOrType Type of the component to create.
-     * @param {string} name Optional name for the component.
-     * @returns {T} The created component.
-     */
-    createComponent<T extends Component>(entity: Entity, componentOrType: ComponentOrType<T>, name?: string): T | undefined
-    {
-        let component;
-
-        if (typeof componentOrType === "string") {
-            component = this.registry.createComponent(componentOrType, entity);
-        }
-        else {
-            const Ctor = (componentOrType instanceof Component ? componentOrType.constructor : componentOrType) as typeof Component;
-            component = new Ctor();
-            component.init(entity);
-        }
-
-        if (component && name) {
-            component.name = name;
-        }
-
-        return component;
-    }
-
-    /**
-     * Creates a new component of the given type only if a component of this type doesn't exist yet in the system.
-     * Otherwise returns the existing component.
-     * @param {Entity} entity The entity the new component is added to.
-     * @param {ComponentOrType<T>} componentOrType Type of the component to create.
-     * @param {string} name Optional name for the component.
-     * @returns {T} The created component.
-     */
-    getOrCreateComponent<T extends Component>(entity: Entity, componentOrType: ComponentOrType<T>, name?: string): T | undefined
-    {
-        const component = this.getComponent(componentOrType);
-        if (component) {
-            return component;
-        }
-
-        return this.createComponent(entity, componentOrType, name);
-    }
-
-    /**
-     * Adds an entity to the system. Automatically called by the entity constructor.
-     * @param {Entity} entity
-     */
-    addEntity(entity: Entity)
-    {
-        this._entitiesById[entity.id] = entity;
-        this._entityList.push(entity);
-
-        this.didAddEntity(entity);
-        this.emit<ISystemEntityEvent>("entity", { add: true, remove: false, entity });
-    }
-
-    /**
-     * Removes an entity from the system. Automatically called by the entity's dispose method.
-     * @param {Entity} entity
-     */
-    removeEntity(entity: Entity)
-    {
-        this.willRemoveEntity(entity);
-
-        delete this._entitiesById[entity.id];
-        const index = this._entityList.indexOf(entity);
-        this._entityList.splice(index, 1);
-
-        this.emit<ISystemEntityEvent>("entity", { add: false, remove: true, entity });
-    }
-
-    getEntities()
-    {
-        return this._entityList;
-    }
-
-    findEntityByName(name: string): Entity | null
-    {
-        const entities = this._entityList;
-
-        for (let i = 0, n = entities.length; i < n; ++i) {
-            if (entities[i].name === name) {
-                return entities[i];
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns an entity by its identifier.
-     * @param {string} id An entity's identifier.
-     * @returns {Entity}
-     */
-    getEntityById(id: string)
-    {
-        return this._entitiesById[id];
-    }
-
-    /**
-     * Returns all entities not containing a hierarchy component with a parent.
-     */
-    getRootEntities()
-    {
-        const entities = this._entityList;
-        const result = [];
-
-        for (let i = 0, n = entities.length; i < n; ++i) {
-            const hierarchy = entities[i].getComponent(Hierarchy);
-            if (!hierarchy || !hierarchy.parent) {
-                result.push(entities[i]);
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Adds a new component to the system. Called automatically by the component's constructor.
-     * @param {Component} component
-     */
-    addComponent(component: Component)
-    {
-        this._componentList.push(component);
-        this._componentsById[component.id] = component;
-        this.getComponentArrayByType(component.type).push(component);
-
-        this.didAddComponent(component);
-
-        this.emit<ISystemComponentEvent>("component", { add: true, remove: false, component });
-        this.emit<ISystemComponentEvent>(component.type, { add: true, remove: false, component });
-    }
-
-    /**
-     * Removes a component from the system. Called automatically by the component's dispose() method.
-     * @param {Component} component
-     * @returns {boolean} True if the component was successfully removed.
-     */
-    removeComponent(component: Component): boolean
-    {
-        if (!this._componentsById[component.id]) {
-            return false;
-        }
-
-        this.willRemoveComponent(component);
-
-        delete this._componentsById[component.id];
-
-        let index = this._componentList.indexOf(component);
-        this._componentList.splice(index, 1);
-
-        const components = this._componentsByType[component.type];
-        index = components.indexOf(component);
-        components.splice(index, 1);
-
-        this.emit<ISystemComponentEvent>("component", { add: false, remove: true, component });
-        this.emit<ISystemComponentEvent>(component.type, { add: false, remove: true, component });
-
-        return true;
-    }
-
-    /**
-     * Registers a component under the given base class. The component can then also be
-     * retrieved by specifying the base class in getComponent(s) methods.
-     * Called by a component's base class constructor.
-     * @param {Component} component
-     * @param {ComponentOrType} baseType
-     */
-    addBaseComponent(component: Component, baseType: ComponentOrType)
-    {
-        const type = getType(baseType);
-        this.getComponentArrayByType(type).push(component);
-
-        this.emit<ISystemComponentEvent>(type, { add: true, remove: false, component });
-    }
-
-    /**
-     * Unregisters the base class of a component.
-     * Called by a component's base class dispose method.
-     * @param {Component} component
-     * @param {ComponentOrType} baseType
-     */
-    removeBaseComponent(component: Component, baseType: ComponentOrType)
-    {
-        const type = getType(baseType);
-        const components = this._componentsByType[type];
-        const index = components.indexOf(component);
-        components.splice(index, 1);
-
-        this.emit<ISystemComponentEvent>(type, { add: false, remove: true, component });
-    }
-
-    /**
-     * Returns true if the system contains components of the given type.
-     * @param {ComponentOrType} componentOrType
-     * @returns {boolean}
-     */
-    hasComponents(componentOrType: ComponentOrType): boolean
-    {
-        const type = getType(componentOrType);
-        const components = this._componentsByType[type];
-        return components && components.length > 0;
-    }
-
-    countComponents(componentOrType?: ComponentOrType): number
-    {
-        const components = componentOrType ? this._componentsByType[getType(componentOrType)] : this._componentList;
-        return components ? components.length : 0;
-    }
-
-    /**
-     * Returns an array of components of a specific type if given.
-     * @param {ComponentOrType<T>} componentOrType If given only returns components of the given type.
-     * @returns {T[]}
-     */
-    getComponents<T extends Component>(componentOrType?: ComponentOrType<T> | T): Readonly<T[]>
-    {
-        if (componentOrType) {
-            return (this._componentsByType[getType(componentOrType)] || _EMPTY_ARRAY) as T[];
-        }
-
-        return this._componentList as T[];
-    }
-
-    /**
-     * Returns the first found component of the given type.
-     * @param {ComponentOrType<T>} componentOrType Type of component to return.
-     * @returns {T | undefined}
-     */
-    getComponent<T extends Component>(componentOrType: ComponentOrType<T> | T): T | undefined
-    {
-        const components =  this._componentsByType[getType(componentOrType)];
-        return components ? components[0] as T : undefined;
-    }
-
-    /**
-     * Returns the component with the given identifier.
-     * @param {string} id Identifier of the entity to retrieve.
-     * @returns {T | undefined}
-     */
-    getComponentById<T extends Component>(id: string): T | undefined
-    {
-        return this._componentsById[id] as T;
-    }
-
-    /**
-     * Returns the first component of the given type with the given name.
-     * @param {string} name
-     * @param {ComponentOrType<T>} componentOrType
-     * @returns {T | undefined}
-     */
-    findComponentByName<T extends Component>(name: string, componentOrType?: ComponentOrType<T> | T): T | undefined
-    {
-        return this._componentList.find(component =>
-            component.name === name && (!componentOrType || component.type === getType(componentOrType))
-        ) as T;
+        this.components.off(getType(componentOrType), callback, context);
     }
 
     deflate()
     {
-        const json: any = {};
-
-        if (this._entityList.length > 0) {
-            json.entities = this._entityList.map(entity => entity.deflate());
-        }
-
-        return json;
+        return this.module.deflate();
     }
 
     inflate(json)
     {
-        if (json.entities) {
-            const linkableDict = {};
-
-            json.entities.forEach(jsonEntity => {
-                const entity = this.doCreateEntity(jsonEntity.id);
-                entity.init(this);
-                entity.inflate(json, linkableDict);
-            });
-            json.entities.forEach(jsonEntity => {
-                const entity = this.getEntityById(jsonEntity.id);
-                entity.inflateLinks(jsonEntity, linkableDict);
-            })
-        }
+        this.module.inflate(json);
     }
 
     toString(verbose: boolean = false)
     {
-        const entities = this._entityList;
-        const numComponents = this._componentList.length;
+        const entities = this.entities.getArray();
+        const numComponents = this.components.count();
 
         const text = `System - ${entities.length} entities, ${numComponents} components.`;
 
@@ -470,13 +158,40 @@ export default class System extends Publisher<System>
         return text;
     }
 
-    /**
-     * Override to create a custom entity type derived from [[Entity]].
-     * @returns {Entity}
-     */
-    protected doCreateEntity(id?: string): Entity
+    _addEntity(entity: Entity)
     {
-        return new Entity(id);
+        this.entities._add(entity);
+        this.didAddEntity(entity);
+
+        this.emit<ISystemEntityEvent>(System.entityEvent, { add: true, remove: false, entity });
+    }
+
+    _removeEntity(entity: Entity)
+    {
+        this.willRemoveEntity(entity);
+        this.entities._remove(entity);
+
+        this.emit<ISystemEntityEvent>(System.entityEvent, { add: false, remove: true, entity });
+    }
+
+    _addComponent(component: Component)
+    {
+        if (component.isSystemSingleton && this.components.has(component)) {
+            throw new Error(`only one component of type '${component.type}' allowed per system`);
+        }
+
+        this.components._add(component);
+        this.didAddComponent(component);
+
+        this.emit<ISystemComponentEvent>(System.componentEvent, { add: true, remove: false, component });
+    }
+
+    _removeComponent(component: Component)
+    {
+        this.emit<ISystemComponentEvent>(System.componentEvent, { add: false, remove: true, component });
+
+        this.willRemoveComponent(component);
+        this.components._remove(component);
     }
 
     /**
@@ -517,16 +232,5 @@ export default class System extends Publisher<System>
      */
     protected willRemoveComponent(component: Component)
     {
-    }
-
-    protected getComponentArrayByType(type: string): Component[]
-    {
-        let components = this._componentsByType[type];
-
-        if (!components) {
-            components = this._componentsByType[type] = [];
-        }
-
-        return components;
     }
 }

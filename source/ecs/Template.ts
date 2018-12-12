@@ -5,9 +5,12 @@
  * License: MIT
  */
 
-import types from "./propertyTypes";
-import { ISystemContext } from "./System";
-import Component from "./Component";
+import {
+    types,
+    Component,
+    IUpdateContext,
+    IRenderContext
+} from "./index";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -36,11 +39,31 @@ export default class Derived extends Base
     {
     }
 
-    update(context: ISystemContext)
+    update(context: IUpdateContext): boolean
+    {
+        const { position, rotation } = this.ins;
+
+        if (position.changed) {
+            // ...
+        }
+
+        if (rotation.changed) {
+            // ...
+        }
+
+        return true;
+    }
+
+    tick(context: IUpdateContext): boolean
+    {
+        return false;
+    }
+
+    preRender(context: IRenderContext)
     {
     }
 
-    tick(context: ISystemContext)
+    postRender(context: IRenderContext)
     {
     }
 

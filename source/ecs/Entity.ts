@@ -5,17 +5,19 @@
  * License: MIT
  */
 
-import { Dictionary, Readonly } from "../types";
+import { Dictionary } from "../types";
 import uniqueId from "../uniqueId";
 import Publisher, { IPublisherEvent } from "../Publisher";
 
-import Component, { ComponentOrType, getType } from "./Component";
-import System from "./System";
 import { ILinkable } from "./PropertySet";
+import Component, { ComponentOrType, getType } from "./Component";
+import ComponentSet, { IComponentTypeEvent } from "./ComponentSet";
+import Module from "./Module";
+import System from "./System";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const _EMPTY_ARRAY = [];
+export { IComponentTypeEvent };
 
 /**
  * Emitted by [[Entity]] after the instance's state has changed.
@@ -26,27 +28,12 @@ export interface IEntityChangeEvent extends IPublisherEvent<Entity>
     what: "name"
 }
 
-/**
- * Emitted by [[Entity]] when a component is added to or removed from the entity.
- * @event
- */
-export interface IEntityComponentEvent extends IPublisherEvent<Entity>
+export interface IEntityComponentEvent<T extends Component = Component>
+    extends IPublisherEvent<Entity>
 {
     add: boolean;
     remove: boolean;
-    component: Component;
-}
-
-/**
- * Emitted by [[Entity]] before the instance is disposed.
- * @event
- */
-export interface IEntityDisposeEvent extends IPublisherEvent<Entity> {}
-
-export interface ISerializedEntity
-{
-    id: string;
-    name: string;
+    component: T;
 }
 
 /**
@@ -54,7 +41,6 @@ export interface ISerializedEntity
  *
  * ### Events
  * - *"change"* - emits [[IEntityChangeEvent]] after the instance's state has changed.
- * - *"<Type>"* - emits [[IEntityComponentEvent]] when a component is added to or removed.
  * - *"dispose"* - emits [[IEntityDisposeEvent]] before the instance is disposed.
  *
  * ### See also
@@ -63,32 +49,36 @@ export interface ISerializedEntity
  */
 export default class Entity extends Publisher<Entity>
 {
-    public readonly id: string;
-    public system: System;
+    static readonly changeEvent = "change";
+    static readonly componentEvent = "component";
+
+    static create(module: Module, id?: string): Entity
+    {
+        const entity = new Entity(module, id);
+        module._addEntity(entity);
+        return entity;
+    }
+
+    readonly id: string;
+    readonly module: Module;
+    readonly system: System;
+    readonly components: ComponentSet;
 
     private _name: string;
 
-    private _componentList: Component[];
-    private _componentsByType: { [id:string]: Component[] };
 
-    constructor(id?: string)
+    constructor(module: Module, id?: string)
     {
         super();
-        this.addEvents("component", "change", "dispose");
+        this.addEvents(Entity.changeEvent, Entity.componentEvent);
 
         this.id = id || uniqueId(8);
-        this.system = null;
+
+        this.module = module;
+        this.system = module.system;
+        this.components = new ComponentSet();
 
         this._name = "";
-
-        this._componentList = [];
-        this._componentsByType = {};
-    }
-
-    init(system: System)
-    {
-        this.system = system;
-        system.addEntity(this);
     }
 
     /**
@@ -97,20 +87,19 @@ export default class Entity extends Publisher<Entity>
      */
     dispose()
     {
-        this.emit<IEntityDisposeEvent>("dispose");
-
-        const componentList = this._componentList.slice();
+        // dispose components
+        const componentList = this.components.getArray().slice();
         componentList.forEach(component => component.dispose());
 
-        this.system.removeEntity(this);
+        // remove entity from system and module
+        this.module._removeEntity(this);
     }
 
     /**
      * Returns the name of this entity.
      * @returns {string}
      */
-    get name()
-    {
+    get name() {
         return this._name;
     }
 
@@ -119,43 +108,37 @@ export default class Entity extends Publisher<Entity>
      * This emits an [[IEntityChangeEvent]]
      * @param {string} value
      */
-    set name(value: string)
-    {
+    set name(value: string) {
         this._name = value;
-        this.emit<IEntityChangeEvent>("change", { what: "name" });
-    }
-
-    /**
-     * Creates and returns a new entity.
-     * @param {string} name
-     * @returns {Entity}
-     */
-    createEntity(name?: string): Entity
-    {
-        return this.system.createEntity(name);
+        this.emit<IEntityChangeEvent>(Entity.changeEvent, { what: "name" });
     }
 
     /**
      * Creates a new component of the given type. Adds it to this entity.
-     * @param {ComponentOrType<T>} componentOrType Type of the component to create.
-     * @param {string} name Optional name for the component.
-     * @returns {T} The created component.
+     * @param componentOrType Type of the component to create.
+     * @param name Optional name for the component.
+     * @param id Optional unique identifier for the component.
      */
-    createComponent<T extends Component>(componentOrType: ComponentOrType<T>, name?: string)
+    createComponent<T extends Component>(componentOrType: ComponentOrType<T>, name?: string, id?: string): T
     {
-        return this.system.createComponent(this, componentOrType, name);
+        const component = this.system.registry.createComponent<T>(getType(componentOrType), this, id);
+
+        if (name) {
+            component.name = name;
+        }
+
+        return component;
     }
 
     /**
      * Creates a new component only if a component of this type doesn't exist yet in this entity.
      * Otherwise returns the existing component.
-     * @param {ComponentOrType<T>} componentOrType Type of the component to create.
-     * @param {string} name Optional name for the component.
-     * @returns {T} The created component.
+     * @param componentOrType Type of the component to create.
+     * @param name Optional name for the component.
      */
     getOrCreateComponent<T extends Component>(componentOrType: ComponentOrType<T>, name?: string)
     {
-        const component = this.getComponent(componentOrType);
+        const component = this.components.get(componentOrType);
         if (component) {
             return component;
         }
@@ -163,189 +146,56 @@ export default class Entity extends Publisher<Entity>
         return this.createComponent(componentOrType, name);
     }
 
-    /**
-     * Adds a component to this entity. Called automatically by the component's constructor.
-     * @param {Component} component
-     */
-    addComponent(component: Component)
+    setValue(path: string, value: any);
+    setValue(componentOrType: ComponentOrType, path: string, value: any);
+    setValue(location, pathOrValue, value?)
     {
-        if (component.isSystemSingleton() && this.hasComponents(component, true)) {
-            throw new Error(`only one component of type '${component.type}' allowed per system`);
+        let component: Component;
+        let path;
+
+        if (typeof location === "string") {
+            const parts = location.split(":");
+            component = this.components.findByName(parts[0]) || this.components.get(parts[0]);
+            path = parts[1];
+            value = pathOrValue;
         }
-        if (component.isEntitySingleton() && this.hasComponents(component)) {
-            throw new Error(`only one component of type '${component.type}' allowed per entity`);
+        else {
+            component = this.components.get(location);
+            path = pathOrValue;
         }
 
-        // add component base types
-        let baseType = Object.getPrototypeOf(component);
-        while((baseType = Object.getPrototypeOf(baseType)).type !== Component.type) {
-            this.addBaseComponent(component, baseType);
+        if (!component) {
+            throw new Error("component not found");
+        }
+        if (!path) {
+            throw new Error("invalid path");
         }
 
-        // add component and actual type
-        this._componentList.push(component);
-        this.getComponentArrayByType(component.type).push(component);
-
-        // add to system
-        this.system.addComponent(component);
-
-        // notify sibling components in entity
-        this._componentList.forEach(sibling => {
-            if (sibling !== component) {
-                sibling.didAddComponent(component);
-            }
-        });
-
-        this.emit<IEntityComponentEvent>("component", { add: true, remove: false, component });
+        component.setValue(path, value);
     }
 
     /**
-     * Removes a component from this entity. Called automatically by the component's dispose() method.
-     * @param {Component} component
-     * @returns {boolean}
+     * Adds a listener for component add/remove events for a specific component type.
+     * @param componentOrType The component type as example object, constructor function or string.
+     * @param callback Event handler function.
+     * @param context Optional context object on which to call the event handler function.
      */
-    removeComponent(component: Component): boolean
+    addComponentTypeListener<T extends Component>(
+        componentOrType: ComponentOrType<T>, callback: (event: IComponentTypeEvent<T>) => void, context?: any)
     {
-        // ensure component is registered
-        let index = this._componentList.indexOf(component);
-        if (index < 0) {
-            return false;
-        }
-
-        // notify sibling components in entity
-        this._componentList.forEach(sibling => {
-            if (sibling !== component) {
-                sibling.willRemoveComponent(component);
-            }
-        });
-
-        // remove from system
-        this.system.removeComponent(component);
-
-        // remove component and actual type
-        this._componentList.splice(index, 1);
-
-        const components = this._componentsByType[component.type];
-        index = components.indexOf(component);
-        components.splice(index, 1);
-
-        // remove component base types
-        let baseType = Object.getPrototypeOf(component);
-        while((baseType = Object.getPrototypeOf(baseType)).type !== Component.type) {
-            this.removeBaseComponent(component, baseType);
-        }
-
-        this.emit<IEntityComponentEvent>("component", { add: false, remove: true, component });
-
-        return true;
+        this.components.on(getType(componentOrType), callback, context);
     }
 
     /**
-     * Returns true if there are components (of a certain type if given) in this entity
-     * or in the entire entity-component system (if global is set to true).
-     * @param {ComponentOrType} componentOrType
-     * @param {boolean} global
-     * @returns {boolean}
+     * Removes a listener for component add/remove events for a specific component type.
+     * @param componentOrType The component type as example object, constructor function or string.
+     * @param callback Event handler function.
+     * @param context Optional context object on which to call the event handler function.
      */
-    hasComponents(componentOrType: ComponentOrType, global?: boolean): boolean
+    removeComponentTypeListener<T extends Component>(
+        componentOrType: ComponentOrType<T>, callback: (event: IComponentTypeEvent<T>) => void, context?: any)
     {
-        if (global) {
-            return this.system.hasComponents(componentOrType);
-        }
-
-        const components = this._componentsByType[getType(componentOrType)];
-        return components && components.length > 0;
-    }
-
-    /**
-     * Returns the number of components (of a certain type if given) in this entity
-     * or in the entire entity-component system (if global is set to true).
-     * @param {ComponentOrType} componentOrType
-     * @param {boolean} global
-     * @returns {boolean}
-     */
-    countComponents(componentOrType?: ComponentOrType, global?: boolean): number
-    {
-        if (global) {
-            return this.system.countComponents(componentOrType);
-        }
-
-        const components = componentOrType ? this._componentsByType[getType(componentOrType)] : this._componentList;
-        return components ? components.length : 0;
-    }
-
-    /**
-     * Returns an array of components of a specific type if given. Includes components
-     * from all entities if global is set to true.
-     * @param {ComponentOrType} componentOrType If given only returns components of the given type.
-     * @param {boolean} global If true, includes components from all entities.
-     * @returns {T[]}
-     */
-    getComponents<T extends Component>(componentOrType?: ComponentOrType<T> | T, global?: boolean): Readonly<T[]>
-    {
-        if (componentOrType) {
-            if (global) {
-                return this.system.getComponents<T>(componentOrType);
-            }
-
-            return (this._componentsByType[getType(componentOrType)] || _EMPTY_ARRAY) as T[];
-        }
-
-        return this._componentList as T[];
-    }
-
-    /**
-     * Returns the first found component of the given type.
-     * @param {ComponentOrType<T>} componentOrType Type of component to return.
-     * @param {boolean} global If true, includes components from all entities.
-     * @returns {T | undefined}
-     */
-    getComponent<T extends Component>(componentOrType: ComponentOrType<T> | T, global?: boolean): T | undefined
-    {
-        if (global) {
-            return this.system.getComponent<T>(componentOrType);
-        }
-
-        const components = this._componentsByType[getType(componentOrType)];
-        return components ? components[0] as T : undefined;
-    }
-
-    /**
-     * Returns the component with the given identifier from all entities in the system.
-     * @param {string} id Identifier of the entity to retrieve.
-     * @returns {T | undefined}
-     */
-    getComponentById<T extends Component>(id: string): T | undefined
-    {
-        return this.system.getComponentById(id);
-    }
-
-    /**
-     * Returns the first component of the given type with the given name.
-     * Searches components from all entities if global is set to true.
-     * @param {string} name
-     * @param {ComponentOrType<T>} componentOrType
-     * @param {boolean} global If true, searches components from all entities.
-     * @returns {T | undefined}
-     */
-    findComponentByName<T extends Component>(
-        name: string, componentOrType?: ComponentOrType<T>, global?: boolean): T | undefined
-    {
-        if (global) {
-            return this.system.findComponentByName<T>(name, componentOrType);
-        }
-
-        return this._componentList.find(component =>
-            component.name === name && (!componentOrType || component.type === getType(componentOrType))
-        ) as T;
-    }
-
-    toJSON(): ISerializedEntity
-    {
-        return {
-            id: this.id,
-            name: this._name
-        }
+        this.components.off(getType(componentOrType), callback, context);
     }
 
     deflate()
@@ -358,8 +208,8 @@ export default class Entity extends Publisher<Entity>
             json.name = this.name;
         }
 
-        if (this._componentList.length > 0) {
-            json.components = this._componentList.map(component => component.deflate());
+        if (this.components.length > 0) {
+            json.components = this.components.getArray().map(component => component.deflate());
         }
 
         return json;
@@ -367,13 +217,9 @@ export default class Entity extends Publisher<Entity>
 
     inflate(json, linkableDict: Dictionary<ILinkable>)
     {
-        if (json.name) {
-            this.name = json.name;
-        }
-
         if (json.components) {
             json.components.forEach(jsonComp => {
-                const component = this.system.registry.createComponent(jsonComp.type, this, jsonComp.id);
+                const component = this.createComponent(jsonComp.type, jsonComp.name, jsonComp.id);
                 component.inflate(jsonComp);
                 linkableDict[jsonComp.id] = component;
             });
@@ -384,7 +230,7 @@ export default class Entity extends Publisher<Entity>
     {
         if (json.components) {
             json.components.forEach(jsonComp => {
-                const component = this.getComponentById(jsonComp.id);
+                const component = this.components.getById(jsonComp.id);
                 component.inflateLinks(jsonComp, linkableDict);
             });
         }
@@ -392,55 +238,36 @@ export default class Entity extends Publisher<Entity>
 
     toString(verbose: boolean = false)
     {
-        const text = `Entity '${this.name}' - ${this.countComponents()} components`;
+        const components = this.components.getArray();
+        const text = `Entity '${this.name}' - ${components.length} components`;
 
         if (verbose) {
-            return text + "\n" + this._componentList.map(component => "  " + component.toString()).join("\n");
+            return text + "\n" + components.map(component => "  " + component.toString()).join("\n");
         }
 
         return text;
     }
 
-    /**
-     * Registers a component under the given base class. The component can then also be
-     * retrieved by specifying the base class in getComponent(s) methods.
-     * Called by a component's base class constructor.
-     * @param {Component} component
-     * @param {ComponentOrType} baseType
-     */
-    protected addBaseComponent(component: Component, baseType: ComponentOrType)
+    _addComponent(component: Component)
     {
-        this.getComponentArrayByType(getType(baseType)).push(component);
-        this.system.addBaseComponent(component, baseType);
-    }
-
-    /**
-     * Unregisters the base class of a component.
-     * Called by a component's base class dispose method.
-     * @param {Component} component
-     * @param {ComponentOrType} baseType
-     */
-    protected removeBaseComponent(component: Component, baseType: ComponentOrType)
-    {
-        const components = this._componentsByType[getType(baseType)];
-        if (!components) {
-            throw new Error(`can't remove unregistered base: '${getType(baseType)}' of component: '${getType(component)}'`)
+        if (component.entity !== this) {
+            throw new Error("component belongs to a different entity");
+        }
+        if (component.isEntitySingleton && this.components.has(component)) {
+            throw new Error(`only one component of type '${component.type}' allowed per entity`);
         }
 
-        const index = components.indexOf(component);
-        components.splice(index, 1);
+        this.module._addComponent(component);
+        this.components._add(component);
 
-        this.system.removeBaseComponent(component, baseType);
+        this.emit<IEntityComponentEvent>(Entity.componentEvent, { add: true, remove: false, component });
     }
 
-    protected getComponentArrayByType(type: string): Component[]
+    _removeComponent(component: Component)
     {
-        let components = this._componentsByType[type];
+        this.emit<IEntityComponentEvent>(Entity.componentEvent, { add: false, remove: true, component });
 
-        if (!components) {
-            components = this._componentsByType[type] = [];
-        }
-
-        return components;
+        this.components._remove(component);
+        this.module._removeComponent(component);
     }
 }

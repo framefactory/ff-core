@@ -4,12 +4,14 @@
  *
  * License: MIT
  */
-
 import { Readonly } from "../types";
-import Entity from "./Entity";
+
 import Component, { ComponentOrType, IComponentChangeEvent } from "./Component";
+import Entity from "./Entity";
 
 ////////////////////////////////////////////////////////////////////////////////
+
+export { Entity };
 
 const _findEntity = (hierarchy: Hierarchy, name: string): Entity | null => {
     if (hierarchy.entity.name === name) {
@@ -28,7 +30,7 @@ const _findEntity = (hierarchy: Hierarchy, name: string): Entity | null => {
 };
 
 const _findOne = <T extends Component>(hierarchy: Hierarchy, componentOrType: ComponentOrType<T>): T | null => {
-    const sibling = hierarchy.getComponent(componentOrType);
+    const sibling = hierarchy.components.get(componentOrType);
     if (sibling) {
         return sibling;
     }
@@ -46,7 +48,7 @@ const _findOne = <T extends Component>(hierarchy: Hierarchy, componentOrType: Co
 
 const _findAll = <T extends Component>(hierarchy: Hierarchy, componentOrType: ComponentOrType<T>): T[] => {
 
-    let result = hierarchy.getComponents(componentOrType);
+    let result = hierarchy.components.getArray(componentOrType);
 
     const children = hierarchy.children;
     for (let i = 0, n = children.length; i < n; ++i) {
@@ -201,7 +203,7 @@ export default class Hierarchy extends Component
         let component = undefined;
 
         while(!component && root) {
-            component = root.getComponent(componentOrType);
+            component = root.components.get(componentOrType);
             root = root._parent;
         }
 

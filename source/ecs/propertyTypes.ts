@@ -30,7 +30,7 @@ export const schemas = {
     colorRGBA: { preset: [1, 1, 1, 1], semantic: "color" } as IPropertySchema<Vector>
 };
 
-export default {
+export const types = {
     getOptionIndex: function(arr: any[], index: number): number {
         const n = arr.length;
         const i = Math.trunc(index);
@@ -43,7 +43,7 @@ export default {
         return arr[i < 0 ? 0 : (i > n ? 0 : i)];
     },
 
-    getEnumEntry: function<T>(e: T, index: any): PropOf<T> {
+    getEnumIndex: function<T>(e: T, index: any): PropOf<T> {
         const i = Math.trunc(index);
         return (e[i] ? i : 0) as any as PropOf<T>;
     },
@@ -53,7 +53,7 @@ export default {
         return e[i] || e[0];
     },
 
-    isEnumEntry: function<T>(enumeration: number, index: number): boolean {
+    isEnumIndex: function<T>(enumeration: number, index: number): boolean {
         return enumeration === Math.trunc(index);
     },
 

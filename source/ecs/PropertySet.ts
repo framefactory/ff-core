@@ -12,7 +12,7 @@ import Property from "./Property";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const _rePath = /^(\S*?)(\[(\d+)\])*$/;
+const _rePath = /^(\S*?)(\[(\d+)])*$/;
 
 /**
  * To make use of linkable properties and property sets, classes must implement this interface.
@@ -50,6 +50,8 @@ export interface IPropertySetChangeEvent extends IPublisherEvent<PropertySet>
  */
 export default class PropertySet extends Publisher<PropertySet>
 {
+    static readonly changeEvent = "change";
+
     linkable: ILinkable;
     properties: Property[];
 
@@ -58,7 +60,7 @@ export default class PropertySet extends Publisher<PropertySet>
     constructor(linkable: ILinkable)
     {
         super();
-        this.addEvents("change");
+        this.addEvents(PropertySet.changeEvent);
 
         this.linkable = linkable;
         this.properties = [];
@@ -107,7 +109,7 @@ export default class PropertySet extends Publisher<PropertySet>
         this.properties.push(property);
         this._propsByPath[property.path] = property;
 
-        this.emit<IPropertySetChangeEvent>("change", { what: "add", property });
+        this.emit<IPropertySetChangeEvent>(PropertySet.changeEvent, { what: "add", property });
     }
 
     /**
@@ -128,7 +130,7 @@ export default class PropertySet extends Publisher<PropertySet>
 
         delete this._propsByPath[property.path];
 
-        this.emit<IPropertySetChangeEvent>("change", { what: "remove", property });
+        this.emit<IPropertySetChangeEvent>(PropertySet.changeEvent, { what: "remove", property });
     }
 
     /**
@@ -300,7 +302,7 @@ export default class PropertySet extends Publisher<PropertySet>
 
         const result: any = { property };
         if (parts[2] !== undefined) {
-            result.index = parseInt(parts[2]);
+            result.index = parseInt(parts[3]);
         }
 
         return result;

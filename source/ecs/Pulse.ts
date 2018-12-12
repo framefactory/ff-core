@@ -5,11 +5,11 @@
  * License: MIT
  */
 
-import { ISystemContext } from "./System";
+import { IUpdateContext } from "./System";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export default class Pulse implements ISystemContext
+export default class Pulse implements IUpdateContext
 {
     time: Date;
     secondsElapsed: number;

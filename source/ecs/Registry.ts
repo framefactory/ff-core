@@ -6,7 +6,9 @@
  */
 
 import { Dictionary, TypeOf } from "../types";
-import Component, { ComponentType, Entity } from "./Component";
+
+import Component, { ComponentType } from "./Component";
+import Entity from "./Entity";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -24,13 +26,10 @@ export default class Registry
         this.types = {};
     }
 
-    createComponent(type: string, entity: Entity, instanceId?: string): Component
+    createComponent<T extends Component>(type: string, entity: Entity, instanceId?: string): T
     {
-        const componentType = this.getComponentType(type) as TypeOf<Component>;
-        const component = new componentType(instanceId);
-        component.init(entity);
-
-        return component;
+        const componentType = this.getComponentType(type) as ComponentType<T>;
+        return Component.create(componentType, entity, instanceId);
     }
 
     getComponentType<T extends Component>(type: string): TypeOf<T>

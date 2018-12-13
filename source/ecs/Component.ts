@@ -322,7 +322,7 @@ export default class Component extends Publisher<Component> implements ILinkable
     {
         const prop = this.ins.properties.find(prop => prop.path === path);
         if (!prop) {
-            throw new Error(`property '${path}' not found on '${this.name}': `);
+            throw new Error(`property '${path}' not found on '${this.name || this.type}': `);
         }
 
         prop.setValue(value);

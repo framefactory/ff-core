@@ -49,7 +49,9 @@ import Module, {
 
 import System, {
     IUpdateContext,
-    IRenderContext
+    IRenderContext,
+    ISystemEntityEvent,
+    ISystemComponentEvent
 } from "./System";
 
 import Registry from "./Registry";
@@ -84,6 +86,8 @@ export {
     IModuleEntityEvent,
     IModuleComponentEvent,
     System,
+    ISystemEntityEvent,
+    ISystemComponentEvent,
     IUpdateContext,
     IRenderContext,
     Registry,

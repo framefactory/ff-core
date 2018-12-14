@@ -13,6 +13,7 @@ import Entity from "./Entity";
 import EntitySet from "./EntitySet";
 import Module from "./Module";
 import Registry from "./Registry";
+import Hierarchy from "./Hierarchy";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -110,6 +111,32 @@ export default class System extends Publisher<System>
         });
     }
 
+    emitComponentEvent(target: Component, name: string, event: any)
+    {
+        while (target) {
+            target.emit(name, event);
+
+            if (event.stopPropagation) {
+                return;
+            }
+
+            const components = target.components.getArray();
+            for (let i = 0, n = components.length; i < n; ++i) {
+                const component = components[i];
+                if (component !== target) {
+                    component.emit(name, event);
+
+                    if (event.stopPropagation) {
+                        return;
+                    }
+                }
+            }
+
+            const hierarchy = target.components.get(Hierarchy);
+            target = hierarchy ? hierarchy.parent : null;
+        }
+    }
+
     /**
      * Adds a listener for component add/remove events for a specific component type.
      * @param componentOrType The component type as example object, constructor function or string.
@@ -161,16 +188,16 @@ export default class System extends Publisher<System>
     _addEntity(entity: Entity)
     {
         this.entities._add(entity);
-        this.didAddEntity(entity);
 
+        this.entityAdded(entity);
         this.emit<ISystemEntityEvent>(System.entityEvent, { add: true, remove: false, entity });
     }
 
     _removeEntity(entity: Entity)
     {
-        this.willRemoveEntity(entity);
         this.entities._remove(entity);
 
+        this.entityRemoved(entity);
         this.emit<ISystemEntityEvent>(System.entityEvent, { add: false, remove: true, entity });
     }
 
@@ -181,17 +208,17 @@ export default class System extends Publisher<System>
         }
 
         this.components._add(component);
-        this.didAddComponent(component);
 
+        this.componentAdded(component);
         this.emit<ISystemComponentEvent>(System.componentEvent, { add: true, remove: false, component });
     }
 
     _removeComponent(component: Component)
     {
-        this.emit<ISystemComponentEvent>(System.componentEvent, { add: false, remove: true, component });
-
-        this.willRemoveComponent(component);
         this.components._remove(component);
+
+        this.componentRemoved(component);
+        this.emit<ISystemComponentEvent>(System.componentEvent, { add: false, remove: true, component });
     }
 
     /**
@@ -200,7 +227,7 @@ export default class System extends Publisher<System>
      * Override to perform custom operations after an entity has been added.
      * @param {Entity} entity The entity added to the system.
      */
-    protected didAddEntity(entity: Entity)
+    protected entityAdded(entity: Entity)
     {
     }
 
@@ -210,7 +237,7 @@ export default class System extends Publisher<System>
      * Override to perform custom operations before an entity is removed.
      * @param {Entity} entity The entity being removed from the system.
      */
-    protected willRemoveEntity(entity: Entity)
+    protected entityRemoved(entity: Entity)
     {
     }
 
@@ -220,7 +247,7 @@ export default class System extends Publisher<System>
      * Override to perform custom operations after a component has been added.
      * @param {Component} component The component added to the system.
      */
-    protected didAddComponent(component: Component)
+    protected componentAdded(component: Component)
     {
     }
 
@@ -230,7 +257,7 @@ export default class System extends Publisher<System>
      * Override to perform custom operations before a component is removed.
      * @param {Component} component The component being removed from the system.
      */
-    protected willRemoveComponent(component: Component)
+    protected componentRemoved(component: Component)
     {
     }
 }

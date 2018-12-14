@@ -178,7 +178,7 @@ export default class Component extends Publisher<Component> implements ILinkable
      */
     constructor(entity: Entity, id?: string)
     {
-        super();
+        super({ knownEvents: false });
         this.addEvents(Component.changeEvent);
 
         this.id = id || uniqueId();

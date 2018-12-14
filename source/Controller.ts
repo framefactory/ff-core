@@ -6,12 +6,12 @@
  */
 
 import { ReturnType } from "./types";
-import Publisher from "./Publisher";
+import Publisher, { IPublisherEvent } from "./Publisher";
 import Commander from "./Commander";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export { Commander };
+export { Commander, IPublisherEvent };
 export type Actions<T extends Controller<any>> = ReturnType<T["createActions"]>;
 
 export default abstract class Controller<T extends Controller<any>> extends Publisher<T>

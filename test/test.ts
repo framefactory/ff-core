@@ -11,7 +11,6 @@ import check_test from "./check.test";
 import conform_test from "./conform.test";
 import SortedArray_test from "./SortedArray.test";
 import animation_test from "./animation/test";
-import ecs_test from "./ecs/test";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -22,5 +21,4 @@ suite("FF Core", function() {
     conform_test();
     SortedArray_test();
     animation_test();
-    ecs_test();
 });

@@ -1,6 +1,6 @@
 {
     "name": "ff-core",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "FF Core Typescript Foundation Library",
     "scripts": {
         "build": "tsc -p source",
@@ -24,10 +24,10 @@
     },
     "homepage": "https://github.com/framelab/ff-core#readme",
     "devDependencies": {
-        "@types/chai": "^4.1.6",
+        "@types/chai": "^4.1.7",
         "@types/mocha": "^5.2.5",
         "chai": "^4.2.0",
         "mocha": "^5.2.0",
-        "typescript": "^3.1.1"
+        "typescript": "^3.2.2"
     }
 }

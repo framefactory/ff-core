@@ -5,26 +5,31 @@
  * License: MIT
  */
 
-import { Subtract } from "./types";
-
-////////////////////////////////////////////////////////////////////////////////
-
 const _pd = Symbol("Publisher private data");
 const _strict = Symbol("Publisher strict option");
 
 /**
+ * Base class for bubbling events
+ */
+export interface IBubblingEvent<T extends string> extends ITypedEvent<T>
+{
+    stopPropagation: boolean;
+}
+
+/**
+ * Base class for typed events. Typed events have a type property holding the name of the event.
  * @event
  */
-export interface IPublisherEvent<T>
+export interface ITypedEvent<T extends string>
 {
-    /** The sender this event originates from. */
-    sender: T;
+    /** The type name of the event. */
+    type: T;
 }
 
 /**
  * Provides subscription services for events.
  */
-export default class Publisher<T>
+export default class Publisher
 {
     constructor(options?: { knownEvents: boolean })
     {
@@ -34,78 +39,89 @@ export default class Publisher<T>
 
     /**
      * Subscribes to an event.
-     * @param {string | string[]} name Name of the event.
-     * @param {function} callback Callback function, invoked when the event is emitted.
+     * @param type Type name of the event.
+     * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    on(name: string | string[], callback: (event: any) => void, context?: any)
+    on<T extends ITypedEvent<string>>(type: T["type"], callback: (event: T) => void, context?: any);
+    on(type: string | string[], callback: (event: any) => void, context?: any);
+    on(type, callback, context?)
     {
-        if (Array.isArray(name)) {
-            name.forEach(name => {
-                this.on(name, callback, context);
+        if (Array.isArray(type)) {
+            type.forEach(type => {
+                this.on(type, callback, context);
             });
 
             return;
         }
 
-        let subscribers = this[_pd][name];
+        let subscribers = this[_pd][type];
         if (!subscribers) {
             if (this[_pd][_strict]) {
-                throw new Error(`can't subscribe to unknown event: '${name}'`);
+                throw new Error(`can't subscribe; unknown event: '${type}'`);
             }
 
-            subscribers = this[_pd][name] = [];
+            subscribers = this[_pd][type] = [];
         }
 
         let subscriber = { callback, context };
         subscribers.push(subscriber);
     }
 
+    addEventListener(type: string, callback: (event: any) => void, context?: any)
+    {
+        this.on(type, callback, context);
+    }
+
     /**
      * One-time subscription to an event. As soon as the event is emitted, the subscription is cancelled.
-     * @param {string | string[]} name Name of the event.
-     * @param {function} callback Callback function, invoked when the event is emitted.
+     * @param type Type name of the event.
+     * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    once(name: string | string[], callback: (event: any) => void, context?: any)
+    once<T extends ITypedEvent<string>>(type: T["type"], callback: (event: T) => void, context?: any);
+    once(type: string | string[], callback: (event: any) => void, context?: any)
+    once(type, callback, context?)
     {
-        if (Array.isArray(name)) {
-            name.forEach(name => {
-                this.once(name, callback, context);
+        if (Array.isArray(type)) {
+            type.forEach(type => {
+                this.once(type, callback, context);
             });
 
             return;
         }
 
         const redirect: any = event => {
-            this.off(name, redirect, context);
+            this.off(type, redirect, context);
             callback.call(context, event);
         };
 
         redirect.cb = callback;
 
-        this.on(name, redirect, context);
+        this.on(type, redirect, context);
     }
 
     /**
      * Unsubscribes from an event.
-     * @param {string | string[]} name Name of the event.
-     * @param {function} callback Callback function, invoked when the event is emitted.
+     * @param type Type name of the event.
+     * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    off(name: string | string[], callback?: (event: any) => void, context?: any)
+    off<T extends ITypedEvent<string>>(type: T["type"], callback?: (event: T) => void, context?: any);
+    off(type: string | string[], callback?: (event: any) => void, context?: any)
+    off(type, callback?, context?)
     {
-        if (Array.isArray(name)) {
-            name.forEach((name) => {
-                this.off(name, callback, context);
+        if (Array.isArray(type)) {
+            type.forEach((type) => {
+                this.off(type, callback, context);
             });
 
             return;
         }
 
-        let subscribers = this[_pd][name];
+        let subscribers = this[_pd][type];
         if (!subscribers) {
-            throw new Error(`can't unsubscribe from unknown event: '${name}'`);
+            throw new Error(`can't unsubscribe; unknown event type: '${type}'`);
         }
 
         let remainingSubscribers = [];
@@ -116,72 +132,60 @@ export default class Publisher<T>
             }
         });
 
-        this[_pd][name] = remainingSubscribers;
+        this[_pd][type] = remainingSubscribers;
     }
 
     /**
-     * Emits an event to all subscribers. The event object is derived from
-     * [[IPublisherEvent]]. The property *sender* can be omitted, in which case
-     * it is added automatically and set to *this*.
-     * @param name Name of the event.
-     * @param event The event instance to be emitted.
+     * Emits an event with the given message to all subscribers of the event type.
+     * @param type Type name of the event.
+     * @param message The object sent to the subscribers of the event type.
      */
-    emit<E extends IPublisherEvent<T>>(name: string, event?: Subtract<E, IPublisherEvent<T>>)
+    emit(type: string, message?: any);
+    /**
+     * Emits an event to all subscribers of the event's type.
+     * @param event The event object sent to the subscribers of the event's type.
+     */
+    emit<T extends ITypedEvent<T["type"]>>(event: T);
+    emit(eventOrType, message?)
     {
-        let subscribers = this[_pd][name];
+        let type, payload;
+        if (typeof eventOrType === "string") {
+            type = eventOrType;
+            payload = message;
+        }
+        else {
+            type = eventOrType.type;
+            payload = eventOrType;
+        }
+
+        if (!type) {
+            throw new Error(`empty or invalid event type: '${type}'`);
+        }
+
+        const data = this[_pd];
+        const subscribers = data[type];
+
         if (!subscribers) {
-            if (this[_pd][_strict]) {
-                throw new Error(`can't emit unknown event: "${name}"`);
+            if (data[_strict]) {
+                throw new Error(`can't emit; unknown event type: '${type}'`);
             }
 
             return;
         }
 
-        if (subscribers.length > 0) {
-            let pubEvent: any = event;
-
-            if (!pubEvent) {
-                pubEvent = { sender: this };
+        for (let i = 0, n = subscribers.length; i < n; ++i) {
+            const subscriber = subscribers[i];
+            if (subscriber.context) {
+                subscriber.callback.call(subscriber.context, payload);
             }
-            else if (!pubEvent.sender) {
-                pubEvent.sender = this;
-            }
-
-            for (let i = 0, n = subscribers.length; i < n; ++i) {
-                const subscriber = subscribers[i];
-                if (subscriber.context) {
-                    subscriber.callback.call(subscriber.context, pubEvent);
-                }
-                else {
-                    subscriber.callback(pubEvent);
-                }
+            else {
+                subscriber.callback(payload);
             }
         }
     }
 
     /**
-     * Emits an event to all subscribers. Accepts arbitrary event data.
-     * @param name Name of the event.
-     * @param event The event data to be sent.
-     */
-    emitAny(name: string, event: any)
-    {
-        const subscribers = this[_pd][name];
-        if (subscribers && subscribers.length > 0) {
-            for (let i = 0, n = subscribers.length; i < n; ++i) {
-                const subscriber = subscribers[i];
-                if (subscriber.context) {
-                    subscriber.callback.call(subscriber.context, event);
-                }
-                else {
-                    subscriber.callback(event);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds a new event type.
+     * Registers a new event type.
      * @param name Name of the event type.
      */
     addEvent(name: string)
@@ -192,7 +196,7 @@ export default class Publisher<T>
     }
 
     /**
-     * Adds multiple new event types.
+     * Registers multiple new event types.
      * @param names Names of the event types.
      */
     addEvents(...names: string[])
@@ -205,7 +209,7 @@ export default class Publisher<T>
     }
 
     /**
-     * Tests whether an event type has been added.
+     * Tests whether an event type has been registered.
      * @param name Name of the event type.
      * @returns true if an event type with the given name has been added.
      */
@@ -215,7 +219,7 @@ export default class Publisher<T>
     }
 
     /**
-     * Lists all added event types.
+     * Lists all registered event types.
      * @returns an array with the names of all added event types.
      */
     listEvents(): string[]

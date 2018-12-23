@@ -15,7 +15,7 @@ export interface ICommandDispatcher
     dispatch: () => void;
 }
 
-export default class Commander extends Publisher<Commander>
+export default class Commander extends Publisher
 {
     protected static readonly defaultCapacity = 30;
 
@@ -35,7 +35,6 @@ export default class Commander extends Publisher<Commander>
 
     register<T extends Function>(factory: (args: any[]) => Command<T>): T;
     register<T extends Function>(props: ICommandProps<T>): T;
-
     register<T extends Function>(propsOrFactory: any): T
     {
         let factory: (args: any[]) => Command<T>;

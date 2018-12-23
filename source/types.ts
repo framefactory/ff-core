@@ -37,13 +37,11 @@ export type Transformable<U, A, TA, B, TB>
     : U extends B ? TB
     : TA | TB;
 
-export type Partial<T> = { [P in keyof T]?: T[P]; };
-
-export type Readonly<T> = { readonly [P in keyof T]: T[P]; };
-
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 export type Subtract<T, U> = Pick<T, Exclude<keyof T, keyof U>>
+
+export type PartialOptional<T, U> = Pick<T, Exclude<keyof T, keyof U>> & Partial<U>
 
 export type Record<K extends keyof any, T> = { [P in K]: T; };
 

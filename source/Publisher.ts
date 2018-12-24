@@ -11,7 +11,7 @@ const _strict = Symbol("Publisher strict option");
 /**
  * Base class for bubbling events
  */
-export interface IBubblingEvent<T extends string> extends ITypedEvent<T>
+export interface IPropagatingEvent<T extends string> extends ITypedEvent<T>
 {
     stopPropagation: boolean;
 }
@@ -43,7 +43,7 @@ export default class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    on<T extends ITypedEvent<string>>(type: T["type"], callback: (event: T) => void, context?: any);
+    on<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any);
     on(type: string | string[], callback: (event: any) => void, context?: any);
     on(type, callback, context?)
     {
@@ -79,7 +79,7 @@ export default class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    once<T extends ITypedEvent<string>>(type: T["type"], callback: (event: T) => void, context?: any);
+    once<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any);
     once(type: string | string[], callback: (event: any) => void, context?: any)
     once(type, callback, context?)
     {
@@ -107,7 +107,7 @@ export default class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    off<T extends ITypedEvent<string>>(type: T["type"], callback?: (event: T) => void, context?: any);
+    off<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback?: (event: T) => void, context?: any);
     off(type: string | string[], callback?: (event: any) => void, context?: any)
     off(type, callback?, context?)
     {

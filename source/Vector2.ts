@@ -5,17 +5,26 @@
  * License: MIT
  */
 
+////////////////////////////////////////////////////////////////////////////////
+
 export interface IVector2
 {
     x: number;
     y: number;
 }
 
+/**
+ * 2-dimensional vector.
+ */
 export default class Vector2 implements IVector2
 {
+    static readonly zeros = new Vector2(0, 0);
+    static readonly ones = new Vector2(1, 1);
+    static readonly unitX = new Vector2(1, 0);
+    static readonly unitY = new Vector2(0, 1);
+
     /**
      * Returns a new vector with all components set to zero.
-     * @returns {Vector2}
      */
     static makeZeros()
     {
@@ -24,7 +33,6 @@ export default class Vector2 implements IVector2
 
     /**
      * Returns a new vector with all components set to one.
-     * @returns {Vector2}
      */
     static makeOnes()
     {
@@ -33,7 +41,6 @@ export default class Vector2 implements IVector2
 
     /**
      * Returns a new vector of unit length, parallel to the X axis.
-     * @returns {Vector2}
      */
     static makeUnitX()
     {
@@ -42,7 +49,6 @@ export default class Vector2 implements IVector2
 
     /**
      * Returns a new vector of unit length, parallel to the Y axis.
-     * @returns {Vector2}
      */
     static makeUnitY()
     {
@@ -51,18 +57,16 @@ export default class Vector2 implements IVector2
 
     /**
      * Returns a new vector with components set from the given vector.
-     * @param {IVector2} vector
-     * @returns {Vector2}
+     * @param vector
      */
-    static makeFromVector(vector: IVector2)
+    static makeCopy(vector: IVector2)
     {
         return new Vector2(vector.x, vector.y);
     }
 
     /**
      * Returns a new vector with each component set to the given scalar value.
-     * @param {number} scalar
-     * @returns {Vector2}
+     * @param scalar
      */
     static makeFromScalar(scalar: number)
     {
@@ -71,22 +75,23 @@ export default class Vector2 implements IVector2
 
     /**
      * Returns a new vector with components set from the values of the given array.
-     * @param {number[]} array
-     * @returns {Vector2}
+     * @param array
      */
     static makeFromArray(array: number[])
     {
         return new Vector2(array[0], array[1]);
     }
 
+    /** The vector's x component. */
     x: number;
+    /** The vector's y component. */
     y: number;
 
     /**
      * Constructs a new vector with the given x and y values.
-     * If the parameters are omitted, the components are set to zero.
-     * @param {number} x
-     * @param {number} y
+     * Omitted or invalid values are set to zero.
+     * @param x
+     * @param y
      */
     constructor(x?: number, y?: number)
     {
@@ -95,10 +100,20 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Sets the components of this to the given values.
-     * @param {number} x
-     * @param {number} y
-     * @returns {Vector2} this
+     * Copies the components of the given vector to this.
+     * @param vector
+     */
+    copy(vector: IVector2): Vector2
+    {
+        this.x = vector.x;
+        this.y = vector.y;
+        return this;
+    }
+
+    /**
+     * Sets the components to the given values.
+     * @param x
+     * @param y
      */
     set(x: number, y: number): Vector2
     {
@@ -108,23 +123,10 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Copies the components of the given vector to this.
-     * @param {Vector2} vector
-     * @returns {Vector2}
+     * Sets each component to the given scalar value.
+     * @param scalar
      */
-    setVector(vector: IVector2): Vector2
-    {
-        this.x = vector.x;
-        this.y = vector.y;
-        return this;
-    }
-
-    /**
-     * Sets each component of this to the given scalar value.
-     * @param {number} scalar
-     * @returns {Vector2}
-     */
-    setScalar(scalar: number): Vector2
+    setFromScalar(scalar: number): Vector2
     {
         this.x = scalar;
         this.y = scalar;
@@ -133,22 +135,21 @@ export default class Vector2 implements IVector2
 
 
     /**
-     * Sets the components of this to the values of the given array.
-     * @param {number[]} array
-     * @returns {Vector2} this
+     * Sets the components to the values of the given array.
+     * @param array
+     * @param offset Optional start index of the array. Default is 0.
      */
-    setArray(array: number[]): Vector2
+    setFromArray(array: number[], offset: number = 0): Vector2
     {
-        this.x = array[0];
-        this.y = array[1];
+        this.x = array[offset];
+        this.y = array[offset + 1];
         return this;
     }
 
     /**
-     * Sets all components of this to zero.
-     * @returns {Vector2} this
+     * Sets all components to zero.
      */
-    setZeroes(): Vector2
+    setZeros(): Vector2
     {
         this.x = 0;
         this.y = 0;
@@ -156,8 +157,7 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Sets all components of this to one.
-     * @returns {Vector2} this
+     * Sets all components to one.
      */
     setOnes(): Vector2
     {
@@ -168,7 +168,6 @@ export default class Vector2 implements IVector2
 
     /**
      * Makes this a unit vector parallel to the X axis.
-     * @returns {Vector2} this
      */
     setUnitX(): Vector2
     {
@@ -179,7 +178,6 @@ export default class Vector2 implements IVector2
 
     /**
      * Makes this a unit vector parallel to the Y axis.
-     * @returns {Vector2} this
      */
     setUnitY(): Vector2
     {
@@ -190,8 +188,7 @@ export default class Vector2 implements IVector2
 
     /**
      * Adds the given vector to this.
-     * @param {IVector2} other
-     * @returns {Vector2} this
+     * @param other
      */
     add(other: IVector2): Vector2
     {
@@ -202,8 +199,7 @@ export default class Vector2 implements IVector2
 
     /**
      * Subtracts the given vector from this.
-     * @param {IVector2} other
-     * @returns {Vector2} this
+     * @param other
      */
     sub(other: IVector2): Vector2
     {
@@ -213,9 +209,8 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Component-wise multiplication of this with the given vector.
-     * @param {IVector2} other
-     * @returns {Vector2} this
+     * Multiplies each component with the corresponding component of the given vector.
+     * @param other
      */
     mul(other: IVector2): Vector2
     {
@@ -225,9 +220,8 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Component-wise division of this by the given vector.
-     * @param {IVector2} other
-     * @returns {Vector2} this
+     * Divides each component by the corresponding component of the given vector.
+     * @param other
      */
     div(other: IVector2): Vector2
     {
@@ -237,9 +231,8 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Adds the given scalar to each component of this.
-     * @param {number} scalar
-     * @returns {Vector2}
+     * Adds the given scalar to each component.
+     * @param scalar
      */
     addScalar(scalar: number): Vector2
     {
@@ -249,9 +242,8 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Subtracts the given scalar from each component of this.
-     * @param {number} scalar
-     * @returns {Vector2}
+     * Subtracts the given scalar from each component.
+     * @param scalar
      */
     subScalar(scalar: number): Vector2
     {
@@ -261,9 +253,8 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Multiplies each component of this with the given scalar.
-     * @param {number} scalar
-     * @returns {Vector2}
+     * Multiplies each component with the given scalar.
+     * @param scalar
      */
     mulScalar(scalar: number): Vector2
     {
@@ -273,9 +264,8 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Divides each component of this by the given scalar.
-     * @param {number} scalar
-     * @returns {Vector2}
+     * Divides each component by the given scalar.
+     * @param scalar
      */
     divScalar(scalar: number): Vector2
     {
@@ -285,8 +275,46 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Inverts each component of this, e.g. x = 1 / x, ...
-     * @returns {Vector2}
+     * Translates the vector by the given offsets.
+     * @param tx
+     * @param ty
+     */
+    translate(tx: number, ty: number): Vector2
+    {
+        this.x += tx;
+        this.y += ty;
+        return this;
+    }
+
+    /**
+     * Rotates the vector by the given angle.
+     * @param angle rotation angle in radians.
+     */
+    rotate(angle: number): Vector2
+    {
+        const co = Math.cos(angle);
+        const si = Math.sin(angle);
+
+        const x = this.x, y = this.y;
+        this.x = co * x - si * y;
+        this.y = si * x + co * y;
+        return this;
+    }
+
+    /**
+     * Scales the vector by the given factors.
+     * @param sx
+     * @param sy
+     */
+    scale(sx: number, sy: number): Vector2
+    {
+        this.x *= sx;
+        this.y *= sy;
+        return this;
+    }
+
+    /**
+     * Inverts each component, e.g. x = 1 / x, ...
      */
     invert(): Vector2
     {
@@ -296,8 +324,7 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Negates each component of this, e.g. x = -x, ...
-     * @returns {Vector2}
+     * Negates each component, e.g. x = -x, ...
      */
     negate(): Vector2
     {
@@ -307,8 +334,7 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Normalizes this, making it a unit vector.
-     * @returns {Vector2} this
+     * Normalizes the vector, making it a unit vector.
      */
     normalize(): Vector2
     {
@@ -318,35 +344,9 @@ export default class Vector2 implements IVector2
         return this;
     }
 
-    translate(tx: number, ty: number): Vector2
-    {
-        this.x += tx;
-        this.y += ty;
-        return this;
-    }
-
-    rotate(angle: number): Vector2
-    {
-        const co = Math.cos(angle);
-        const si = Math.sin(angle);
-
-        const x = this.x, y = this.y;
-        this.x = co*x - si*y;
-        this.y = si*x + co*y;
-        return this;
-    }
-
-    scale(sx: number, sy: number): Vector2
-    {
-        this.x *= sx;
-        this.y *= sy;
-        return this;
-    }
-
     /**
      * Returns the dot product of this and the given vector.
-     * @param {IVector2} other
-     * @returns {number}
+     * @param other
      */
     dot(other: IVector2): number
     {
@@ -355,38 +355,36 @@ export default class Vector2 implements IVector2
 
     /**
      * Returns the 2-norm (length) of this.
-     * @returns {number}
      */
     length(): number
     {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
+        const x = this.x, y = this.y;
+        return Math.sqrt(x * x + y * y);
     }
 
     /**
      * Returns the squared 2-norm of this, i.e. the dot product of the vector with itself.
-     * @returns {number}
      */
     lengthSquared(): number
     {
-        return this.x * this.x + this.y * this.y;
+        const x = this.x, y = this.y;
+        return x * x + y * y;
     }
 
     /**
-     * Returns the distance this and other.
-      * @param {IVector2} other
-     * @returns {number}
+     * Returns the distance between this and other.
+      * @param other
      */
     distanceTo(other: IVector2): number
     {
         const dx = other.x - this.x;
         const dy = other.y - this.y;
-
         return Math.sqrt(dx * dx + dy * dy);
     }
 
     /**
      * Returns the angle between this and the positive X axis.
-     * @returns {number}
+     * @returns angle in radians.
      */
     angle(): number
     {
@@ -395,17 +393,17 @@ export default class Vector2 implements IVector2
 
     /**
      * Returns the angle between this and the given vector.
-     * @param {IVector2} other
-     * @returns {number}
+     * @param other
+     * @returns angle in radians.
      */
     angleTo(other: IVector2): number
     {
-        return Math.atan2(this.y - other.y, this.x - other.x);
+        const x0 = this.x, y0 = this.y, x1 = other.x, y1 = other.y;
+        return Math.acos((x0*x1 + y0*y1) / (Math.sqrt(x0*x0 + y0*y0) + Math.sqrt(x1*x1 + y1*y1)));
     }
 
     /**
-     * Returns the minimum component of this.
-     * @returns {number}
+     * Returns the smallest component.
      */
     min()
     {
@@ -413,8 +411,7 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Returns the maximum component of this.
-     * @returns {number}
+     * Returns the largest component.
      */
     max()
     {
@@ -422,8 +419,7 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Returns true if all components are zero.
-     * @returns {boolean}
+     * Returns true if all components are exactly zero.
      */
     isZero(): boolean
     {
@@ -431,8 +427,7 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Returns a clone of this.
-     * @returns {Vector2}
+     * Returns a clone.
      */
     clone(): Vector2
     {
@@ -440,16 +435,19 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Returns an array with the components of this vector.
-     * If given, the components are copied into the provided array.
-     * @param {number[]} array
-     * @returns {number[]}
+     * Returns an array with the components of this.
+     * @param array Optional destination array.
+     * @param offset Optional start index of the array. Default is 0.
      */
-    toArray(array?: number[]): number[]
+    toArray(array?: number[], offset?: number): number[]
     {
         if (array) {
-            array[0] = this.x;
-            array[1] = this.y;
+            if (offset === undefined) {
+                offset = 0;
+            }
+
+            array[offset] = this.x;
+            array[offset + 1] = this.y;
             return array;
         }
 
@@ -460,8 +458,7 @@ export default class Vector2 implements IVector2
     }
 
     /**
-     * Returns a text representation of this.
-     * @returns {string}
+     * Returns a text representation.
      */
     toString()
     {

@@ -6,7 +6,7 @@
  */
 
 import { assert } from "chai";
-import Color from "../source/Color";
+import Color from "@ff/core/Color";
 
 const eps = 1e-6;
 

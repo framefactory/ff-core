@@ -5,27 +5,53 @@
  * License: MIT
  */
 
-import Vector3 from "./Vector3";
+import Vector2, { IVector2 } from "./Vector2";
+import Vector3, { IVector3 } from "./Vector3";
 
 ////////////////////////////////////////////////////////////////////////////////
 
+export interface IMatrix3
+{
+    elements: Float32Array;
+}
+
 /**
- * A 3x3 matrix.
- * Internally, elements are stored in column-major order using a Float32Array.
+ * 3 by 3 matrix.
  */
 export default class Matrix3
 {
+    static readonly zeros = new Matrix3().setZeros();
+    static readonly ones = new Matrix3().setOnes();
+    static readonly identity = new Matrix3();
+
+    /**
+     * Returns a new matrix with all elements set to zero.
+     */
+    static makeZeros(): Matrix3
+    {
+        return new Matrix3().setZeros();
+    }
+
+    /**
+     * Returns a new matrix with all elements set to one.
+     */
+    static makeOnes(): Matrix3
+    {
+        return new Matrix3().setOnes();
+    }
+
+    /**
+     * Returns a new matrix set to the identity matrix.
+     */
     static makeIdentity(): Matrix3
     {
-        const matrix = new Matrix3();
-        matrix.e[0] = matrix.e[4] = matrix.e[8] = 1;
-        return matrix;
+        return new Matrix3();
     }
 
     static makeFromRowVectors(row0: Vector3, row1: Vector3, row2: Vector3): Matrix3
     {
         const matrix = new Matrix3();
-        const e = matrix.e;
+        const e = matrix.elements;
 
         e[0] = row0.x; e[1] = row1.x; e[2] = row2.x;
         e[3] = row0.y; e[4] = row1.y; e[5] = row2.y;
@@ -37,7 +63,7 @@ export default class Matrix3
     static makeFromColumnVectors(col0: Vector3, col1: Vector3, col2: Vector3): Matrix3
     {
         const matrix = new Matrix3();
-        const e = matrix.e;
+        const e = matrix.elements;
 
         e[0] = col0.x; e[1] = col0.y; e[2] = col0.z;
         e[3] = col1.x; e[4] = col1.y; e[5] = col1.z;
@@ -46,53 +72,119 @@ export default class Matrix3
         return matrix;
     }
 
-    e: Float32Array;
+    /** The matrix' elements in column major order. */
+    elements: Float32Array;
 
-    constructor(array?: number[])
+    /**
+     * Constructs a new 3 by 3 identity matrix.
+     * @param elements Optional initial values.
+     */
+    constructor(elements?: ArrayLike<number>)
     {
-        this.e = array ? Float32Array.from(array) : new Float32Array(9);
+        if (elements) {
+            this.elements = new Float32Array(elements);
+            if (this.elements.length !== 9) {
+                throw new Error("array length mismatch: must be 9");
+            }
+        }
+        else {
+            const e = this.elements = new Float32Array(9);
+            e[0] = e[4] = e[8] = 1;
+        }
     }
 
+    copy(matrix: IMatrix3): Matrix3
+    {
+        this.elements.set(matrix.elements, 0);
+        return this;
+    }
+
+    /**
+     * Sets the elements of this to the given values.
+     * @param e00
+     * @param e01
+     * @param e02
+     * @param e10
+     * @param e11
+     * @param e12
+     * @param e20
+     * @param e21
+     * @param e22
+     */
     set(e00, e01, e02, e10, e11, e12, e20, e21, e22): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         e[0] = e00; e[1] = e10; e[2] = e20;
         e[3] = e01; e[4] = e11; e[5] = e21;
         e[6] = e02; e[7] = e12; e[8] = e22;
         return this;
     }
 
-    setMatrix(matrix: Matrix3): Matrix3
+    setFromArray(array: number[], rowMajor: boolean = false): Matrix3
     {
-        const e = this.e;
-        const m = matrix.e;
-
-        e[0] = m[0]; e[1] = m[1]; e[2] = m[2];
-        e[3] = m[3]; e[4] = m[4]; e[5] = m[5];
-        e[6] = m[6]; e[7] = m[7]; e[8] = m[8];
+        if (rowMajor) {
+            const e = this.elements;
+            e[0] = array[0]; e[1] = array[3]; e[2] = array[6];
+            e[3] = array[1]; e[4] = array[4]; e[5] = array[7];
+            e[6] = array[2]; e[7] = array[5]; e[8] = array[8];
+        }
+        else {
+            this.elements.set(array, 0);
+        }
         return this;
     }
 
+    /**
+     * Sets all elements to zero.
+     */
+    setZeros(): Matrix3
+    {
+        const e = this.elements;
+        e[0] = 0; e[1] = 0; e[2] = 0;
+        e[3] = 0; e[4] = 0; e[5] = 0;
+        e[6] = 0; e[7] = 0; e[8] = 0;
+        return this;
+    }
+
+    /**
+     * Sets all elements to one.
+     */
+    setOnes(): Matrix3
+    {
+        const e = this.elements;
+        e[0] = 1; e[1] = 1; e[2] = 1;
+        e[3] = 1; e[4] = 1; e[5] = 1;
+        e[6] = 1; e[7] = 1; e[8] = 1;
+        return this;
+    }
+
+    /**
+     * Sets the identity matrix.
+     */
     setIdentity(): Matrix3
     {
-        const e = this.e;
-        e[1] = e[2] = e[3] = e[5] = e[6] = e[7] = 0;
-        e[0] = e[4] = e[8] = 1;
+        const e = this.elements;
+        e[0] = 1; e[1] = 0; e[2] = 0;
+        e[3] = 0; e[4] = 1; e[5] = 0;
+        e[6] = 0; e[7] = 0; e[8] = 1;
         return this;
     }
 
-    setArray(array: number[]): Matrix3
+    /**
+     * Transposes the matrix in-place.
+     */
+    transpose(): Matrix3
     {
-        const e = this.e;
-        for (let i = 0; i < 0; ++i) {
-            e[i] = array[i];
-        }
+        const e = this.elements;
+        const t0 = e[1]; e[1] = e[3]; e[3] = t0;
+        const t1 = e[2]; e[2] = e[6]; e[6] = t1;
+        const t2 = e[5]; e[5] = e[7]; e[7] = t2;
         return this;
     }
 
     setTranslation(tx: number, ty: number): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         e[6] = tx;
         e[7] = ty;
         e[1] = e[2] = e[3] = e[5] = 0;
@@ -100,19 +192,14 @@ export default class Matrix3
         return this;
     }
 
-    setScaling(sx: number, sy: number): Matrix3
+    setTranslationFromVector(translation: IVector2)
     {
-        const e = this.e;
-        e[0] = sx;
-        e[4] = sy;
-        e[1] = e[2] = e[3] = e[5] = e[6] = e[7] = 0;
-        e[8] = 1;
-        return this;
+        return this.setTranslation(translation.x, translation.y);
     }
 
-    setRotation2d(angle: number): Matrix3
+    setRotation(angle: number): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         const si = Math.sin(angle);
         const co = Math.cos(angle);
 
@@ -123,9 +210,24 @@ export default class Matrix3
         return this;
     }
 
+    setScale(sx: number, sy: number): Matrix3
+    {
+        const e = this.elements;
+        e[0] = sx;
+        e[4] = sy;
+        e[1] = e[2] = e[3] = e[5] = e[6] = e[7] = 0;
+        e[8] = 1;
+        return this;
+    }
+
+    setScaleFromVector(scale: IVector2)
+    {
+        return this.setScale(scale.x, scale.y);
+    }
+
     addScalar(scalar: number): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         e[0] += scalar; e[1] += scalar; e[2] += scalar;
         e[3] += scalar; e[4] += scalar; e[5] += scalar;
         e[6] += scalar; e[7] += scalar; e[8] += scalar;
@@ -134,7 +236,7 @@ export default class Matrix3
 
     subScalar(scalar: number): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         e[0] -= scalar; e[1] -= scalar; e[2] -= scalar;
         e[3] -= scalar; e[4] -= scalar; e[5] -= scalar;
         e[6] -= scalar; e[7] -= scalar; e[8] -= scalar;
@@ -143,7 +245,7 @@ export default class Matrix3
 
     mulScalar(scalar: number): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         e[0] *= scalar; e[1] *= scalar; e[2] *= scalar;
         e[3] *= scalar; e[4] *= scalar; e[5] *= scalar;
         e[6] *= scalar; e[7] *= scalar; e[8] *= scalar;
@@ -152,7 +254,7 @@ export default class Matrix3
 
     divScalar(scalar: number): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         e[0] /= scalar; e[1] /= scalar; e[2] /= scalar;
         e[3] /= scalar; e[4] /= scalar; e[5] /= scalar;
         e[6] /= scalar; e[7] /= scalar; e[8] /= scalar;
@@ -161,7 +263,7 @@ export default class Matrix3
 
     mulVector(vector: Vector3): Vector3
     {
-        const e = this.e;
+        const e = this.elements;
         const x = vector.x, y = vector.y, z = vector.z;
         vector.x = e[0] * x + e[3] * y + e[6] * z;
         vector.y = e[1] * x + e[4] * y + e[7] * z;
@@ -171,8 +273,8 @@ export default class Matrix3
 
     mulMatrix(other: Matrix3): Matrix3
     {
-        const a = this.e;
-        const b = other.e;
+        const a = this.elements;
+        const b = other.elements;
 
         const t00 = a[0]*b[0] + a[3]*b[1] + a[6]*b[2];
         const t01 = a[0]*b[3] + a[3]*b[4] + a[6]*b[5];
@@ -190,15 +292,6 @@ export default class Matrix3
         return this;
     }
 
-    transpose(): Matrix3
-    {
-        const e = this.e;
-        const t0 = e[1]; e[1] = e[3]; e[3] = t0;
-        const t1 = e[2]; e[2] = e[6]; e[6] = t1;
-        const t2 = e[5]; e[5] = e[7]; e[7] = t2;
-        return this;
-    }
-
     invert(determinant?: number): Matrix3
     {
         if (determinant === undefined) {
@@ -206,7 +299,7 @@ export default class Matrix3
         }
 
         if (determinant !== 0) {
-            const e = this.e;
+            const e = this.elements;
 
             const t00 = (e[4]*e[8] - e[7]*e[5]) / determinant;
             const t01 = (e[6]*e[5] - e[3]*e[8]) / determinant;
@@ -228,7 +321,7 @@ export default class Matrix3
 
     determinant(): number
     {
-        const e = this.e;
+        const e = this.elements;
 
         return e[2]*e[3]*e[7] - e[2]*e[6]*e[4]
              - e[1]*e[3]*e[8] + e[1]*e[6]*e[5]
@@ -237,24 +330,16 @@ export default class Matrix3
 
     translate(tx: number, ty: number): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         e[0] += e[2] * tx; e[1] += e[2] * ty;
         e[3] += e[5] * tx; e[4] += e[5] * ty;
         e[6] += e[8] * tx; e[7] += e[8] * ty;
         return this;
     }
 
-    scale(sx: number, sy: number): Matrix3
-    {
-        const e = this.e;
-        e[0] *= sx; e[3] *= sx; e[6] *= sx;
-        e[1] *= sy; e[4] *= sy; e[7] *= sy;
-        return this;
-    }
-
     rotate(angle: number): Matrix3
     {
-        const e = this.e;
+        const e = this.elements;
         const si = Math.sin(angle);
         const co = Math.cos(angle);
 
@@ -267,6 +352,14 @@ export default class Matrix3
 
         e[0] = t00; e[3] = t01; e[6] = t02;
         e[1] = t10; e[4] = t11; e[7] = t12;
+        return this;
+    }
+
+    scale(sx: number, sy: number): Matrix3
+    {
+        const e = this.elements;
+        e[0] *= sx; e[3] *= sx; e[6] *= sx;
+        e[1] *= sy; e[4] *= sy; e[7] *= sy;
         return this;
     }
 }

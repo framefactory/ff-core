@@ -6,7 +6,7 @@
  */
 
 import { assert } from "chai";
-import clone from "../source/clone";
+import clone from "@ff/core/clone";
 
 ////////////////////////////////////////////////////////////////////////////////
 // CLONE FUNCTION - TEST SUITE

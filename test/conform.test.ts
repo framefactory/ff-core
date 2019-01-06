@@ -6,7 +6,7 @@
  */
 
 import { assert } from "chai";
-import conform from "../source/conform";
+import conform from "@ff/core/conform";
 
 ////////////////////////////////////////////////////////////////////////////////
 // CONFORM FUNCTION - TEST SUITE

@@ -5,6 +5,8 @@
  * License: MIT
  */
 
+import Vector2_test from "./Vector2.test";
+import Vector3_test from "./Vector3.test";
 import Color_test from "./Color.test";
 import clone_test from "./clone.test";
 import check_test from "./check.test";
@@ -15,6 +17,8 @@ import animation_test from "./animation/test";
 ////////////////////////////////////////////////////////////////////////////////
 
 suite("FF Core", function() {
+    Vector2_test();
+    Vector3_test();
     Color_test();
     clone_test();
     check_test();

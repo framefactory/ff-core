@@ -17,11 +17,20 @@ export interface IVector4
     w: number;
 }
 
+/**
+ * 4-dimensional vector.
+ */
 export default class Vector4
 {
+    static readonly zeros = new Vector4(0, 0, 0, 0);
+    static readonly ones = new Vector4(1, 1, 1, 1);
+    static readonly unitX = new Vector4(1, 0, 0, 0);
+    static readonly unitY = new Vector4(0, 1, 0, 0);
+    static readonly unitZ = new Vector4(0, 0, 1, 0);
+    static readonly unitW = new Vector4(0, 0, 0, 1);
+
     /**
-     * Returns a new vector with all components set to zero.
-     * @returns {Vector4}
+     * Returns a new vector with all components set to zero: [0, 0, 0, 0].
      */
     static makeZeros(): Vector4
     {
@@ -29,8 +38,7 @@ export default class Vector4
     }
 
     /**
-     * Returns a new vector with all components set to one.
-     * @returns {Vector4}
+     * Returns a new vector with all components set to one: [1, 1, 1, 1].
      */
     static makeOnes(): Vector4
     {
@@ -38,46 +46,49 @@ export default class Vector4
     }
 
     /**
-     * Returns a new vector of unit length, parallel to the X axis.
-     * @returns {Vector4}
+     * Returns a new unit-length vector, parallel to the X axis: [1, 0, 0, 0].
      */
     static makeUnitX(): Vector4
     {
-        return new Vector4(1, 0, 0, 1);
+        return new Vector4(1, 0, 0, 0);
     }
 
     /**
-     * Returns a new vector of unit length, parallel to the Y axis.
-     * @returns {Vector4}
+     * Returns a new unit-length vector, parallel to the Y axis: [0, 1, 0, 0].
      */
     static makeUnitY(): Vector4
     {
-        return new Vector4(0, 1, 0, 1);
+        return new Vector4(0, 1, 0, 0);
     }
 
     /**
-     * Returns a new vector of unit length, parallel to the Z axis.
-     * @returns {Vector4}
+     * Returns a new unit-length vector, parallel to the Z axis: [0, 0, 1, 0].
      */
     static makeUnitZ(): Vector4
     {
-        return new Vector4(0, 0, 1, 1);
+        return new Vector4(0, 0, 1, 0);
+    }
+
+    /**
+     * Returns a new unit-length vector, parallel to the W axis: [0, 0, 0, 1].
+     */
+    static makeUnitW(): Vector4
+    {
+        return new Vector4(0, 0, 0, 1);
     }
 
     /**
      * Returns a new vector with components set from the given vector.
-     * @param {Vector4} vector
-     * @returns {Vector4}
+     * @param vector
      */
-    static makeFromVector(vector: IVector4)
+    static makeCopy(vector: IVector4)
     {
         return new Vector4(vector.x, vector.y, vector.z, vector.w);
     }
 
     /**
      * Returns a new vector with each component set to the given scalar value.
-     * @param {number} scalar
-     * @returns {Vector4}
+     * @param scalar
      */
     static makeFromScalar(scalar: number)
     {
@@ -86,48 +97,50 @@ export default class Vector4
 
     /**
      * Returns a new vector with components set from the values of the given array.
-     * @param {number[]} array
-     * @returns {Vector4}
+     * @param array
      */
     static makeFromArray(array: number[]): Vector4
     {
         return new Vector4(array[0], array[1], array[2], array[3]);
     }
 
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-
     /**
      * Returns a new positional vector from the given [[Vector3]].
-     * Copies the components of the given vector to x, y, z and sets w to 0.
-     * @param {Vector3} position
-     * @returns {Vector4}
+     * Copies the components of the given vector to x, y, z and sets w to 1.
+     * @param position
      */
     static makeFromPosition(position: IVector3): Vector4
     {
-        return new Vector4(position.x, position.y, position.z, 0);
+        return new Vector4(position.x, position.y, position.z, 1);
     }
 
     /**
      * Returns a new directional vector from the given [[Vector3]].
-     * Copies the components of the given vector to x, y, z and sets w to 1.
-     * @param {Vector3} direction
-     * @returns {Vector4} this
+     * Copies the components of the given vector to x, y, z and sets w to 0.
+     * @param direction
      */
     static makeFromDirection(direction: IVector3): Vector4
     {
-        return new Vector4(direction.x, direction.y, direction.z, 1);
+        return new Vector4(direction.x, direction.y, direction.z, 0);
     }
 
+    /** The vector's x component. */
+    x: number;
+    /** The vector's y component. */
+    y: number;
+    /** The vector's z component. */
+    z: number;
+    /** The vector's w component. */
+    w: number;
+
+
     /**
-     * Constructs a new vector with the given x and y values.
-     * If the parameters are omitted, the components are set to zero.
-     * @param {number} x
-     * @param {number} y
-     * @param {number} z
-     * @param {number} w
+     * Constructs a new vector with the given x, y, z, and w values.
+     * Omitted or invalid values are set to zero.
+     * @param x
+     * @param y
+     * @param z
+     * @param w
      */
     constructor(x?: number, y?: number, z?: number, w?: number)
     {
@@ -138,28 +151,10 @@ export default class Vector4
     }
 
     /**
-     * Sets the components of this to the given values.
-     * @param {number} x
-     * @param {number} y
-     * @param {number} z
-     * @param {number} w
-     * @returns {Vector4} this
-     */
-    set(x: number, y: number, z: number, w: number): Vector4
-    {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
-        return this;
-    }
-
-    /**
      * Copies the components of the given vector to this.
-     * @param {Vector4} vector
-     * @returns {Vector4}
+     * @param vector
      */
-    setVector(vector: IVector4): Vector4
+    copy(vector: IVector4): Vector4
     {
         this.x = vector.x;
         this.y = vector.y;
@@ -169,11 +164,26 @@ export default class Vector4
     }
 
     /**
-     * Sets each component of this to the given scalar value.
-     * @param {number} scalar
-     * @returns {Vector4}
+     * Sets the components of this to the given values.
+     * @param x
+     * @param y
+     * @param z
+     * @param w Optional, is set to one if omitted.
      */
-    setScalar(scalar: number): Vector4
+    set(x: number, y: number, z: number, w?: number): Vector4
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w === undefined ? 1 : w;
+        return this;
+    }
+
+    /**
+     * Sets each component to the given scalar value.
+     * @param scalar
+     */
+    setFromScalar(scalar: number): Vector4
     {
         this.x = scalar;
         this.y = scalar;
@@ -183,54 +193,51 @@ export default class Vector4
     }
 
     /**
-     * Sets the components of this to the values of the given array.
-     * @param {number[]} array
-     * @returns {Vector4} this
+     * Sets the components to the values of the given array.
+     * @param array
+     * @param offset Optional start index of the array. Default is 0.
      */
-    setArray(array: number[]): Vector4
+    setFromArray(array: number[], offset: number = 1): Vector4
     {
-        this.x = array[0];
-        this.y = array[1];
-        this.z = array[2];
-        this.w = array[3];
+        this.x = array[offset];
+        this.y = array[offset + 1];
+        this.z = array[offset + 2];
+        this.w = array[offset + 3];
         return this;
     }
 
     /**
-     * Sets this as positional vector from the given [[Vector3]].
-     * Copies the components of the given vector to x, y, z and sets w to 0.
-     * @param {Vector3} position
-     * @returns {Vector4} this
+     * Sets this to a positional vector by copying the values of the given [[Vector3]]
+     * and adding one as fourth component.
+     * @param position
      */
     setPosition(position: IVector3): Vector4
     {
         this.x = position.x;
         this.y = position.y;
         this.z = position.z;
-        this.w = 0;
+        this.w = 1;
         return this;
     }
 
     /**
-     * Sets this as directional vector from the given [[Vector3]].
-     * Copies the components of the given vector to x, y, z and sets w to 1.
-     * @param {Vector3} direction
-     * @returns {Vector4} this
+     * Sets this to a positional vector by copying the values of the given [[Vector3]]
+     * and adding zero as fourth component.
+     * @param direction
      */
     setDirection(direction: IVector3): Vector4
     {
         this.x = direction.x;
         this.y = direction.y;
         this.z = direction.z;
-        this.w = 1;
+        this.w = 0;
         return this;
     }
 
     /**
-     * Sets all components of this to zero.
-     * @returns {Vector4} this
+     * Sets all components to zero.
      */
-    setZeroes(): Vector4
+    setZeros(): Vector4
     {
         this.x = 0;
         this.y = 0;
@@ -240,8 +247,7 @@ export default class Vector4
     }
 
     /**
-     * Sets all components of this to one.
-     * @returns {Vector4} this
+     * Sets all components to one.
      */
     setOnes(): Vector4
     {
@@ -254,47 +260,55 @@ export default class Vector4
 
     /**
      * Makes this a unit vector parallel to the X axis.
-     * @returns {Vector4} this
      */
     setUnitX(): Vector4
     {
         this.x = 1;
         this.y = 0;
         this.z = 0;
-        this.w = 1;
+        this.w = 0;
         return this;
     }
 
     /**
      * Makes this a unit vector parallel to the Y axis.
-     * @returns {Vector4} this
      */
     setUnitY(): Vector4
     {
         this.x = 0;
         this.y = 1;
         this.z = 0;
-        this.w = 1;
+        this.w = 0;
         return this;
     }
 
     /**
      * Makes this a unit vector parallel to the Z axis.
-     * @returns {Vector4} this
      */
     setUnitZ(): Vector4
     {
         this.x = 0;
         this.y = 0;
         this.z = 1;
+        this.w = 0;
+        return this;
+    }
+
+    /**
+     * Makes this a unit vector parallel to the W axis.
+     */
+    setUnitW(): Vector4
+    {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
         this.w = 1;
         return this;
     }
 
     /**
      * Adds the given vector to this.
-     * @param {Vector4} other
-     * @returns {Vector4} this
+     * @param other
      */
     add(other: IVector4): Vector4
     {
@@ -307,8 +321,7 @@ export default class Vector4
 
     /**
      * Subtracts the given vector from this.
-     * @param {Vector4} other
-     * @returns {Vector4} this
+     * @param other
      */
     sub(other: IVector4): Vector4
     {
@@ -320,9 +333,8 @@ export default class Vector4
     }
 
     /**
-     * Component-wise multiplication of this with the given vector.
-     * @param {Vector4} other
-     * @returns {Vector4} this
+     * Multiplies each component with the corresponding component of the given vector.
+     * @param other
      */
     mul(other: IVector4): Vector4
     {
@@ -334,9 +346,8 @@ export default class Vector4
     }
 
     /**
-     * Component-wise division of this by the given vector.
-     * @param {Vector4} other
-     * @returns {Vector4} this
+     * Divides each component by the corresponding component of the given vector.
+     * @param other
      */
     div(other: IVector4): Vector4
     {
@@ -348,8 +359,7 @@ export default class Vector4
     }
 
     /**
-     * Normalizes this, making it a unit vector.
-     * @returns {Vector4} this
+     * Normalizes the vector, making it a unit vector.
      */
     normalize(): Vector4
     {
@@ -362,8 +372,7 @@ export default class Vector4
     }
 
     /**
-     * Makes this homogeneous by dividing all components by the last components.
-     * @returns {Vector4} this
+     * Makes this vector homogeneous by dividing all components by the w-component.
      */
     homogenize(): Vector4
     {
@@ -376,11 +385,11 @@ export default class Vector4
 
     /**
      * Projects this onto the given vector.
-     * @param {Vector4} other
-     * @returns {Vector4}
+     * @param other
      */
     project(other: IVector4): Vector4
     {
+        //TODO: Verify
         const f = this.dot(other) / this.lengthSquared();
         this.x *= f;
         this.y *= f;
@@ -391,8 +400,7 @@ export default class Vector4
 
     /**
      * Returns the dot product of this and the given vector.
-     * @param {Vector4} other
-     * @returns {number}
+     * @param other
      */
     dot(other: IVector4): number
     {
@@ -401,24 +409,24 @@ export default class Vector4
 
     /**
      * Returns the 2-norm (length) of this.
-     * @returns {number}
      */
     length(): number
     {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        const x = this.x, y = this.y, z = this.z, w = this.w;
+        return Math.sqrt(x * x + y * y + z * z + w * w);
     }
 
     /**
      * Returns the squared 2-norm of this, i.e. the dot product of the vector with itself.
-     * @returns {number}
      */
     lengthSquared(): number
     {
-        return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
+        const x = this.x, y = this.y, z = this.z, w = this.w;
+        return x * x + y * y + z * z + w * w;
     }
 
     /**
-     * Returns true if all components are zero.
+     * Returns true if all components are exactly zero.
      * @returns {boolean}
      */
     isZero(): boolean
@@ -427,8 +435,7 @@ export default class Vector4
     }
 
     /**
-     * Returns a clone of this.
-     * @returns {Vector4}
+     * Returns a clone of this vector.
      */
     clone(): Vector4
     {
@@ -436,18 +443,21 @@ export default class Vector4
     }
 
     /**
-     * Returns an array with the components of this vector.
-     * If an array is given, the components of this are copied into it.
-     * @param {number[]} array
-     * @returns {number[]}
+     * Returns an array with the components of this.
+     * @param array Optional destination array.
+     * @param offset Optional start index of the array. Default is 0.
      */
-    toArray(array?: number[]): number[]
+    toArray(array?: number[], offset?: number): number[]
     {
         if (array) {
-            array[0] = this.x;
-            array[1] = this.y;
-            array[2] = this.z;
-            array[3] = this.w;
+            if (offset === undefined) {
+                offset = 0;
+            }
+
+            array[offset] = this.x;
+            array[offset + 1] = this.y;
+            array[offset + 2] = this.z;
+            array[offset + 3] = this.w;
             return array;
         }
 
@@ -460,10 +470,8 @@ export default class Vector4
     }
 
     /**
-     * Returns a [[Vector3]] with the x, y, and z components of this vector.
-     * If a vector is given, the components of this are copied into it.
-     * @param {Vector3} vector
-     * @returns {Vector3}
+     * Returns a [[Vector3]] with the x, y, and z components of this.
+     * @param vector Optional destination vector.
      */
     toVector3(vector?: Vector3): Vector3
     {
@@ -478,8 +486,7 @@ export default class Vector4
     }
 
     /**
-     * Returns a text representation of this.
-     * @returns {string}
+     * Returns a text representation.
      */
     toString()
     {

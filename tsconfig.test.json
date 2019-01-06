@@ -9,12 +9,12 @@
         "sourceMap": true,
 
         "rootDir": "test",
-        "outDir": "../node_modules/@ff/test/core"
+        "outDir": "../../node_modules/@ff/test/core"
     },
     "include": [
         "test/**/*"
     ],
     "references": [{
-        "path": "../source"
+        "path": "tsconfig.module.json"
     }]
 }

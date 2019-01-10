@@ -94,6 +94,15 @@ export default class Vector3 implements IVector3
         return new Vector3(array[0], array[1], array[2]);
     }
 
+    /**
+     * Returns a string representation of the given vector.
+     * @param vector
+     */
+    static toString(vector: IVector3)
+    {
+        return `[${vector.x}, ${vector.y}, ${vector.z}]`;
+    }
+
     /** The vector's x component. */
     x: number;
     /** The vector's y component. */
@@ -569,6 +578,6 @@ export default class Vector3 implements IVector3
      */
     toString()
     {
-        return `[${this.x}, ${this.y}, ${this.z}]`;
+        return Vector3.toString(this);
     }
 }

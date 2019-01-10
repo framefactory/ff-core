@@ -72,6 +72,17 @@ export default class Matrix3
         return matrix;
     }
 
+    /**
+     * Returns a text representation of the given matrix.
+     * @param matrix
+     */
+    static toString(matrix: IMatrix3)
+    {
+        const e = matrix.elements;
+        return `[${e[0]}, ${e[3]}, ${e[6]}]\n[${e[1]}, ${e[4]}, ${e[7]}]\n[${e[2]}, ${e[5]}, ${e[8]}]`;
+
+    }
+
     /** The matrix' elements in column major order. */
     elements: Float32Array;
 
@@ -361,5 +372,45 @@ export default class Matrix3
         e[0] *= sx; e[3] *= sx; e[6] *= sx;
         e[1] *= sy; e[4] *= sy; e[7] *= sy;
         return this;
+    }
+
+    toArray(array?: number[], rowMajor: boolean = false): number[]
+    {
+        if (!array) {
+            array = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+        }
+
+        const e = this.elements;
+
+        if (rowMajor) {
+            array[0] = e[0]; array[3] = e[1]; array[2] = e[2];
+            array[1] = e[3]; array[4] = e[4]; array[5] = e[5];
+            array[2] = e[6]; array[5] = e[7]; array[8] = e[8];
+        }
+        else {
+            array[0] = e[0];  array[1] = e[1];  array[2] = e[2];
+            array[3] = e[3];  array[4] = e[4];  array[5] = e[5];
+            array[6] = e[6];  array[7] = e[7];  array[8] = e[8];
+        }
+
+        return array;
+    }
+
+    toTypedArray(array?: Float32Array): Float32Array
+    {
+        if (array) {
+            array.set(this.elements, 0);
+            return array;
+        }
+
+        return new Float32Array(this.elements);
+    }
+
+    /**
+     * Returns a text representation of this matrix.
+     */
+    toString()
+    {
+        return Matrix3.toString(this);
     }
 }

@@ -51,6 +51,16 @@ export default class Matrix4
         return new Matrix4();
     }
 
+    /**
+     * Returns a text representation of the given matrix.
+     * @param matrix
+     */
+    static toString(matrix: IMatrix4)
+    {
+        const e = matrix.elements;
+        return `[${e[0]}, ${e[4]}, ${e[8]}, ${e[12]}]\n[${e[1]}, ${e[5]}, ${e[9]}, ${e[13]}]\n[${e[2]}, ${e[6]}, ${e[10]}, ${e[14]}]\n[${e[3]}, ${e[7]}, ${e[11]}, ${e[15]}]`;
+    }
+
     /** The matrix' elements in column major order. */
     elements: Float32Array;
 
@@ -445,11 +455,10 @@ export default class Matrix4
     }
 
     /**
-     * Returns a text representation.
+     * Returns a text representation of this matrix.
      */
     toString()
     {
-        const e = this.elements;
-        return `[${e[0]}, ${e[4]}, ${e[8]}, ${e[12]}]\n[${e[1]}, ${e[5]}, ${e[9]}, ${e[13]}]\n[${e[2]}, ${e[6]}, ${e[10]}, ${e[14]}]\n[${e[3]}, ${e[7]}, ${e[11]}, ${e[15]}]`;
+        return Matrix4.toString(this);
     }
 }

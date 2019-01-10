@@ -82,6 +82,15 @@ export default class Vector2 implements IVector2
         return new Vector2(array[0], array[1]);
     }
 
+    /**
+     * Returns a string representation of the given vector.
+     * @param vector
+     */
+    static toString(vector: IVector2)
+    {
+        return `[${vector.x}, ${vector.y}]`;
+    }
+
     /** The vector's x component. */
     x: number;
     /** The vector's y component. */
@@ -462,6 +471,6 @@ export default class Vector2 implements IVector2
      */
     toString()
     {
-        return `[${this.x}, ${this.y}]`;
+        return Vector2.toString(this);
     }
 }

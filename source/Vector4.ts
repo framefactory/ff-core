@@ -124,6 +124,15 @@ export default class Vector4
         return new Vector4(direction.x, direction.y, direction.z, 0);
     }
 
+    /**
+     * Returns a string representation of the given vector.
+     * @param vector
+     */
+    static toString(vector: IVector4)
+    {
+        return `[${vector.x}, ${vector.y}, ${vector.z}, ${vector.w}]`;
+    }
+
     /** The vector's x component. */
     x: number;
     /** The vector's y component. */
@@ -490,6 +499,6 @@ export default class Vector4
      */
     toString()
     {
-        return `[${this.x}, ${this.y}, ${this.z}, ${this.w}]`;
+        return Vector4.toString(this);
     }
 }

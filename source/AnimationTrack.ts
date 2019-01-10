@@ -5,8 +5,9 @@
  * License: MIT
  */
 
-import SortedArray from "../SortedArray";
+import SortedArray from "./SortedArray";
 
+////////////////////////////////////////////////////////////////////////////////
 
 export interface IKey<T = any>
 {
@@ -23,7 +24,7 @@ export interface IKeyPair<K extends IKey>
 /**
  * Base class for a track containing keyframes
  */
-export default class Track<T, K extends IKey<T>>
+export default class AnimationTrack<T = any, K extends IKey<T> = IKey<T>>
 {
     readonly keys: SortedArray<K>;
 
@@ -51,6 +52,11 @@ export default class Track<T, K extends IKey<T>>
     setDefaultValue(value: T)
     {
         this.defaultValue = value;
+    }
+
+    insert(time: number, value: T)
+    {
+        this.insertKey({ time, value } as K);
     }
 
     insertKey(key: K)

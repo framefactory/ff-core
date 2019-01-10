@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import math from "../math";
-import Track, { IKey, IKeyPair } from "./Track";
+import math from "./math";
+import AnimationTrack, { IKey, IKeyPair } from "./AnimationTrack";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@ export interface ISplineKeyPair extends IKeyPair<ISplineKey>
 {
 }
 
-export default class SplineTrack extends Track<number, ISplineKey>
+export default class SplineTrack extends AnimationTrack<number, ISplineKey>
 {
     interval: ISplineKeyPair;
 
@@ -50,7 +50,7 @@ export default class SplineTrack extends Track<number, ISplineKey>
         };
     }
 
-    insert(time: number, value: number, type: InterpolationType = InterpolationType.Hold)
+    insert(time: number, value: number, type: InterpolationType = InterpolationType.Ease)
     {
         this.insertKey({
             time,

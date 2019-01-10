@@ -12,7 +12,7 @@ import clone_test from "./clone.test";
 import check_test from "./check.test";
 import conform_test from "./conform.test";
 import SortedArray_test from "./SortedArray.test";
-import animation_test from "./animation/test";
+import SplineTrack_test from "./SplineTrack.test";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -24,5 +24,5 @@ suite("FF Core", function() {
     check_test();
     conform_test();
     SortedArray_test();
-    animation_test();
+    SplineTrack_test();
 });

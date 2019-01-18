@@ -5,186 +5,322 @@
  * License: MIT
  */
 
-export interface IColorHSL
-{
-    hue: number,
-    saturation: number,
-    luminance: number,
-    alpha?: number
-}
+import Vector3, { IVector3 } from "./Vector3";
+import Vector4, { IVector4 } from "./Vector4";
 
-export default class Color
+////////////////////////////////////////////////////////////////////////////////
+
+export { Vector3, IVector3, Vector4, IVector4 };
+
+/**
+ * RGB color with alpha channel. The class is compatible with Vector4,
+ * the field names for the colors are x (red), y (green), z (blue), and w (alpha).
+ *
+ * Source for RGB/HSL/HSV conversions: https://gist.github.com/mjackson/5311256
+ */
+export default class Color implements IVector4
 {
     static fromString(color: string): Color
     {
         return (new Color()).setString(color);
     }
 
-    static fromHSL(hue: number | IColorHSL, saturation: number = 1, luminance: number = 1): Color
-    {
-        return (new Color()).setHSL(hue, saturation, luminance)
-    }
-
-    "0": number;
-    "1": number;
-    "2": number;
-    "3": number;
+    x: number;
+    y: number;
+    z: number;
+    w: number;
 
     length: 4;
 
     constructor(red: number | number[] | string | Color = 0, green: number = 0, blue: number = 0, alpha: number = 1)
     {
         if (typeof red === "object" && (red instanceof Color || Array.isArray(red))) {
-            this[0] = red[0];
-            this[1] = red[1];
-            this[2] = red[2];
-            this[3] = red[3];
+            this.x = red[0];
+            this.y = red[1];
+            this.z = red[2];
+            this.w = red[3];
         }
         else if (typeof red === "string") {
             this.setString(red);
         }
         else {
-            this[0] = red;
-            this[1] = green;
-            this[2] = blue;
-            this[3] = alpha;
+            this.x = red;
+            this.y = green;
+            this.z = blue;
+            this.w = alpha;
         }
     }
 
-    get red(): number { return this[0]; }
-    get green(): number { return this[1]; }
-    get blue(): number { return this[2]; }
-    get alpha(): number { return this[3]; }
+    get r() { return this.x; }
+    get g() { return this.y; }
+    get b() { return this.z; }
+    get a() { return this.w; }
 
-    set red(value: number) { this[0] = value; }
-    set green(value: number) { this[1] = value; }
-    set blue(value: number) { this[2] = value; }
-    set alpha(value: number) { this[3] = value; }
+    set r(value: number) { this.x = value; }
+    set g(value: number) { this.y = value; }
+    set b(value: number) { this.z = value; }
+    set a(value: number) { this.w = value; }
 
-    get redByte(): number { return Math.floor(this[0] * 255); }
-    get greenByte(): number { return Math.floor(this[1] * 255); }
-    get blueByte(): number { return Math.floor(this[2] * 255); }
-    get alphaByte(): number { return Math.floor(this[3] * 255); }
+    get red(): number { return this.x; }
+    get green(): number { return this.y; }
+    get blue(): number { return this.z; }
+    get alpha(): number { return this.w; }
 
-    set redByte(value: number) { this[0] = value / 255.0; }
-    set greenByte(value: number) { this[1] = value / 255.0; }
-    set blueByte(value: number) { this[2] = value / 255.0; }
-    set alphaByte(value: number) { this[3] = value / 255.0; }
+    set red(value: number) { this.x = value; }
+    set green(value: number) { this.y = value; }
+    set blue(value: number) { this.z = value; }
+    set alpha(value: number) { this.w = value; }
+
+    get redByte(): number { return Math.floor(this.x * 255); }
+    get greenByte(): number { return Math.floor(this.y * 255); }
+    get blueByte(): number { return Math.floor(this.z * 255); }
+    get alphaByte(): number { return Math.floor(this.w * 255); }
+
+    set redByte(value: number) { this.x = value / 255.0; }
+    set greenByte(value: number) { this.y = value / 255.0; }
+    set blueByte(value: number) { this.z = value / 255.0; }
+    set alphaByte(value: number) { this.w = value / 255.0; }
+
+    inverseMultiply(factor: number): Color
+    {
+        this.x = this.x * (1 - factor) + factor;
+        this.y = this.y * (1 - factor) + factor;
+        this.z = this.z * (1 - factor) + factor;
+
+        return this;
+    }
+
+    multiply(factor: number): Color
+    {
+        this.x *= factor;
+        this.y *= factor;
+        this.z *= factor;
+
+        return this;
+    }
+
+    copy(color: Color)
+    {
+        this.x = color.x;
+        this.y = color.y;
+        this.z = color.z;
+        this.w = color.w;
+    }
 
     clone() : Color
     {
-        return new Color(this[0], this[1], this[2], this[3]);
+        return new Color(this.x, this.y, this.z, this.w);
     }
     
     set(red: number, green: number, blue: number, alpha?: number)
     {
-        this[0] = red;
-        this[1] = green;
-        this[2] = blue;
-        this[3] = alpha === undefined ? 1 : alpha;
+        this.x = red;
+        this.y = green;
+        this.z = blue;
+        this.w = alpha === undefined ? 1 : alpha;
+
+        return this;
     }
 
     setBytes(red: number, green: number, blue: number, alpha?: number)
     {
-        this[0] = red / 255;
-        this[1] = green / 255;
-        this[2] = blue / 255;
-        this[3] = alpha === undefined ? 1 : alpha / 255;
+        this.x = red / 255;
+        this.y = green / 255;
+        this.z = blue / 255;
+        this.w = alpha === undefined ? 1 : alpha / 255;
+
+        return this;
+    }
+
+    setUInt24RGB(x: number)
+    {
+        this.x = (x >> 16) & 0xff;
+        this.y = (x >> 8) & 0xff;
+        this.z = x & 0xff;
+        this.w = 1;
+
+        return this;
+    }
+
+    setUInt32RGBA(x: number)
+    {
+        this.x = (x >> 24) & 0xff;
+        this.y = (x >> 16) & 0xff;
+        this.z = (x >> 8) & 0xff;
+        this.w = x & 0xff;
+        this.w = 1;
+
+        return this;
     }
 
     setRed(red: number) : Color
     {
-        this[0] = red;
+        this.x = red;
         return this;
     }
 
     setGreen(green: number) : Color
     {
-        this[1] = green;
+        this.y = green;
         return this;
     }
 
     setBlue(blue: number) : Color
     {
-        this[2] = blue;
+        this.z = blue;
         return this;
     }
 
     setAlpha(alpha: number) : Color
     {
-        this[3] = alpha;
+        this.w = alpha;
         return this;
     }
 
     setRedByte(red: number) : Color
     {
-        this[0] = red / 255;
+        this.x = red / 255;
         return this;
     }
 
     setGreenByte(green: number) : Color
     {
-        this[1] = green / 255;
+        this.y = green / 255;
         return this;
     }
 
     setBlueByte(blue: number) : Color
     {
-        this[2] = blue / 255;
+        this.z = blue / 255;
         return this;
     }
 
     setAlphaByte(alpha: number) : Color
     {
-        this[3] = alpha / 255;
+        this.w = alpha / 255;
         return this;
     }
 
-    setString(color: string, alpha: number = 1): Color
+    setHSV(hue: number | IVector3 | IVector4, saturation: number = 1, value: number = 1, alpha?: number): Color
+    {
+        if (typeof hue === "object") {
+            saturation = hue.y;
+            value = hue.z;
+            alpha = hue["w"] !== undefined ? hue["w"] : alpha;
+            hue = hue.x;
+        }
+
+        const i = Math.floor(hue / 60);
+        const f = hue / 60 - i;
+        const p = value * (1 - saturation);
+        const q = value * (1 - f * saturation);
+        const t = value * (1 - (1 - f) * saturation);
+        let r, g, b;
+
+        switch (i % 6) {
+            case 0: r = value; g = t; b = p; break;
+            case 1: r = q; g = value; b = p; break;
+            case 2: r = p; g = value; b = t; break;
+            case 3: r = p; g = q; b = value; break;
+            case 4: r = t; g = p; b = value; break;
+            case 5: r = value; g = p; b = q; break;
+        }
+
+        this.x = r;
+        this.y = g;
+        this.z = b;
+
+        if (alpha !== undefined) {
+            this.w = alpha;
+        }
+
+        return this;
+    }
+
+    setHSL(hue: number | IVector3 | IVector4, saturation: number = 1, luminance: number = 1, alpha?: number): Color
+    {
+        if (typeof hue === "object") {
+            saturation = hue.y;
+            luminance = hue.z;
+            alpha = hue["w"] !== undefined ? hue["w"] : alpha;
+            hue = hue.x;
+        }
+
+        if (saturation === 0) {
+            this.x = this.y = this.z = luminance;
+        }
+        else {
+            hue /= 360;
+
+            function hue2rgb(p, q, t) {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            }
+
+            var q = luminance < 0.5 ? luminance * (1 + saturation) : luminance + saturation - luminance * saturation;
+            var p = 2 * luminance - q;
+
+            this.x = hue2rgb(p, q, hue + 1/3);
+            this.y = hue2rgb(p, q, hue);
+            this.z = hue2rgb(p, q, hue - 1/3);
+        }
+
+        if (alpha !== undefined) {
+            this.w = alpha;
+        }
+
+        return this;
+    }
+
+    setString(color: string, alpha: number = 1, throws: boolean = true): Color
     {
         color = color.trim().toLowerCase();
         color = Color.presets[color] || color;
 
-        let result = color.match(/^#([0-9a-f]{3})$/i);
-        if(result) {
+        let result = color.match(/^#?([0-9a-f]{3})$/i);
+        if (result) {
             const text = result[1];
             const factor = 1 / 15;
-            this[0] = Number.parseInt(text.charAt(0), 16) * factor;
-            this[1] = Number.parseInt(text.charAt(1), 16) * factor;
-            this[2] = Number.parseInt(text.charAt(2), 16) * factor;
-            this[3] = alpha;
+            this.x = Number.parseInt(text.charAt(0), 16) * factor;
+            this.y = Number.parseInt(text.charAt(1), 16) * factor;
+            this.z = Number.parseInt(text.charAt(2), 16) * factor;
+            this.w = alpha;
             return this;
         }
 
-        result = color.match(/^#([0-9a-f]{6})$/i);
-        if(result) {
+        result = color.match(/^#?([0-9a-f]{6})$/i);
+        if (result) {
             const text = result[1];
             const factor = 1 / 255;
-            this[0] = Number.parseInt(text.substr(0,2), 16) * factor;
-            this[1] = Number.parseInt(text.substr(2,2), 16) * factor;
-            this[2] = Number.parseInt(text.substr(4,2), 16) * factor;
-            this[3] = alpha;
+            this.x = Number.parseInt(text.substr(0,2), 16) * factor;
+            this.y = Number.parseInt(text.substr(2,2), 16) * factor;
+            this.z = Number.parseInt(text.substr(4,2), 16) * factor;
+            this.w = alpha;
             return this;
         }
 
         if (color.indexOf("rgb") === 0) {
             let result : any = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
-            if(result) {
+            if (result) {
                 const factor = 1 / 255;
-                this[0] = Number.parseInt(result[1]) * factor;
-                this[1] = Number.parseInt(result[2]) * factor;
-                this[2] = Number.parseInt(result[3]) * factor;
-                this[3] = alpha;
+                this.x = Number.parseInt(result[1]) * factor;
+                this.y = Number.parseInt(result[2]) * factor;
+                this.z = Number.parseInt(result[3]) * factor;
+                this.w = alpha;
                 return this;
             }
 
             result = color.match(/^rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+.*\d*)\s*\)$/i);
-            if(result) {
+            if (result) {
                 const factor = 1 / 255;
-                this[0] = Number.parseInt(result[1]) * factor;
-                this[1] = Number.parseInt(result[2]) * factor;
-                this[2] = Number.parseInt(result[3]) * factor;
-                this[3] = Number.parseFloat(result[4]);
+                this.x = Number.parseInt(result[1]) * factor;
+                this.y = Number.parseInt(result[2]) * factor;
+                this.z = Number.parseInt(result[3]) * factor;
+                this.w = Number.parseFloat(result[4]);
                 return this;
             }
         }
@@ -202,104 +338,86 @@ export default class Color
             return this;
         }
 
-        throw new RangeError("failed to parse color from string: " + color);
+        if (throws) {
+            throw new RangeError("failed to parse color from string: " + color);
+        }
+
+        return this;
     }
 
-    toInt(): number
+    toUInt24RGB(): number
     {
-        return Math.floor(this[0] * 255) << 16
-            + Math.floor(this[1] * 255) << 8
-            + Math.floor(this[2] * 255);
+        return Math.floor(this.x * 255) << 16
+            + Math.floor(this.y * 255) << 8
+            + Math.floor(this.z * 255);
     }
 
-    toString(): string
+    toUInt32RGBA(): number
     {
-        const alpha = this[3];
+        return Math.floor(this.x * 255) << 24
+            + Math.floor(this.y * 255) << 16
+            + Math.floor(this.z * 255) << 8
+            + Math.floor(this.w * 255);
+    }
 
-        if (alpha < 1) {
-            return `rgba(${this.redByte}, ${this.greenByte}, ${this.blueByte}, ${alpha})`;
+    toHSV(hsv?: IVector3): IVector3
+    {
+        let r = this.x, g = this.y, b = this.z;
+
+        let min = Math.min(r, g, b);
+        let max = Math.max(r, g, b);
+        let d = max - min;
+        let h = 0;
+        let s = max === 0 ? 0 : d / max;
+        let v = max;
+
+        if (d !== 0) {
+            h = (r === max ? (g - b) / d + (g < b ? 6 : 0) : (g === max ? (b - r) / d + 2 : (r - g) / d + 4)) * 60;
+        }
+
+        if (hsv) {
+            hsv.x = h;
+            hsv.y = s;
+            hsv.z = v;
+            return hsv;
+        }
+
+        return new Vector3(h, s, v);
+    }
+
+    toHSL(hsl?: IVector3): IVector3
+    {
+        let r = this.x, g = this.y, b = this.z;
+
+        let min = Math.min(r, g, b);
+        let max = Math.max(r, g, b);
+        let d = max - min;
+        let h = 0, s = 0, l = (max + min) * 0.5;
+
+        if (d !== 0) {
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            h = (r === max ? (g - b) / d + (g < b ? 6 : 0) : g === max ? 2 + (b - r) / d : 4 + (r - g) / d) * 60;
+        }
+
+        if (hsl) {
+            hsl.x = h;
+            hsl.y = s;
+            hsl.z = l;
+            return hsl;
+        }
+
+        return new Vector3(h, s, l);
+    }
+
+    toString(includeAlpha: boolean = true): string
+    {
+        if (includeAlpha && this.w < 1) {
+            return `rgba(${this.redByte}, ${this.greenByte}, ${this.blueByte}, ${this.w})`;
         }
         else {
             const value = (1 << 24) + (this.redByte << 16) + (this.greenByte << 8) + this.blueByte;
             return `#${value.toString(16).slice(1)}`;
         }
-    }
-
-    setHSL(hue: number | IColorHSL, saturation: number = 1, luminance: number = 1, alpha: number = 1): Color
-    {
-        if (typeof hue === "object") {
-            luminance = hue.luminance;
-            saturation = hue.saturation;
-            alpha = hue.alpha !== undefined ? hue.alpha : alpha;
-            hue = hue.hue;
-        }
-
-        if (saturation === 0) {
-            this[0] = this[1] = this[2] = luminance;
-        }
-        else {
-            hue /= 360;
-
-            let t2 = luminance < 0.5 ? luminance * (1 + saturation) : luminance + saturation - luminance * saturation;
-            let t1 = 2 * luminance - t2;
-            let t3, val;
-
-            for (let i = 0; i < 3; ++i) {
-                t3 = hue + 1 / 3 * (1 - i);
-                t3 < 0 && t3++;
-                t3 > 1 && t3--;
-                if (6 * t3 < 1)
-                    val= t1 + (t2 - t1) * 6 * t3;
-                else if (2 * t3 < 1)
-                    val= t2;
-                else if (3 * t3 < 2)
-                    val = t1 + (t2 - t1) * (2 / 3 - t3) * 6;
-                else
-                    val= t1;
-                this[i] = val;
-            }
-        }
-
-        this[3] = alpha;
-
-        return this;
-    }
-
-    toHSL(): IColorHSL
-    {
-        let r = this[0],
-            g = this[1],
-            b = this[2];
-
-        let min = Math.min(r, g, b),
-            max = Math.max(r, g, b),
-            d = max - min,
-            h = 0, s = 0, l = (min + max) / 2;
-
-        if (d != 0) {
-            s = l < 0.5 ? d / (max + min) : d / (2 - max - min);
-            h = (r == max ? (g - b) / d : g == max ? 2 + (b - r) / d : 4 + (r - g) / d) * 60;
-        }
-
-        return { hue: h, saturation: s, luminance: l };
-    }
-
-    inverseMultiply(factor: number): Color
-    {
-        this[0] = this[0] * (1 - factor) + factor;
-        this[1] = this[1] * (1 - factor) + factor;
-        this[2] = this[2] * (1 - factor) + factor;
-
-        return this;
-    }
-
-    multiply(factor: number): Color
-    {
-        this[0] *= factor;
-        this[1] *= factor;
-        this[2] *= factor;
-
-        return this;
     }
 
     private static presets = {

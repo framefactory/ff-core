@@ -6,7 +6,7 @@
  */
 
 import { assert } from "chai";
-import SplineTrack, { InterpolationType } from "@ff/core/animation/SplineTrack";
+import SplineTrack, { InterpolationType } from "@ff/core/SplineTrack";
 
 ////////////////////////////////////////////////////////////////////////////////
 // SPLINE TRACK CLASS - TEST SUITE
@@ -24,14 +24,15 @@ export default function() {
 
             assert.isFalse(track.empty());
             assert.lengthOf(track, 3);
-            assert.deepEqual(track.keys.items[0], { key: 3, value: { time: 3, value: 2, type: InterpolationType.Hold }});
-            assert.deepEqual(track.keys.items[2], { key: 5, value: { time: 5, value: 3, type: InterpolationType.Hold }});
+            assert.deepEqual(track.keys.items[0], { key: 3, value: { time: 3, value: 2, type: InterpolationType.Ease }});
+            assert.deepEqual(track.keys.items[2], { key: 5, value: { time: 5, value: 3, type: InterpolationType.Ease }});
 
             assert.equal(track.valueAt(3), 2);
             assert.equal(track.valueAt(1), 2);
             assert.equal(track.valueAt(7), 3);
-            assert.equal(track.valueAt(3.5), 2);
-            assert.equal(track.valueAt(4.5), 5);
+            assert.equal(track.valueAt(3.5), 3.5);
+            assert.equal(track.valueAt(4.5), 4);
+            assert.equal(track.valueAt(5), 3);
         });
 
         test("linear", function() {

@@ -34,7 +34,13 @@ export default class Color implements IVector4
 
     constructor(red: number | number[] | string | Color = 0, green: number = 0, blue: number = 0, alpha: number = 1)
     {
-        if (typeof red === "object" && (red instanceof Color || Array.isArray(red))) {
+        if (red instanceof Color) {
+            this.x = red.x;
+            this.y = red.y;
+            this.z = red.z;
+            this.w = red.w;
+        }
+        else if (Array.isArray(red)) {
             this.x = red[0];
             this.y = red[1];
             this.z = red[2];

@@ -164,23 +164,23 @@ export default function() {
         });
 
         test("toHSL - rgb to hsl conversion (a)", function() {
-            const b = { hue: 291, saturation: 0.31, luminance: 0.74 };
+            const b = { x: 291, y: 0.31, z: 0.74 };
             const c = new Color();
-            c.setHSL(b.hue, b.saturation, b.luminance);
+            c.setHSL(b);
             const d = c.toHSL();
-            assert.approximately(d.hue, b.hue, eps, "hue");
-            assert.approximately(d.saturation, b.saturation, eps, "saturation");
-            assert.approximately(d.luminance, b.luminance, eps, "luminance");
+            assert.approximately(d.x, b.x, eps, "hue");
+            assert.approximately(d.y, b.y, eps, "saturation");
+            assert.approximately(d.z, b.z, eps, "luminance");
         });
 
         test("toHSL - rgb to hsl conversion (b)", function() {
-            const b = { hue: 35, saturation: 0.89, luminance: 0.12 };
+            const b = { x: 35, y: 0.89, z: 0.12 };
             const c = new Color();
-            c.setHSL(b.hue, b.saturation, b.luminance);
+            c.setHSL(b.x, b.y, b.z);
             const d = c.toHSL();
-            assert.approximately(d.hue, b.hue, eps, "hue");
-            assert.approximately(d.saturation, b.saturation, eps, "saturation");
-            assert.approximately(d.luminance, b.luminance, eps, "luminance");
+            assert.approximately(d.x, b.x, eps, "hue");
+            assert.approximately(d.y, b.y, eps, "saturation");
+            assert.approximately(d.z, b.z, eps, "luminance");
         });
 
         test("inverseMultiply", function() {

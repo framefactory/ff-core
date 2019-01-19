@@ -12,7 +12,7 @@ export type Index = number;
 
 export type Identifier = string;
 
-export type Constructor<T> = {
+export type Constructor<T = any> = {
     new (...args: any[]): T;
 }
 

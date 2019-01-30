@@ -4,7 +4,6 @@
  *
  * License: MIT
  */
-import { TypeOf } from "./types";
 
 const _pd = Symbol("Publisher private data");
 const _strict = Symbol("Publisher strict option");

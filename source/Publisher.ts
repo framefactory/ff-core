@@ -4,6 +4,7 @@
  *
  * License: MIT
  */
+import { TypeOf } from "./types";
 
 const _pd = Symbol("Publisher private data");
 const _strict = Symbol("Publisher strict option");
@@ -44,7 +45,7 @@ export default class Publisher
      * @param context Optional: this context for the callback invocation.
      */
     on<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any);
-    on(type: string | string[], callback: (event: any) => void, context?: any);
+    on(type: string | string[] | object, callback: (event: any) => void, context?: any);
     on(type, callback, context?)
     {
         if (Array.isArray(type)) {
@@ -80,7 +81,7 @@ export default class Publisher
      * @param context Optional: this context for the callback invocation.
      */
     once<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any);
-    once(type: string | string[], callback: (event: any) => void, context?: any)
+    once(type: string | string[] | object, callback: (event: any) => void, context?: any)
     once(type, callback, context?)
     {
         if (Array.isArray(type)) {
@@ -108,7 +109,7 @@ export default class Publisher
      * @param context Optional: this context for the callback invocation.
      */
     off<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback?: (event: T) => void, context?: any);
-    off(type: string | string[], callback?: (event: any) => void, context?: any)
+    off(type: string | string[] | object, callback?: (event: any) => void, context?: any)
     off(type, callback?, context?)
     {
         if (Array.isArray(type)) {

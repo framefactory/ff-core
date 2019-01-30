@@ -40,12 +40,12 @@ export default class Publisher
 
     /**
      * Subscribes to an event.
-     * @param type Type name of the event.
+     * @param type Type name of the event or an array of type names of events.
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    on<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any);
-    on(type: string | string[] | object, callback: (event: any) => void, context?: any);
+    on<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: object);
+    on(type: string | string[] | object, callback: (event: any) => void, context?: object);
     on(type, callback, context?)
     {
         if (Array.isArray(type)) {
@@ -54,6 +54,10 @@ export default class Publisher
             });
 
             return;
+        }
+
+        if (!callback) {
+            throw new Error("missing callback function");
         }
 
         let subscribers = this[_pd][type];
@@ -69,19 +73,25 @@ export default class Publisher
         subscribers.push(subscriber);
     }
 
-    addEventListener(type: string, callback: (event: any) => void, context?: any)
+    /**
+     * Subscribes to an event. You may find using the .on() method more handy and more flexible.
+     * @param type
+     * @param callback
+     * @param context
+     */
+    addEventListener(type: string, callback: (event: any) => void, context?: object)
     {
         this.on(type, callback, context);
     }
 
     /**
      * One-time subscription to an event. As soon as the event is emitted, the subscription is cancelled.
-     * @param type Type name of the event.
+     * @param type Type name of the event or an array of type names of events.
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    once<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any);
-    once(type: string | string[] | object, callback: (event: any) => void, context?: any)
+    once<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: object);
+    once(type: string | string[] | object, callback: (event: any) => void, context?: object)
     once(type, callback, context?)
     {
         if (Array.isArray(type)) {
@@ -104,36 +114,69 @@ export default class Publisher
 
     /**
      * Unsubscribes from an event.
-     * @param type Type name of the event.
+     * @param type Type name of the event, or an array of type names of events.
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    off<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback?: (event: T) => void, context?: any);
-    off(type: string | string[] | object, callback?: (event: any) => void, context?: any)
+    off<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback?: (event: T) => void, context?: object);
+    off(type: string | string[] | object, callback?: (event: any) => void, context?: object)
+    off(type: object)
     off(type, callback?, context?)
     {
-        if (Array.isArray(type)) {
-            type.forEach((type) => {
-                this.off(type, callback, context);
-            });
+        if (typeof type === "object") {
+
+            if (Array.isArray(type)) {
+                // if first parameter is an array, call function for all elements of the array
+                type.forEach((type) => {
+                    this.off(type, callback, context);
+                });
+            }
+            else {
+                // if first parameter is an object, unsubscribe all subscriptions where the context matches the object.
+                const events = this[_pd];
+                const types = Object.keys(events);
+
+                for (let i = 0, ni = types.length; i < ni; ++i) {
+                    const subscribers = events[type];
+                    const remainingSubscribers = [];
+                    for (let j = 0, nj = subscribers.length; j < nj; ++j) {
+                        const subscriber = subscribers[j];
+                        if (type && subscriber.context !== type) {
+                            remainingSubscribers.push(subscriber);
+                        }
+                    }
+                    events[type] = remainingSubscribers;
+                }
+            }
 
             return;
         }
 
-        let subscribers = this[_pd][type];
+        const subscribers = this[_pd][type];
         if (!subscribers) {
             throw new Error(`can't unsubscribe; unknown event type: '${type}'`);
         }
 
-        let remainingSubscribers = [];
-        subscribers.forEach((subscriber) => {
+        const remainingSubscribers = [];
+        for (let i = 0, n = subscribers.length; i < n; ++i) {
+            const subscriber = subscribers[i];
             if ((callback && callback !== subscriber.callback && callback !== subscriber.callback.cb)
                 || (context && context !== subscriber.context)) {
                 remainingSubscribers.push(subscriber);
             }
-        });
-
+        }
         this[_pd][type] = remainingSubscribers;
+    }
+
+    /**
+     * Unsubscribes from an event. You may find using the .off() method more handy and more flexible.
+     * @param type Type name of the event.
+     * @param callback Callback function, invoked when the event is emitted.
+     * @param context Optional: this context for the callback invocation.
+     */
+    removeEventListener(type: string, callback?: (event: any) => void, context?: object)
+    {
+        this.off(type, callback, context);
     }
 
     /**

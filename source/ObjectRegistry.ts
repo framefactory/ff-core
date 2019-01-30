@@ -12,8 +12,14 @@ import Publisher, { ITypedEvent } from "./Publisher";
 
 const _EMPTY_ARRAY = [];
 
-//type ClassOrName<T extends object = object> = TypeOf<T> | string;
-type ObjectOrClassOrName<T extends object = object> = TypeOf<T> | T | string;
+export const getClassName = function(scope: ObjectOrClassOrName): string
+{
+    return typeof scope === "function" ? scope.name : (typeof scope === "object"
+        ? scope.constructor.name : scope);
+}
+
+export type ClassOrName<T extends object = object> = TypeOf<T> | string;
+export type ObjectOrClassOrName<T extends object = object> = TypeOf<T> | T | string;
 
 export interface IObjectEvent<T extends object = object> extends ITypedEvent<string>
 {
@@ -74,8 +80,8 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
         // add all types in prototype chain
         do {
             prototype = Object.getPrototypeOf(prototype);
-
             className = prototype.constructor.name;
+
             if (className) {
                 (this._objLists[className] || (this._objLists[className] = [])).push(object);
 
@@ -111,13 +117,15 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
         // remove all types in prototype chain
         do {
             prototype = Object.getPrototypeOf(prototype);
+            className = prototype.constructor.name;
 
-            className = prototype.name;
-            const objects = this._objLists[className];
-            objects.splice(objects.indexOf(object), 1);
+            if (className) {
+                const objects = this._objLists[className];
+                objects.splice(objects.indexOf(object), 1);
 
-            event.type = className;
-            this.emit<IObjectEvent>(event);
+                event.type = className;
+                this.emit<IObjectEvent>(event);
+            }
 
         } while (className !== rootClassName);
     }
@@ -174,7 +182,6 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
 
     /**
      * Returns true if the registry contains the given object.
-     * @deprecated
      * @param object
      */
     contains<U extends T>(object: U): boolean
@@ -214,8 +221,7 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
      */
     getArray<U extends T = T>(scope?: ObjectOrClassOrName<U>): Readonly<U[]>
     {
-        const objects = this._objLists[this.getClassName(scope)];
-        return objects || _EMPTY_ARRAY;
+        return this._objLists[this.getClassName(scope)] || _EMPTY_ARRAY;
     }
 
     /**
@@ -251,7 +257,7 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    on<U extends T>(scope: ObjectOrClassOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: any)
+    on<U extends T>(scope: ObjectOrClassOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object)
     {
         super.on(this.getClassName(scope), callback, context);
     }
@@ -262,7 +268,7 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    once<U extends T>(scope: ObjectOrClassOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: any)
+    once<U extends T>(scope: ObjectOrClassOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object)
     {
         super.once(this.getClassName(scope), callback, context);
     }
@@ -273,7 +279,7 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    off<U extends T>(scope: ObjectOrClassOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: any)
+    off<U extends T>(scope: ObjectOrClassOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object)
     {
         super.off(this.getClassName(scope), callback, context);
     }
@@ -282,7 +288,7 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
      * Returns the class name for the given instance, class or class name.
      * @param scope
      */
-    protected getClassName(scope?: ObjectOrClassOrName): string
+    getClassName(scope?: ObjectOrClassOrName): string
     {
         return typeof scope === "function" ? scope.name : (typeof scope === "object"
             ? scope.constructor.name : (scope || this._rootClassName));

@@ -15,7 +15,7 @@ export interface IClassEvent extends ITypedEvent<"class">
 {
     add: boolean;
     remove: boolean;
-    clazz: Class;
+    classType: Class;
 }
 
 export default class ClassRegistry extends Publisher
@@ -28,14 +28,14 @@ export default class ClassRegistry extends Publisher
         this.addEvent("class");
     }
 
-    add(clazz: Class | Class[])
+    add(classType: Class | Class[])
     {
-        if (Array.isArray(clazz)) {
-            clazz.forEach(type => this.add(type));
+        if (Array.isArray(classType)) {
+            classType.forEach(type => this.add(type));
             return;
         }
 
-        const name = clazz.name;
+        const name = classType.name;
         if (!name) {
             throw new Error("missing class name");
         }
@@ -44,18 +44,18 @@ export default class ClassRegistry extends Publisher
             throw new Error(`class '${name}' already registered`);
         }
 
-        this._dict[name] = clazz;
-        this.emit<IClassEvent>({ type: "class", add: true, remove: false, clazz });
+        this._dict[name] = classType;
+        this.emit<IClassEvent>({ type: "class", add: true, remove: false, classType });
     }
 
-    remove(clazz: Class | Class[])
+    remove(classType: Class | Class[])
     {
-        if (Array.isArray(clazz)) {
-            clazz.forEach(type => this.remove(type));
+        if (Array.isArray(classType)) {
+            classType.forEach(type => this.remove(type));
             return;
         }
 
-        const name = clazz.name;
+        const name = classType.name;
         if (!name) {
             throw new Error("missing class name");
         }
@@ -65,17 +65,24 @@ export default class ClassRegistry extends Publisher
         }
 
         delete this._dict[name];
-        this.emit<IClassEvent>({ type: "class", add: false, remove: true, clazz });
+        this.emit<IClassEvent>({ type: "class", add: false, remove: true, classType });
     }
 
-    getClass(className: string): Class | undefined
+    getClass(className: string | object | Class): Class | undefined
     {
+        if (typeof className === "function") {
+            className = className.name;
+        }
+        else if (typeof className === "object") {
+            className = className.constructor.name;
+        }
+
         return this._dict[className];
     }
 
-    createInstance(className: string, ...args)
+    createInstance(className: string | object | Class, ...args)
     {
-        const clazz = this._dict[className];
+        const clazz = this.getClass(className);
         if (!clazz) {
             throw new Error(`class '${className}' not registered`);
         }

@@ -198,15 +198,16 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
     /**
      * Returns the first found instance of the given class or class name.
      * @param scope Class or class name of the instance to return.
-     * @param throws If true, the method throws an error if no instance was found.
+     * @param nothrow If true, the method returns undefined if no instance was found.
+     * By default, an error is thrown uf no instance is registered with the given class/class name.
      */
-    get<U extends T = T>(scope?: ObjectOrClassOrName<U>, throws: boolean = false): U | undefined
+    get<U extends T = T>(scope?: ObjectOrClassOrName<U>, nothrow: boolean = false): U | undefined
     {
         const className = this.getClassName(scope);
         const objects = this._objLists[className];
         const object = objects ? objects[0] as U : undefined;
 
-        if (throws && !object) {
+        if (!nothrow && !object) {
             throw new Error(`no instances of class '${className}' in registry`);
         }
 

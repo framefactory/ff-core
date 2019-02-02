@@ -120,11 +120,11 @@ export default class ObjectRegistry<T extends object = object> extends Publisher
             className = prototype.constructor.name;
 
             if (className) {
-                const objects = this._objLists[className];
-                objects.splice(objects.indexOf(object), 1);
-
                 event.type = className;
                 this.emit<IObjectEvent>(event);
+
+                const objects = this._objLists[className];
+                objects.splice(objects.indexOf(object), 1);
             }
 
         } while (className !== rootClassName);

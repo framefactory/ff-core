@@ -16,14 +16,6 @@ export type Constructor<T = any> = {
     new (...args: any[]): T;
 }
 
-export interface Class extends Function {
-    new (...args: any[]): object;
-}
-
-export interface ClassOf<T> extends Function {
-    new (...args: any[]): T;
-}
-
 export interface Type extends Function {
     new (...args: any[]): object;
 }

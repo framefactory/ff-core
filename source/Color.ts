@@ -25,6 +25,11 @@ export default class Color implements IVector4
         return (new Color()).setString(color);
     }
 
+    static fromArray(color: number[]): Color
+    {
+        return new Color(color);
+    }
+
     x: number;
     y: number;
     z: number;
@@ -41,10 +46,10 @@ export default class Color implements IVector4
             this.w = red.w;
         }
         else if (Array.isArray(red)) {
-            this.x = red[0];
-            this.y = red[1];
-            this.z = red[2];
-            this.w = red[3];
+            this.x = red[0] || 0;
+            this.y = red[1] || 0;
+            this.z = red[2] || 0;
+            this.w = red[3] !== undefined ? red[3] : 1;
         }
         else if (typeof red === "string") {
             this.setString(red);
@@ -282,6 +287,14 @@ export default class Color implements IVector4
         return this;
     }
 
+    fromArray(arr: number[])
+    {
+        this.x = arr[0] || 0;
+        this.y = arr[1] || 0;
+        this.z = arr[2] || 0;
+        this.w = arr[3] !== undefined ? arr[3] : 1;
+    }
+
     setString(color: string, alpha: number = 1, throws: boolean = true): Color
     {
         color = color.trim().toLowerCase();
@@ -366,6 +379,31 @@ export default class Color implements IVector4
             + Math.floor(this.w * 255);
     }
 
+    toVector3(rgb: IVector3): IVector3
+    {
+        if (rgb) {
+            rgb.x = this.r;
+            rgb.y = this.g;
+            rgb.z = this.b;
+            return rgb;
+        }
+
+        return new Vector3(this.r, this.g, this.b);
+    }
+
+    toVector4(rgba: IVector4): IVector4
+    {
+        if (rgba) {
+            rgba.x = this.r;
+            rgba.y = this.g;
+            rgba.z = this.b;
+            rgba.w = this.a;
+            return rgba;
+        }
+
+        return new Vector4(this.r, this.g, this.b, this.a);
+    }
+
     toHSV(hsv?: IVector3): IVector3
     {
         let r = this.x, g = this.y, b = this.z;
@@ -413,6 +451,31 @@ export default class Color implements IVector4
         }
 
         return new Vector3(h, s, l);
+    }
+
+    toRGBArray(arr?: number[])
+    {
+        if (arr) {
+            arr[0] = this.r;
+            arr[1] = this.g;
+            arr[2] = this.b;
+            return arr;
+        }
+
+        return [ this.r, this.g, this.b ];
+    }
+
+    toRGBAArray(arr?: number[])
+    {
+        if (arr) {
+            arr[0] = this.r;
+            arr[1] = this.g;
+            arr[2] = this.b;
+            arr[3] = this.a;
+            return arr;
+        }
+
+        return [ this.r, this.g, this.b, this.a ];
     }
 
     toString(includeAlpha: boolean = true): string

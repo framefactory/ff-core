@@ -214,7 +214,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
         const object = objects ? objects[0] as U : undefined;
 
         if (!nothrow && !object) {
-            throw new Error(`no instances of class '${className}' in registry`);
+            throw new Error(`no instances of class '${className}' in object registry`);
         }
 
         return object;

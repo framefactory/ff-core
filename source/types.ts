@@ -34,6 +34,8 @@ export type PrimitiveType = number | boolean | string;
 
 export type Identifiable<T extends object = object> = T & { id: Identifier };
 
+export type MaybeIdentifiable<T extends object = object> = T & { id?: Identifier };
+
 export type Dictionary<T> = { [id: string]: T };
 
 export type Transformable<U, A, TA, B, TB>

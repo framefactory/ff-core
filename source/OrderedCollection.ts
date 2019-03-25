@@ -275,6 +275,15 @@ export default class OrderedCollection<T extends MaybeIdentifiable> extends Publ
     }
 
     /**
+     * Returns the index position of the given item.
+     * @param item
+     */
+    getIndexOf(item: T)
+    {
+        return this._list.indexOf(item);
+    }
+
+    /**
      * Replaces the collection items with a shallow copy of the given list.
      * @param list
      */

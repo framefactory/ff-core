@@ -124,6 +124,18 @@ export default class UnorderedCollection<T extends MaybeIdentifiable> extends Pu
         return this._dict[id];
     }
 
+    getOrCreate(id: string, defaultItem: T)
+    {
+        let item = this._dict[id];
+
+        if (!item) {
+            item = this._dict[id] = defaultItem;
+            this.emit<ICollectionUpdateEvent<T>>({ type: "update", item, what: "insert" });
+        }
+
+        return item as T;
+    }
+
     /**
      * Replaces the internal id/item dictionary with a shallow copy of the given id/item dictionary.
      * @param dict

@@ -175,12 +175,6 @@ export default class ObjectRegistry<T extends object> extends Publisher
             return !!objects && objects.length > 0;
         }
 
-        // scope is an object, test with id if it has an id member
-        const id = (scope as any).id;
-        if (typeof id === "string") {
-            return !!this._objDict[id];
-        }
-
         // scope is an object, search by its type name
         const objects = this._objLists[(scope.constructor as any).typeName];
         return objects && objects.indexOf(scope) >= 0;

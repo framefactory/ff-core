@@ -42,6 +42,7 @@ export default class OrderedCollection<T extends MaybeIdentifiable> extends Publ
         this.addEvent("update");
 
         this._list = items || [];
+        this._dict = {};
 
         items && items.forEach(item => {
             if (item.id) {
@@ -215,30 +216,35 @@ export default class OrderedCollection<T extends MaybeIdentifiable> extends Publ
     /**
      * Removes an item by its id.
      * @param id
+     * @returns the removed item.
      */
-    removeById(id: string)
+    removeById(id: string): T
     {
         const item = this._dict[id];
         if (item) {
             this.removeItem(item);
         }
+        return item;
     }
 
     /**
      * Removes the given item from the collection.
      * @param item
+     * @returns the position index of the removed item.
      */
-    removeItem(item: T)
+    removeItem(item: T): number
     {
         const index = this._list.indexOf(item);
         this.removeAt(index);
+        return index;
     }
 
     /**
      * Removes the item at the given index position from the collection.
      * @param index
+     * @returns the removed item.
      */
-    removeAt(index: number)
+    removeAt(index: number): T
     {
         const items = this._list;
 
@@ -254,6 +260,7 @@ export default class OrderedCollection<T extends MaybeIdentifiable> extends Publ
         }
 
         this.emit<ICollectionUpdateEvent<T>>({ type: "update", item, what: "remove" });
+        return item;
     }
 
     /**
@@ -304,11 +311,11 @@ export default class OrderedCollection<T extends MaybeIdentifiable> extends Publ
 OrderedCollection.prototype[Symbol.iterator] = function() {
     return {
         index: 0,
-        items: this._items,
+        list: this._list,
 
         next: function() {
-            if (this.index < this.items.length) {
-                return { value: this.items[this.index++], done: false }
+            if (this.index < this.list.length) {
+                return { value: this.list[this.index++], done: false }
             }
             else {
                 return { done: true };

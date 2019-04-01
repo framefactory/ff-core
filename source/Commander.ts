@@ -26,7 +26,7 @@ export default class Commander extends Publisher
     constructor(capacity?: number)
     {
         super();
-        this.addEvent("change");
+        this.addEvent("update");
 
         this.stack = [];
         this.pointer = -1;
@@ -85,7 +85,7 @@ export default class Commander extends Publisher
 
             this.pointer = this.stack.length - 1;
 
-            this.emit("change");
+            this.emit("update");
         }
     }
 
@@ -96,7 +96,7 @@ export default class Commander extends Publisher
             command.undo();
             this.pointer--;
 
-            this.emit("change");
+            this.emit("update");
         }
     }
 
@@ -108,7 +108,7 @@ export default class Commander extends Publisher
             const command = this.stack[this.pointer];
             command.do();
 
-            this.emit("change");
+            this.emit("update");
         }
     }
 
@@ -118,7 +118,7 @@ export default class Commander extends Publisher
             this.stack = [];
             this.pointer = -1;
 
-            this.emit("change");
+            this.emit("update");
         }
     }
 

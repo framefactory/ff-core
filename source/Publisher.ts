@@ -187,7 +187,7 @@ export default class Publisher
      * Emits an event to all subscribers of the event's type.
      * @param event The event object sent to the subscribers of the event's type.
      */
-    emit<T extends ITypedEvent<T["type"]>>(event: T);
+    emit<T extends ITypedEvent<string>>(event: T);
     emit(eventOrType, message?)
     {
         let type, payload;

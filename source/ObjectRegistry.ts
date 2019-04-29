@@ -22,6 +22,14 @@ export interface IObjectEvent<T extends object = object> extends ITypedEvent<str
     object: T;
 }
 
+export interface ITagEvent<T extends object = object> extends ITypedEvent<string>
+{
+    add: boolean;
+    remove: boolean;
+    object: T;
+    tag: string;
+}
+
 /**
  * Registry of object instances, grouped by their classes and base classes.
  */
@@ -36,6 +44,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
     protected _rootTypeName: string;
 
     protected _objLists: Dictionary<T[]>;
+    protected _objTags: Dictionary<T[]>;
     protected _objDict: Dictionary<T>;
 
     constructor(rootType: TypeOf<T>)
@@ -51,6 +60,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
         this._rootTypeName = typeName;
 
         this._objLists = { [this._rootTypeName]: [] };
+        this._objTags = {};
         this._objDict = {};
     }
 
@@ -130,6 +140,56 @@ export default class ObjectRegistry<T extends object> extends Publisher
             }
 
         } while (typeName !== rootTypeName);
+    }
+
+    /**
+     * Registers an object with a given tag.
+     * @param tag The tag name. Valid tag names are all non-empty strings except "tag".
+     * @param object
+     */
+    addByTag(tag: string, object: T)
+    {
+        if (!tag || tag === "tag") {
+            throw new Error("illegal tag name");
+        }
+
+        const list = this._objTags[tag] || (this._objTags[tag] = []);
+        list.push(object);
+
+        const event: ITagEvent = { type: "tag", add: true, remove: false, object, tag };
+        this.emit<ITagEvent>(event);
+
+        event.type = tag;
+        this.emit<ITagEvent>(event);
+    }
+
+    /**
+     * Unregisters an object with a given tag.
+     * @param tag The tag name. Valid tag names are all non-empty strings except "tag".
+     * @param object
+     */
+    removeByTag(tag: string, object: T): boolean
+    {
+        if (!tag || tag === "tag") {
+            throw new Error("illegal tag name");
+        }
+
+        const list = this._objTags[tag];
+        if (list) {
+            const index = list.indexOf(object);
+            if (index >= 0) {
+                const event: ITagEvent = { type: "tag", add: false, remove: true, object, tag };
+                this.emit<ITagEvent>(event);
+
+                event.type = tag;
+                this.emit(event);
+
+                list.splice(index, 1);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -250,6 +310,11 @@ export default class ObjectRegistry<T extends object> extends Publisher
     getDictionary(): Readonly<Dictionary<T>>
     {
         return this._objDict;
+    }
+
+    getByTag(tag: string): Readonly<T[]>
+    {
+        return this._objTags[tag] || _EMPTY_ARRAY;
     }
 
     /**

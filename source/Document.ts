@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Publisher, { ITypedEvent } from "@ff/core/Publisher";
+import Publisher, { ITypedEvent } from "./Publisher";
 import uniqueId from "./uniqueId";
 
 ////////////////////////////////////////////////////////////////////////////////

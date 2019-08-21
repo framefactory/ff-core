@@ -22,6 +22,11 @@ export interface IDocumentDisposeEvent<T extends Document = Document> extends IT
 
 export default class Document<T extends any = any, U = T> extends Publisher
 {
+    static generateId()
+    {
+        return uniqueId();
+    }
+
     private _data: T;
 
     constructor(json?: U)
@@ -96,10 +101,5 @@ export default class Document<T extends any = any, U = T> extends Publisher
     {
         json = json || {} as U;
         Object.assign(json, this._data);
-    }
-
-    protected generateId()
-    {
-        return uniqueId();
     }
 }

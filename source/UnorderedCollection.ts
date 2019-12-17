@@ -98,10 +98,6 @@ export default class UnorderedCollection<T extends MaybeIdentifiable> extends Pu
             throw new Error("can't insert, missing id");
         }
 
-        if (this._dict[id] !== undefined) {
-            throw new Error(`id already exists: '${id}'`);
-        }
-
         this._dict[id] = item;
         this.emit<ICollectionUpdateEvent<T>>({ type: "update", item, what: "insert" });
     }

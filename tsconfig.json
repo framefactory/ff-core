@@ -1,9 +1,15 @@
 {
     "compilerOptions": {
-        "noEmit": true,
+        "composite": true,
         "target": "ES6",
-        "module": "commonjs",
+        "module": "CommonJS",
         "experimentalDecorators": true,
-        "sourceMap": true
-    }
+        "sourceMap": true,
+
+        "outDir": "exports",
+        "rootDir": "source"
+    },
+    "include": [
+        "source/**/*"
+    ]
 }

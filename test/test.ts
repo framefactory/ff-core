@@ -5,6 +5,18 @@
  * License: MIT
  */
 
+import * as path from "path";
+import * as moduleAlias from "module-alias";
+
+moduleAlias.addAliases({
+    "@ff/core": path.resolve(__dirname, "../export"),
+});
+
+// define vars on node global object (usually done by Webpack)
+global["ENV_DEVELOPMENT"] = false;
+global["ENV_PRODUCTION"] = true;
+global["ENV_VERSION"] = "Test";
+
 import Vector2_test from "./Vector2.test";
 import Vector3_test from "./Vector3.test";
 import Color_test from "./Color.test";

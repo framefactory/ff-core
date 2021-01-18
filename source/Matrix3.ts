@@ -1,12 +1,12 @@
 /**
  * FF Typescript Foundation Library
- * Copyright 2019 Ralph Wiedemeier, Frame Factory GmbH
+ * Copyright 2021 Ralph Wiedemeier, Frame Factory GmbH
  *
  * License: MIT
  */
 
-import Vector2, { IVector2 } from "./Vector2";
-import Vector3, { IVector3 } from "./Vector3";
+import { IVector2 } from "./Vector2";
+import Vector3 from "./Vector3";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -76,7 +76,7 @@ export default class Matrix3
      * Returns a text representation of the given matrix.
      * @param matrix
      */
-    static toString(matrix: IMatrix3)
+    static toString(matrix: IMatrix3): string
     {
         const e = matrix.elements;
         return `[${e[0]}, ${e[3]}, ${e[6]}]\n[${e[1]}, ${e[4]}, ${e[7]}]\n[${e[2]}, ${e[5]}, ${e[8]}]`;
@@ -122,7 +122,7 @@ export default class Matrix3
      * @param e21
      * @param e22
      */
-    set(e00, e01, e02, e10, e11, e12, e20, e21, e22): Matrix3
+    set(e00: number, e01: number, e02: number, e10: number, e11: number, e12: number, e20: number, e21: number, e22: number): Matrix3
     {
         const e = this.elements;
         e[0] = e00; e[1] = e10; e[2] = e20;
@@ -131,7 +131,7 @@ export default class Matrix3
         return this;
     }
 
-    setFromArray(array: number[], rowMajor: boolean = false): Matrix3
+    setFromArray(array: number[], rowMajor = false): Matrix3
     {
         if (rowMajor) {
             const e = this.elements;
@@ -203,7 +203,7 @@ export default class Matrix3
         return this;
     }
 
-    setTranslationFromVector(translation: IVector2)
+    setTranslationFromVector(translation: IVector2): Matrix3
     {
         return this.setTranslation(translation.x, translation.y);
     }
@@ -231,7 +231,7 @@ export default class Matrix3
         return this;
     }
 
-    setScaleFromVector(scale: IVector2)
+    setScaleFromVector(scale: IVector2): Matrix3
     {
         return this.setScale(scale.x, scale.y);
     }
@@ -374,7 +374,7 @@ export default class Matrix3
         return this;
     }
 
-    toArray(array?: number[], rowMajor: boolean = false): number[]
+    toArray(array?: number[], rowMajor = false): number[]
     {
         if (!array) {
             array = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
@@ -409,7 +409,7 @@ export default class Matrix3
     /**
      * Returns a text representation of this matrix.
      */
-    toString()
+    toString(): string
     {
         return Matrix3.toString(this);
     }

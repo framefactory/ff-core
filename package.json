@@ -1,6 +1,6 @@
 {
     "name": "ff-core",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "FF Core Typescript Foundation Library",
     "scripts": {
         "build": "tsc -p source",
@@ -8,7 +8,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/framelab/ff-core.git"
+        "url": "git+https://github.com/framefactory/ff-core.git"
     },
     "keywords": [
         "typescript",
@@ -16,19 +16,19 @@
     ],
     "author": {
         "name": "Ralph Wiedemeier",
-        "url": "https://about.me/ralphw"
+        "url": "https://github.com/framefactory"
     },
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/framelab/ff-core/issues"
+        "url": "https://github.com/framefactory/ff-core/issues"
     },
-    "homepage": "https://github.com/framelab/ff-core#readme",
+    "homepage": "https://github.com/framefactory/ff-core#readme",
     "devDependencies": {
-        "@types/chai": "^4.2.11",
-        "@types/mocha": "^7.0.2",
+        "@types/chai": "^4.2.14",
+        "@types/mocha": "^8.2.0",
         "chai": "^4.2.0",
-        "mocha": "^7.1.2",
+        "mocha": "^8.2.1",
         "module-alias": "^2.2.2",
-        "typescript": "^3.8.3"
+        "typescript": "^4.1.3"
     }
 }

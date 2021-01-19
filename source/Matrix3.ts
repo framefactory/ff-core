@@ -131,7 +131,7 @@ export default class Matrix3
         return this;
     }
 
-    setFromArray(array: number[], rowMajor = false): Matrix3
+    setFromArray(array: ArrayLike<number>, rowMajor = false): Matrix3
     {
         if (rowMajor) {
             const e = this.elements;
@@ -236,6 +236,11 @@ export default class Matrix3
         return this.setScale(scale.x, scale.y);
     }
 
+    setUniformScale(scale: number): Matrix3
+    {
+        return this.setScale(scale, scale);
+    }
+
     addScalar(scalar: number): Matrix3
     {
         const e = this.elements;
@@ -300,6 +305,27 @@ export default class Matrix3
         a[0] = t00; a[3] = t01; a[6] = t02;
         a[1] = t10; a[4] = t11; a[7] = t12;
         a[2] = t20; a[5] = t21; a[8] = t22;
+        return this;
+    }
+
+    preMulMatrix(other: Matrix3): Matrix3
+    {
+        const a = other.elements;
+        const b = this.elements;
+
+        const t00 = a[0]*b[0] + a[3]*b[1] + a[6]*b[2];
+        const t01 = a[0]*b[3] + a[3]*b[4] + a[6]*b[5];
+        const t02 = a[0]*b[6] + a[3]*b[7] + a[6]*b[8];
+        const t10 = a[1]*b[0] + a[4]*b[1] + a[7]*b[2];
+        const t11 = a[1]*b[3] + a[4]*b[4] + a[7]*b[5];
+        const t12 = a[1]*b[6] + a[4]*b[7] + a[7]*b[8];
+        const t20 = a[2]*b[0] + a[5]*b[1] + a[8]*b[2];
+        const t21 = a[2]*b[3] + a[5]*b[4] + a[8]*b[5];
+        const t22 = a[2]*b[6] + a[5]*b[7] + a[8]*b[8];
+
+        b[0] = t00; b[3] = t01; b[6] = t02;
+        b[1] = t10; b[4] = t11; b[7] = t12;
+        b[2] = t20; b[5] = t21; b[8] = t22;
         return this;
     }
 
@@ -372,6 +398,11 @@ export default class Matrix3
         e[0] *= sx; e[3] *= sx; e[6] *= sx;
         e[1] *= sy; e[4] *= sy; e[7] *= sy;
         return this;
+    }
+
+    uniformScale(scale: number): Matrix3
+    {
+        return this.scale(scale, scale);
     }
 
     toArray(array?: number[], rowMajor = false): number[]

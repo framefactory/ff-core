@@ -438,9 +438,11 @@ export default class Vector3 implements IVector3
      */
     homogenize(): Vector3
     {
-        this.x /= this.z;
-        this.y /= this.z;
-        this.z = 1;
+        if (this.z != 0) {
+            this.x /= this.z;
+            this.y /= this.z;
+            this.z = 1;
+        }
         return this;
     }
 
@@ -498,6 +500,30 @@ export default class Vector3 implements IVector3
         const dy = other.y - this.y;
         const dz = other.z - this.z;
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    /**
+     * Sets each component to the smaller component of this and other.
+     * @param other 
+     */
+    setMin(other: IVector3): this
+    {
+        this.x = Math.min(this.x, other.x);
+        this.y = Math.min(this.y, other.y);
+        this.z = Math.min(this.z, other.z);
+        return this;
+    }
+
+    /**
+     * Sets each component to the larger component of this and other.
+     * @param other
+     */
+    setMax(other: IVector3): this
+    {
+        this.x = Math.max(this.x, other.x);
+        this.y = Math.max(this.y, other.y);
+        this.z = Math.max(this.z, other.z);
+        return this;
     }
 
     /**

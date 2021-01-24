@@ -6,7 +6,7 @@
  */
 
 import { IVector2 } from "./Vector2";
-import Vector3 from "./Vector3";
+import Vector3, { IVector3 } from "./Vector3";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +48,7 @@ export default class Matrix3
         return new Matrix3();
     }
 
-    static makeFromRowVectors(row0: Vector3, row1: Vector3, row2: Vector3): Matrix3
+    static makeFromRowVectors(row0: IVector3, row1: IVector3, row2: IVector3): Matrix3
     {
         const matrix = new Matrix3();
         const e = matrix.elements;
@@ -60,7 +60,7 @@ export default class Matrix3
         return matrix;
     }
 
-    static makeFromColumnVectors(col0: Vector3, col1: Vector3, col2: Vector3): Matrix3
+    static makeFromColumnVectors(col0: IVector3, col1: IVector3, col2: IVector3): Matrix3
     {
         const matrix = new Matrix3();
         const e = matrix.elements;
@@ -104,7 +104,7 @@ export default class Matrix3
         }
     }
 
-    copy(matrix: IMatrix3): Matrix3
+    copy(matrix: IMatrix3): this
     {
         this.elements.set(matrix.elements, 0);
         return this;
@@ -122,16 +122,16 @@ export default class Matrix3
      * @param e21
      * @param e22
      */
-    set(e00: number, e01: number, e02: number, e10: number, e11: number, e12: number, e20: number, e21: number, e22: number): Matrix3
+    set(e00: number, e01: number, e02: number, e10: number, e11: number, e12: number, e20: number, e21: number, e22: number): this
     {
         const e = this.elements;
-        e[0] = e00; e[1] = e10; e[2] = e20;
-        e[3] = e01; e[4] = e11; e[5] = e21;
-        e[6] = e02; e[7] = e12; e[8] = e22;
+        e[0] = e00; e[3] = e10; e[6] = e20;
+        e[1] = e01; e[4] = e11; e[7] = e21;
+        e[2] = e02; e[5] = e12; e[8] = e22;
         return this;
     }
 
-    setFromArray(array: ArrayLike<number>, rowMajor = false): Matrix3
+    setFromArray(array: ArrayLike<number>, rowMajor = false): this
     {
         if (rowMajor) {
             const e = this.elements;
@@ -148,7 +148,7 @@ export default class Matrix3
     /**
      * Sets all elements to zero.
      */
-    setZeros(): Matrix3
+    setZeros(): this
     {
         const e = this.elements;
         e[0] = 0; e[1] = 0; e[2] = 0;
@@ -160,7 +160,7 @@ export default class Matrix3
     /**
      * Sets all elements to one.
      */
-    setOnes(): Matrix3
+    setOnes(): this
     {
         const e = this.elements;
         e[0] = 1; e[1] = 1; e[2] = 1;
@@ -172,7 +172,7 @@ export default class Matrix3
     /**
      * Sets the identity matrix.
      */
-    setIdentity(): Matrix3
+    setIdentity(): this
     {
         const e = this.elements;
         e[0] = 1; e[1] = 0; e[2] = 0;
@@ -184,7 +184,7 @@ export default class Matrix3
     /**
      * Transposes the matrix in-place.
      */
-    transpose(): Matrix3
+    transpose(): this
     {
         const e = this.elements;
         const t0 = e[1]; e[1] = e[3]; e[3] = t0;
@@ -193,7 +193,7 @@ export default class Matrix3
         return this;
     }
 
-    setTranslation(tx: number, ty: number): Matrix3
+    setTranslation(tx: number, ty: number): this
     {
         const e = this.elements;
         e[6] = tx;
@@ -203,12 +203,12 @@ export default class Matrix3
         return this;
     }
 
-    setTranslationFromVector(translation: IVector2): Matrix3
+    setTranslationFromVector(translation: IVector2): this
     {
         return this.setTranslation(translation.x, translation.y);
     }
 
-    setRotation(angle: number): Matrix3
+    setRotation(angle: number): this
     {
         const e = this.elements;
         const si = Math.sin(angle);
@@ -221,7 +221,7 @@ export default class Matrix3
         return this;
     }
 
-    setScale(sx: number, sy: number): Matrix3
+    setScale(sx: number, sy: number): this
     {
         const e = this.elements;
         e[0] = sx;
@@ -231,17 +231,17 @@ export default class Matrix3
         return this;
     }
 
-    setScaleFromVector(scale: IVector2): Matrix3
+    setScaleFromVector(scale: IVector2): this
     {
         return this.setScale(scale.x, scale.y);
     }
 
-    setUniformScale(scale: number): Matrix3
+    setUniformScale(scale: number): this
     {
         return this.setScale(scale, scale);
     }
 
-    addScalar(scalar: number): Matrix3
+    addScalar(scalar: number): this
     {
         const e = this.elements;
         e[0] += scalar; e[1] += scalar; e[2] += scalar;
@@ -250,7 +250,7 @@ export default class Matrix3
         return this;
     }
 
-    subScalar(scalar: number): Matrix3
+    subScalar(scalar: number): this
     {
         const e = this.elements;
         e[0] -= scalar; e[1] -= scalar; e[2] -= scalar;
@@ -259,7 +259,7 @@ export default class Matrix3
         return this;
     }
 
-    mulScalar(scalar: number): Matrix3
+    mulScalar(scalar: number): this
     {
         const e = this.elements;
         e[0] *= scalar; e[1] *= scalar; e[2] *= scalar;
@@ -268,7 +268,7 @@ export default class Matrix3
         return this;
     }
 
-    divScalar(scalar: number): Matrix3
+    divScalar(scalar: number): this
     {
         const e = this.elements;
         e[0] /= scalar; e[1] /= scalar; e[2] /= scalar;
@@ -277,7 +277,7 @@ export default class Matrix3
         return this;
     }
 
-    mulVector(vector: Vector3): Vector3
+    mulVector<T extends IVector3>(vector: T): T
     {
         const e = this.elements;
         const x = vector.x, y = vector.y, z = vector.z;
@@ -287,7 +287,7 @@ export default class Matrix3
         return vector;
     }
 
-    mulMatrix(other: Matrix3): Matrix3
+    mulMatrix(other: Matrix3): this
     {
         const a = this.elements;
         const b = other.elements;
@@ -308,7 +308,7 @@ export default class Matrix3
         return this;
     }
 
-    preMulMatrix(other: Matrix3): Matrix3
+    preMulMatrix(other: Matrix3): this
     {
         const a = other.elements;
         const b = this.elements;
@@ -329,7 +329,7 @@ export default class Matrix3
         return this;
     }
 
-    invert(determinant?: number): Matrix3
+    invert(determinant?: number): this
     {
         if (determinant === undefined) {
             determinant = this.determinant();
@@ -365,7 +365,7 @@ export default class Matrix3
              - e[0]*e[5]*e[7] + e[0]*e[4]*e[8];
     }
 
-    translate(tx: number, ty: number): Matrix3
+    translate(tx: number, ty: number): this
     {
         const e = this.elements;
         e[0] += e[2] * tx; e[1] += e[2] * ty;
@@ -374,7 +374,7 @@ export default class Matrix3
         return this;
     }
 
-    rotate(angle: number): Matrix3
+    rotate(angle: number): this
     {
         const e = this.elements;
         const si = Math.sin(angle);
@@ -392,7 +392,7 @@ export default class Matrix3
         return this;
     }
 
-    scale(sx: number, sy: number): Matrix3
+    scale(sx: number, sy: number): this
     {
         const e = this.elements;
         e[0] *= sx; e[3] *= sx; e[6] *= sx;
@@ -400,7 +400,7 @@ export default class Matrix3
         return this;
     }
 
-    uniformScale(scale: number): Matrix3
+    uniformScale(scale: number): this
     {
         return this.scale(scale, scale);
     }

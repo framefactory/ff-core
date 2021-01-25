@@ -405,6 +405,11 @@ export default class Matrix3
         return this.scale(scale, scale);
     }
 
+    clone(): Matrix3
+    {
+        return new Matrix3(this.elements);
+    }
+
     toArray(array?: number[], rowMajor = false): number[]
     {
         if (!array) {

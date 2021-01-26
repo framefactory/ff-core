@@ -30,7 +30,7 @@ export default class Vector3 implements IVector3
     /**
      * Returns a new vector with all components set to zero.
      */
-    static makeZeros()
+    static makeZeros(): Vector3
     {
         return new Vector3(0, 0, 0);
     }
@@ -38,7 +38,7 @@ export default class Vector3 implements IVector3
     /**
      * Returns a new vector with all components set to one.
      */
-    static makeOnes()
+    static makeOnes(): Vector3
     {
         return new Vector3(1, 1, 1);
     }
@@ -46,7 +46,7 @@ export default class Vector3 implements IVector3
     /**
      * Returns a new unit-length vector, parallel to the X axis.
      */
-    static makeUnitX()
+    static makeUnitX(): Vector3
     {
         return new Vector3(1, 0, 0);
     }
@@ -54,7 +54,7 @@ export default class Vector3 implements IVector3
     /**
      * Returns a new unit-length vector, parallel to the Y axis.
      */
-    static makeUnitY()
+    static makeUnitY(): Vector3
     {
         return new Vector3(0, 1, 0);
     }
@@ -62,7 +62,7 @@ export default class Vector3 implements IVector3
     /**
      * Returns a new unit-length vector, parallel to the Z axis.
      */
-    static makeUnitZ()
+    static makeUnitZ(): Vector3
     {
         return new Vector3(0, 0, 1);
     }
@@ -71,7 +71,7 @@ export default class Vector3 implements IVector3
      * Returns a new vector with components set from the given vector.
      * @param vector
      */
-    static makeCopy(vector: IVector3)
+    static makeCopy(vector: IVector3): Vector3
     {
         return new Vector3(vector.x, vector.y, vector.z);
     }
@@ -80,7 +80,7 @@ export default class Vector3 implements IVector3
      * Returns a new vector with each component set to the given scalar value.
      * @param scalar
      */
-    static makeFromScalar(scalar: number)
+    static makeFromScalar(scalar: number): Vector3
     {
         return new Vector3(scalar, scalar, scalar);
     }
@@ -89,7 +89,7 @@ export default class Vector3 implements IVector3
      * Returns a new vector with components set from the values of the given array.
      * @param array
      */
-    static makeFromArray(array: number[])
+    static makeFromArray(array: number[]): Vector3
     {
         return new Vector3(array[0], array[1], array[2]);
     }
@@ -98,7 +98,7 @@ export default class Vector3 implements IVector3
      * Returns a string representation of the given vector.
      * @param vector
      */
-    static toString(vector: IVector3)
+    static toString(vector: IVector3): string
     {
         return `[${vector.x}, ${vector.y}, ${vector.z}]`;
     }
@@ -167,7 +167,7 @@ export default class Vector3 implements IVector3
      * @param array
      * @param offset Optional start index of the array. Default is 0.
      */
-    setFromArray(array: number[], offset: number = 0): Vector3
+    setFromArray(array: number[], offset = 0): Vector3
     {
         this.x = array[offset];
         this.y = array[offset + 1];
@@ -246,7 +246,7 @@ export default class Vector3 implements IVector3
      * Subtracts the given vector from this.
      * @param other
      */
-    sub(other: IVector3): Vector3
+    subtract(other: IVector3): Vector3
     {
         this.x -= other.x;
         this.y -= other.y;
@@ -258,7 +258,7 @@ export default class Vector3 implements IVector3
      * Multiplies each component with the corresponding component of the given vector.
      * @param other
      */
-    mul(other: IVector3): Vector3
+    multiply(other: IVector3): Vector3
     {
         this.x *= other.x;
         this.y *= other.y;
@@ -270,7 +270,7 @@ export default class Vector3 implements IVector3
      * Divides each component by the corresponding component of the given vector.
      * @param other
      */
-    div(other: IVector3): Vector3
+    divideBy(other: IVector3): Vector3
     {
         this.x /= other.x;
         this.y /= other.y;
@@ -294,7 +294,7 @@ export default class Vector3 implements IVector3
      * Subtracts the given scalar from each component.
      * @param scalar
      */
-    subScalar(scalar: number): Vector3
+    subtractScalar(scalar: number): Vector3
     {
         this.x -= scalar;
         this.y -= scalar;
@@ -306,7 +306,7 @@ export default class Vector3 implements IVector3
      * Multiplies each component with the given scalar.
      * @param scalar
      */
-    mulScalar(scalar: number): Vector3
+    multiplyScalar(scalar: number): Vector3
     {
         this.x *= scalar;
         this.y *= scalar;
@@ -318,7 +318,7 @@ export default class Vector3 implements IVector3
      * Divides each component by the given scalar.
      * @param scalar
      */
-    divScalar(scalar: number): Vector3
+    divideByScalar(scalar: number): Vector3
     {
         this.x /= scalar;
         this.y /= scalar;
@@ -503,6 +503,26 @@ export default class Vector3 implements IVector3
     }
 
     /**
+     * Returns the angle in the XY plane between this and the positive X axis.
+     * @returns angle in radians.
+     */
+    angle(): number
+    {
+        return Math.atan2(this.y, this.x);
+    }
+
+    /**
+     * Returns the angle in the XY plane between this and the given vector.
+     * @param other
+     * @returns angle in radians.
+     */
+    angleTo(other: IVector3): number
+    {
+        const x0 = this.x, y0 = this.y, x1 = other.x, y1 = other.y;
+        return Math.acos((x0*x1 + y0*y1) / (Math.sqrt(x0*x0 + y0*y0) + Math.sqrt(x1*x1 + y1*y1)));
+    }
+
+    /**
      * Sets each component to the smaller component of this and other.
      * @param other 
      */
@@ -529,7 +549,7 @@ export default class Vector3 implements IVector3
     /**
      * Returns the smallest component.
      */
-    min()
+    min(): number
     {
         return this.x < this.y ? (this.x < this.z ? this.x : this.z) : (this.y < this.z ? this.y : this.z);
     }
@@ -537,7 +557,7 @@ export default class Vector3 implements IVector3
     /**
      * Returns the largest component.
      */
-    max()
+    max(): number
     {
         return this.x > this.y ? (this.x > this.z ? this.x : this.z) : (this.y > this.z ? this.y : this.z);
     }
@@ -602,7 +622,7 @@ export default class Vector3 implements IVector3
     /**
      * Returns a text representation.
      */
-    toString()
+    toString(): string
     {
         return Vector3.toString(this);
     }

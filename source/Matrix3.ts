@@ -20,8 +20,8 @@ export interface IMatrix3
  */
 export default class Matrix3
 {
-    static readonly zeros = new Matrix3().setZeros();
-    static readonly ones = new Matrix3().setOnes();
+    static readonly zeros = new Matrix3().makeZeros();
+    static readonly ones = new Matrix3().makeOnes();
     static readonly identity = new Matrix3();
 
     /**
@@ -29,7 +29,7 @@ export default class Matrix3
      */
     static makeZeros(): Matrix3
     {
-        return new Matrix3().setZeros();
+        return new Matrix3().makeZeros();
     }
 
     /**
@@ -37,17 +37,23 @@ export default class Matrix3
      */
     static makeOnes(): Matrix3
     {
-        return new Matrix3().setOnes();
+        return new Matrix3().makeOnes();
     }
 
     /**
      * Returns a new matrix set to the identity matrix.
      */
-    static makeIdentity(): Matrix3
+    static makeIndentity(): Matrix3
     {
         return new Matrix3();
     }
 
+    /**
+     * Returns a new 3 by 3 matrix with rows set to the given vectors.
+     * @param row0 
+     * @param row1 
+     * @param row2 
+     */
     static makeFromRowVectors(row0: IVector3, row1: IVector3, row2: IVector3): Matrix3
     {
         const matrix = new Matrix3();
@@ -60,6 +66,12 @@ export default class Matrix3
         return matrix;
     }
 
+    /**
+     * Returns a new 3 by 3 matrix with columns set to the given vectors.
+     * @param col0 
+     * @param col1 
+     * @param col2 
+     */
     static makeFromColumnVectors(col0: IVector3, col1: IVector3, col2: IVector3): Matrix3
     {
         const matrix = new Matrix3();
@@ -87,15 +99,16 @@ export default class Matrix3
     elements: Float32Array;
 
     /**
-     * Constructs a new 3 by 3 identity matrix.
-     * @param elements Optional initial values.
+     * Constructs a new 3 by 3 matrix.
+     * If no initial values are given, the matrix is set to the identity.
+     * @param elements Optional initial values in column-major order.
      */
     constructor(elements?: ArrayLike<number>)
     {
         if (elements) {
             this.elements = new Float32Array(elements);
             if (this.elements.length !== 9) {
-                throw new Error("array length mismatch: must be 9");
+                throw new RangeError("array length mismatch: must be 9");
             }
         }
         else {
@@ -104,6 +117,10 @@ export default class Matrix3
         }
     }
 
+    /**
+     * Copies the given matrix to this.
+     * @param matrix 
+     */
     copy(matrix: IMatrix3): this
     {
         this.elements.set(matrix.elements, 0);
@@ -122,7 +139,9 @@ export default class Matrix3
      * @param e21
      * @param e22
      */
-    set(e00: number, e01: number, e02: number, e10: number, e11: number, e12: number, e20: number, e21: number, e22: number): this
+    set(e00: number, e01: number, e02: number,
+        e10: number, e11: number, e12: number,
+        e20: number, e21: number, e22: number): this
     {
         const e = this.elements;
         e[0] = e00; e[3] = e10; e[6] = e20;
@@ -131,6 +150,11 @@ export default class Matrix3
         return this;
     }
 
+    /**
+     * Sets the elements of this to the values of the given array.
+     * @param array Array with 9 matrix elements in column-major or row-major order.
+     * @param rowMajor If true expects array elements in row-major order, default is false (column-major).
+     */
     setFromArray(array: ArrayLike<number>, rowMajor = false): this
     {
         if (rowMajor) {
@@ -148,7 +172,7 @@ export default class Matrix3
     /**
      * Sets all elements to zero.
      */
-    setZeros(): this
+    makeZeros(): this
     {
         const e = this.elements;
         e[0] = 0; e[1] = 0; e[2] = 0;
@@ -160,7 +184,7 @@ export default class Matrix3
     /**
      * Sets all elements to one.
      */
-    setOnes(): this
+    makeOnes(): this
     {
         const e = this.elements;
         e[0] = 1; e[1] = 1; e[2] = 1;
@@ -172,7 +196,7 @@ export default class Matrix3
     /**
      * Sets the identity matrix.
      */
-    setIdentity(): this
+    makeIdentity(): this
     {
         const e = this.elements;
         e[0] = 1; e[1] = 0; e[2] = 0;
@@ -193,7 +217,12 @@ export default class Matrix3
         return this;
     }
 
-    setTranslation(tx: number, ty: number): this
+    /**
+     * Makes this a transform matrix representing a translation by [tx, ty].
+     * @param tx 
+     * @param ty 
+     */
+    makeTranslation(tx: number, ty: number): this
     {
         const e = this.elements;
         e[6] = tx;
@@ -203,12 +232,34 @@ export default class Matrix3
         return this;
     }
 
+    /**
+     * Makes this a transform matrix representing a translation by the given vector.
+     * @param translation 
+     */
+    makeTranslationFromVector(translation: IVector2): this
+    {
+        return this.makeTranslation(translation.x, translation.y);
+    }
+
+    /**
+     * Sets the translation components of this matrix.
+     * @param tx 
+     * @param ty 
+     */
+    setTranslation(tx: number, ty: number): this
+    {
+        const e = this.elements;
+        e[6] = tx;
+        e[7] = ty;
+        return this;
+    }
+
     setTranslationFromVector(translation: IVector2): this
     {
         return this.setTranslation(translation.x, translation.y);
     }
 
-    setRotation(angle: number): this
+    makeRotation(angle: number): this
     {
         const e = this.elements;
         const si = Math.sin(angle);
@@ -221,13 +272,42 @@ export default class Matrix3
         return this;
     }
 
-    setScale(sx: number, sy: number): this
+    setRotation(angle: number): this
+    {
+        const e = this.elements;
+        const si = Math.sin(angle);
+        const co = Math.cos(angle);
+
+        e[0] = co; e[3] = -si;
+        e[1] = si; e[4] = co;
+        return this;
+    }
+
+    makeScale(sx: number, sy: number): this
     {
         const e = this.elements;
         e[0] = sx;
         e[4] = sy;
         e[1] = e[2] = e[3] = e[5] = e[6] = e[7] = 0;
         e[8] = 1;
+        return this;
+    }
+
+    makeScaleFromVector(scale: IVector2): this
+    {
+        return this.makeScale(scale.x, scale.y);
+    }
+
+    makeUniformScale(scale: number): this
+    {
+        return this.makeScale(scale, scale);
+    }
+
+    setScale(sx: number, sy: number): this
+    {
+        const e = this.elements;
+        e[0] = sx;
+        e[4] = sy;
         return this;
     }
 
@@ -250,7 +330,7 @@ export default class Matrix3
         return this;
     }
 
-    subScalar(scalar: number): this
+    subtractScalar(scalar: number): this
     {
         const e = this.elements;
         e[0] -= scalar; e[1] -= scalar; e[2] -= scalar;
@@ -259,7 +339,7 @@ export default class Matrix3
         return this;
     }
 
-    mulScalar(scalar: number): this
+    multiplyScalar(scalar: number): this
     {
         const e = this.elements;
         e[0] *= scalar; e[1] *= scalar; e[2] *= scalar;
@@ -268,7 +348,7 @@ export default class Matrix3
         return this;
     }
 
-    divScalar(scalar: number): this
+    divideByScalar(scalar: number): this
     {
         const e = this.elements;
         e[0] /= scalar; e[1] /= scalar; e[2] /= scalar;
@@ -277,7 +357,7 @@ export default class Matrix3
         return this;
     }
 
-    mulVector<T extends IVector3>(vector: T): T
+    multiplyVector<T extends IVector3>(vector: T): T
     {
         const e = this.elements;
         const x = vector.x, y = vector.y, z = vector.z;
@@ -287,7 +367,7 @@ export default class Matrix3
         return vector;
     }
 
-    mulMatrix(other: Matrix3): this
+    multiply(other: Matrix3): this
     {
         const a = this.elements;
         const b = other.elements;
@@ -308,7 +388,7 @@ export default class Matrix3
         return this;
     }
 
-    preMulMatrix(other: Matrix3): this
+    premultiply(other: Matrix3): this
     {
         const a = other.elements;
         const b = this.elements;
@@ -365,6 +445,12 @@ export default class Matrix3
              - e[0]*e[5]*e[7] + e[0]*e[4]*e[8];
     }
 
+    /**
+     * Applies a translation to this matrix
+     * by pre-multiplying the matrix with the translation transform.
+     * @param tx 
+     * @param ty 
+     */
     translate(tx: number, ty: number): this
     {
         const e = this.elements;
@@ -374,6 +460,11 @@ export default class Matrix3
         return this;
     }
 
+    /**
+     * Applies a rotation transform to this matrix
+     * by pre-multiplying the matrix with the rotation transform.
+     * @param angle 
+     */
     rotate(angle: number): this
     {
         const e = this.elements;
@@ -392,6 +483,12 @@ export default class Matrix3
         return this;
     }
 
+    /**
+     * Applies a scale transform to this matrix
+     * by pre-multiplying the matrix with the scale transform.
+     * @param sx 
+     * @param sy 
+     */
     scale(sx: number, sy: number): this
     {
         const e = this.elements;
@@ -400,43 +497,62 @@ export default class Matrix3
         return this;
     }
 
+    /**
+     * Applies a uniform scale transform to this matrix
+     * by pre-multiplying the matrix with the uniform scale transform.
+     * @param scale 
+     */
     uniformScale(scale: number): this
     {
         return this.scale(scale, scale);
     }
 
+    /**
+     * Returns a new matrix set to the same values as this.
+     */
     clone(): Matrix3
     {
         return new Matrix3(this.elements);
     }
 
-    toArray(array?: number[], rowMajor = false): number[]
+    /**
+     * Returns an array set to the values of this matrix
+     * in column-major or row-major order.
+     * @param target Optional target array.
+     * @param rowMajor If true, values are written in row-major order.
+     */
+    toArray(target?: number[], rowMajor = false): number[]
     {
-        if (!array) {
-            array = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+        if (!target) {
+            target = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
         }
 
         const e = this.elements;
 
         if (rowMajor) {
-            array[0] = e[0]; array[3] = e[1]; array[2] = e[2];
-            array[1] = e[3]; array[4] = e[4]; array[5] = e[5];
-            array[2] = e[6]; array[5] = e[7]; array[8] = e[8];
+            target[0] = e[0]; target[3] = e[1]; target[2] = e[2];
+            target[1] = e[3]; target[4] = e[4]; target[5] = e[5];
+            target[2] = e[6]; target[5] = e[7]; target[8] = e[8];
         }
         else {
-            array[0] = e[0];  array[1] = e[1];  array[2] = e[2];
-            array[3] = e[3];  array[4] = e[4];  array[5] = e[5];
-            array[6] = e[6];  array[7] = e[7];  array[8] = e[8];
+            target[0] = e[0];  target[1] = e[1];  target[2] = e[2];
+            target[3] = e[3];  target[4] = e[4];  target[5] = e[5];
+            target[6] = e[6];  target[7] = e[7];  target[8] = e[8];
         }
 
-        return array;
+        return target;
     }
 
-    toTypedArray(array?: Float32Array): Float32Array
+    /**
+     * Returns a Float32Array set to the values of this matrix
+     * in column-major order.
+     * @param target Optional target array.
+     */
+    toTypedArray(target?: Float32Array): Float32Array
     {
-        if (array) {
-            array.set(this.elements, 0);
-            return array;
+        if (target) {
+            target.set(this.elements, 0);
+            return target;
         }
 
         return new Float32Array(this.elements);

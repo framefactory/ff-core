@@ -23,8 +23,8 @@ export interface IMatrix4
  */
 export default class Matrix4
 {
-    static readonly zeros = new Matrix4().setZeros();
-    static readonly ones = new Matrix4().setOnes();
+    static readonly zeros = new Matrix4().makeZeros();
+    static readonly ones = new Matrix4().makeOnes();
     static readonly identity = new Matrix4();
 
     /**
@@ -32,7 +32,7 @@ export default class Matrix4
      */
     static makeZeros(): Matrix4
     {
-        return new Matrix4().setZeros();
+        return new Matrix4().makeZeros();
     }
 
     /**
@@ -40,7 +40,7 @@ export default class Matrix4
      */
     static makeOnes(): Matrix4
     {
-        return new Matrix4().setOnes();
+        return new Matrix4().makeOnes();
     }
 
     /**
@@ -52,10 +52,50 @@ export default class Matrix4
     }
 
     /**
+     * Returns a new 4 by 4 matrix with rows set to the given vectors.
+     * @param row0 
+     * @param row1 
+     * @param row2 
+     * @param row3 
+     */
+    static makeFromRowVectors(row0: IVector4, row1: IVector4, row2: IVector4, row3: IVector4): Matrix4
+    {
+        const matrix = new Matrix4();
+        const e = matrix.elements;
+
+        e[ 0] = row0.x; e[ 1] = row1.x; e[ 2] = row2.x; e[ 3] = row3.x;
+        e[ 4] = row0.y; e[ 5] = row1.y; e[ 6] = row2.y; e[ 7] = row3.y;
+        e[ 8] = row0.z; e[ 9] = row1.z; e[10] = row2.z; e[11] = row3.z;
+        e[12] = row0.w; e[13] = row1.w; e[14] = row2.w; e[15] = row3.w;
+
+        return matrix;
+    }
+
+    /**
+     * Returns a new 4 by 4 matrix with columns set to the given vectors.
+     * @param col0 
+     * @param col1 
+     * @param col2 
+     * @param col3 
+     */
+    static makeFromColumnVectors(col0: IVector4, col1: IVector4, col2: IVector4, col3: IVector4): Matrix4
+    {
+        const matrix = new Matrix4();
+        const e = matrix.elements;
+
+        e[ 0] = col0.x; e[ 1] = col0.y; e[ 2] = col0.z; e[ 3] = col0.w;
+        e[ 4] = col1.x; e[ 5] = col1.y; e[ 6] = col1.z; e[ 7] = col1.w;
+        e[ 8] = col2.x; e[ 9] = col2.y; e[10] = col2.z; e[11] = col2.w;
+        e[12] = col3.x; e[13] = col3.y; e[14] = col3.z; e[15] = col3.w;
+
+        return matrix;
+    }
+
+    /**
      * Returns a text representation of the given matrix.
      * @param matrix
      */
-    static toString(matrix: IMatrix4)
+    static toString(matrix: IMatrix4): string
     {
         const e = matrix.elements;
         return `[${e[0]}, ${e[4]}, ${e[8]}, ${e[12]}]\n[${e[1]}, ${e[5]}, ${e[9]}, ${e[13]}]\n[${e[2]}, ${e[6]}, ${e[10]}, ${e[14]}]\n[${e[3]}, ${e[7]}, ${e[11]}, ${e[15]}]`;
@@ -65,15 +105,16 @@ export default class Matrix4
     elements: Float32Array;
 
     /**
-     * Constructs a new 4 by 4 identity matrix.
-     * @param elements Optional initial values.
+     * Constructs a new 4 by 4 matrix.
+     * If no initial values are given, the matrix is set to the identity.
+     * @param elements Optional initial values in column-major order.
      */
     constructor(elements?: ArrayLike<number>)
     {
         if (elements) {
             this.elements = new Float32Array(elements);
             if (this.elements.length !== 16) {
-                throw new Error("array length mismatch: must be 16");
+                throw new RangeError("array length mismatch: must be 16");
             }
         }
         else {
@@ -83,10 +124,10 @@ export default class Matrix4
     }
 
     /**
-     * Copies the elements of the given matrix to this.
+     * Copies the given matrix to this.
      * @param matrix
      */
-    copy(matrix: IMatrix4): Matrix4
+    copy(matrix: IMatrix4): this
     {
         this.elements.set(matrix.elements, 0);
         return this;
@@ -111,7 +152,10 @@ export default class Matrix4
      * @param e32
      * @param e33
      */
-    set(e00, e01, e02, e03, e10, e11, e12, e13, e20, e21, e22, e23, e30, e31, e32, e33): Matrix4
+    set(e00: number, e01: number, e02: number, e03: number,
+        e10: number, e11: number, e12: number, e13: number,
+        e20: number, e21: number, e22: number, e23: number,
+        e30: number, e31: number, e32: number, e33: number): Matrix4
     {
         const e = this.elements;
         e[0]  = e00; e[1]  = e10; e[2]  = e20; e[3]  = e30;
@@ -122,11 +166,11 @@ export default class Matrix4
     }
 
     /**
-     * Sets the elements to the values of the given array.
-     * @param array
-     * @param rowMajor If true, reads the array in row major order. Default is false.
+     * Sets the elements of this to the values of the given array.
+     * @param array Array with 16 matrix elements in column-major or row-major order.
+     * @param rowMajor If true expects array elements in row-major order, default is false (column-major).
      */
-    setFromArray(array: number[], rowMajor: boolean = false): Matrix4
+    setFromArray(array: number[], rowMajor = false): this
     {
         if (rowMajor) {
             const e = this.elements;
@@ -144,7 +188,7 @@ export default class Matrix4
     /**
      * Sets all elements to zero.
      */
-    setZeros(): Matrix4
+    makeZeros(): this
     {
         const e = this.elements;
         e[0]  = 0; e[1]  = 0; e[2]  = 0; e[3]  = 0;
@@ -157,7 +201,7 @@ export default class Matrix4
     /**
      * Sets all elements to one.
      */
-    setOnes(): Matrix4
+    makeOnes(): this
     {
         const e = this.elements;
         e[0]  = 1; e[1]  = 1; e[2]  = 1; e[3]  = 1;
@@ -170,7 +214,7 @@ export default class Matrix4
     /**
      * Sets the identity matrix.
      */
-    setIdentity(): Matrix4
+    makeIdentity(): this
     {
         const e = this.elements;
         e[0]  = 1; e[1]  = 0; e[2]  = 0; e[3]  = 0;
@@ -183,7 +227,7 @@ export default class Matrix4
     /**
      * Transposes the matrix in-place.
      */
-    transpose()
+    transpose(): this
     {
         const e = this.elements;
         const t0 = e[4];  e[4]  = e[1];  e[1]  = t0;
@@ -201,7 +245,7 @@ export default class Matrix4
      * @param y Basis vector for the y axis.
      * @param z Basis vector for the z axis.
      */
-    getBasis(x: IVector3, y: IVector3, z: IVector3)
+    getBasis(x: IVector3, y: IVector3, z: IVector3): this
     {
         const e = this.elements;
         x.x = e[0]; x.y = e[1]; x.z = e[2];
@@ -216,7 +260,7 @@ export default class Matrix4
      * @param y Basis vector for the y axis.
      * @param z Basis vector for the z axis.
      */
-    setBasis(x: IVector3, y: IVector3, z: IVector3)
+    setBasis(x: IVector3, y: IVector3, z: IVector3): this
     {
         const e = this.elements;
         e[0] = x.x; e[1] = x.y; e[2] = x.z;
@@ -230,7 +274,7 @@ export default class Matrix4
      * from the given matrix.
      * @param matrix Matrix to extract the rotation from.
      */
-    setRotationFromMatrix(matrix: IMatrix4)
+    setRotationFromMatrix(matrix: IMatrix4): this
     {
         const e = this.elements;
         const m = matrix.elements;
@@ -252,25 +296,25 @@ export default class Matrix4
         return this;
     }
 
-    setRotationX(angleX: number)
+    setRotationX(angleX: number): this
     {
         // TODO: Implement
         return this;
     }
 
-    setRotationY(angleY: number)
+    setRotationY(angleY: number): this
     {
         // TODO: Implement
         return this;
     }
 
-    setRotationZ(angleZ: number)
+    setRotationZ(angleZ: number): this
     {
         // TODO: Implement
         return this;
     }
 
-    setRotation(ax: number, ay: number, az: number, order: ERotationOrder)
+    setRotation(ax: number, ay: number, az: number, order: ERotationOrder): this
     {
         const e = this.elements;
         const sinX = Math.sin(ax), cosX = Math.cos(ax);
@@ -357,7 +401,7 @@ export default class Matrix4
         return this;
     }
 
-    setRotationFromVector(angles: IVector3, order: ERotationOrder)
+    setRotationFromVector(angles: IVector3, order: ERotationOrder): this
     {
         return this.setRotation(angles.x, angles.y, angles.y, order);
     }
@@ -367,13 +411,13 @@ export default class Matrix4
      * from the given quaternion.
      * @param quat
      */
-    setRotationFromQuaternion(quat: IQuaternion)
+    setRotationFromQuaternion(quat: IQuaternion): this
     {
         // TODO: Implement
         return this;
     }
 
-    setTranslation(tx: number, ty: number, tz: number)
+    setTranslation(tx: number, ty: number, tz: number): this
     {
         const e = this.elements;
         e[0]  = 1;  e[1]  = 0;  e[2]  = 0;  e[3]  = 0;
@@ -383,12 +427,12 @@ export default class Matrix4
         return this;
     }
 
-    setTranslationFromVector(translation: IVector3)
+    setTranslationFromVector(translation: IVector3): this
     {
         return this.setTranslation(translation.x, translation.y, translation.z);
     }
 
-    setScale(sx: number, sy: number, sz: number)
+    setScale(sx: number, sy: number, sz: number): this
     {
         const e = this.elements;
         e[0]  = sx; e[1]  = 0;  e[2]  = 0;  e[3]  = 0;
@@ -398,57 +442,59 @@ export default class Matrix4
         return this;
     }
 
-    setScaleFromVector(scale: IVector3)
+    setScaleFromVector(scale: IVector3): this
     {
         return this.setScale(scale.x, scale.y, scale.z);
     }
 
     /**
-     * Returns a clone of this matrix.
+     * Returns a new matrix set to the same values as this.
      */
-    clone()
+    clone(): Matrix4
     {
         return new Matrix4(this.elements);
     }
 
     /**
-     * Returns an array with the elements of this matrix.
-     * @param array Optional destination array.
+     * Returns an array set to the values of this matrix
+     * in column-major or row-major order.
+     * @param target Optional target array.
      * @param rowMajor If true, writes the array in row major order. Default is false.
      */
-    toArray(array?: number[], rowMajor: boolean = false): number[]
+    toArray(target?: number[], rowMajor = false): number[]
     {
-        if (!array) {
-            array = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+        if (!target) {
+            target = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
         }
 
         const e = this.elements;
 
         if (rowMajor) {
-            array[0] = e[0];  array[4] = e[1];  array[8]  = e[2];  array[12] = e[3];
-            array[1] = e[4];  array[5] = e[5];  array[9]  = e[6];  array[13] = e[7];
-            array[2] = e[8];  array[6] = e[9];  array[10] = e[10]; array[14] = e[11];
-            array[3] = e[12]; array[7] = e[13]; array[11] = e[14]; array[15] = e[15];
+            target[0] = e[0];  target[4] = e[1];  target[8]  = e[2];  target[12] = e[3];
+            target[1] = e[4];  target[5] = e[5];  target[9]  = e[6];  target[13] = e[7];
+            target[2] = e[8];  target[6] = e[9];  target[10] = e[10]; target[14] = e[11];
+            target[3] = e[12]; target[7] = e[13]; target[11] = e[14]; target[15] = e[15];
         }
         else {
-            array[0]  = e[0];  array[1]  = e[1];  array[2]  = e[2];  array[3]  = e[3];
-            array[4]  = e[4];  array[5]  = e[5];  array[6]  = e[6];  array[7]  = e[7];
-            array[8]  = e[8];  array[9]  = e[9];  array[10] = e[10]; array[11] = e[11];
-            array[12] = e[12]; array[13] = e[13]; array[14] = e[14]; array[15] = e[15];
+            target[0]  = e[0];  target[1]  = e[1];  target[2]  = e[2];  target[3]  = e[3];
+            target[4]  = e[4];  target[5]  = e[5];  target[6]  = e[6];  target[7]  = e[7];
+            target[8]  = e[8];  target[9]  = e[9];  target[10] = e[10]; target[11] = e[11];
+            target[12] = e[12]; target[13] = e[13]; target[14] = e[14]; target[15] = e[15];
         }
 
-        return array;
+        return target;
     }
 
     /**
-     * Returns a typed array with the elements of this matrix.
-     * @param array Optional destination array.
+     * Returns a Float32Array set to the values of this matrix
+     * in column-major order.
+     * @param target Optional target array.
      */
-    toTypedArray(array?: Float32Array): Float32Array
+    toTypedArray(target?: Float32Array): Float32Array
     {
-        if (array) {
-            array.set(this.elements, 0);
-            return array;
+        if (target) {
+            target.set(this.elements, 0);
+            return target;
         }
 
         return new Float32Array(this.elements);
@@ -457,7 +503,7 @@ export default class Matrix4
     /**
      * Returns a text representation of this matrix.
      */
-    toString()
+    toString(): string
     {
         return Matrix4.toString(this);
     }

@@ -29,7 +29,7 @@ export default class Quad3 implements IQuad3
     transformMat3(matrix: Matrix3): this
     {
         for (let i = 0; i < 4; ++i) {
-            matrix.mulVector(this.points[i]);
+            matrix.multiplyVector(this.points[i]);
         }
         return this;
     }

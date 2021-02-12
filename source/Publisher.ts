@@ -43,8 +43,8 @@ export default class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    on<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: object);
-    on(type: string | string[] | object, callback: (event: any) => void, context?: object);
+    on<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: unknown): void;
+    on(type: string | string[] | Record<string, unknown>, callback: (event: unknown) => void, context?: unknown): void;
     on(type, callback, context?)
     {
         if (Array.isArray(type)) {
@@ -68,7 +68,7 @@ export default class Publisher
             subscribers = this[_pd][type] = [];
         }
 
-        let subscriber = { callback, context };
+        const subscriber = { callback, context };
         subscribers.push(subscriber);
     }
 
@@ -78,7 +78,7 @@ export default class Publisher
      * @param callback
      * @param context
      */
-    addEventListener(type: string, callback: (event: any) => void, context?: object)
+    addEventListener(type: string, callback: (event: unknown) => void, context?: unknown): void
     {
         this.on(type, callback, context);
     }
@@ -89,8 +89,8 @@ export default class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    once<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: object);
-    once(type: string | string[] | object, callback: (event: any) => void, context?: object)
+    once<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: unknown): void;
+    once(type: string | string[] | Record<string, unknown>, callback: (event: unknown) => void, context?: unknown): void;
     once(type, callback, context?)
     {
         if (Array.isArray(type)) {
@@ -117,8 +117,8 @@ export default class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    off<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback?: (event: T) => void, context?: object);
-    off(type: string | string[] | object, callback?: (event: any) => void, context?: object)
+    off<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback?: (event: T) => void, context?: unknown): void;
+    off(type: string | string[] | Record<string, unknown>, callback?: (event: unknown) => void, context?: unknown): void;
     off(type, callback?, context?)
     {
         if (typeof type === "object") {
@@ -172,7 +172,7 @@ export default class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    removeEventListener(type: string, callback?: (event: any) => void, context?: object)
+    removeEventListener(type: string, callback?: (event: unknown) => void, context?: unknown): void
     {
         this.off(type, callback, context);
     }
@@ -182,12 +182,12 @@ export default class Publisher
      * @param type Type name of the event.
      * @param message The object sent to the subscribers of the event type.
      */
-    emit(type: string, message?: any);
+    emit(type: string, message?: unknown): void;
     /**
      * Emits an event to all subscribers of the event's type.
      * @param event The event object sent to the subscribers of the event's type.
      */
-    emit<T extends ITypedEvent<string>>(event: T);
+    emit<T extends ITypedEvent<string>>(event: T): void;
     emit(eventOrType, message?)
     {
         let type, payload;
@@ -230,7 +230,7 @@ export default class Publisher
      * Registers a new event type.
      * @param name Name of the event type.
      */
-    addEvent(name: string)
+    addEvent(name: string): void
     {
         if (!this[_pd][name]) {
             this[_pd][name] = [];
@@ -241,7 +241,7 @@ export default class Publisher
      * Registers multiple new event types.
      * @param names Names of the event types.
      */
-    addEvents(...names: string[])
+    addEvents(...names: string[]): void
     {
         names.forEach(name => {
             if (!this[_pd][name]) {

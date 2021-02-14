@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-export default function isFunction(obj: any): boolean
+export default function isFunction(obj: unknown): boolean
 {
-    return !!(obj && obj.constructor && obj.call && obj.apply);
+    return !!(obj && obj.constructor && obj["call"] && obj["apply"]);
 }

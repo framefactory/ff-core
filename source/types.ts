@@ -56,6 +56,6 @@ export type Enum<E> = Record<keyof E, number | string> & { [k: number]: string }
 ////////////////////////////////////////////////////////////////////////////////
 // ENUM HELPER FUNCTIONS
 
-export const enumToArray = function(e: any) {
+export const enumToArray = function(e: object): string[] {
     return Object.keys(e).filter(key => isNaN(Number(key)));
 };

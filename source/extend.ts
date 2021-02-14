@@ -5,10 +5,12 @@
  * License: MIT
  */
 
-export default function extend(derivedClass: any, baseClass: any)
+import { Type } from "./types";
+
+export default function extend(derivedClass: Type, baseClass: Type): void
 {
     // create prototype chain
-    let derivedPrototype = Object.create(baseClass.prototype);
+    const derivedPrototype = Object.create(baseClass.prototype);
     derivedPrototype.constructor = derivedClass;
     derivedClass.prototype = derivedPrototype;
 

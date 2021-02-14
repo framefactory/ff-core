@@ -39,7 +39,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
     {
         return typeof scope === "function" ? (scope as any).typeName : (typeof scope === "object"
             ? (scope.constructor as any).typeName : scope);
-    };
+    }
 
     protected _rootTypeName: string;
 
@@ -70,7 +70,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
      * for each class in the object's prototype chain.
      * @param object
      */
-    add(object: T)
+    add(object: T): void
     {
         const id = (object as any).id;
         if (typeof id === "string") {
@@ -108,7 +108,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
      * Removes an object from the registry.
      * @param object
      */
-    remove(object: T)
+    remove(object: T): void
     {
         const id = (object as any).id;
         if (typeof id === "string") {
@@ -147,7 +147,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
      * @param tag The tag name. Valid tag names are all non-empty strings except "tag".
      * @param object
      */
-    addByTag(tag: string, object: T)
+    addByTag(tag: string, object: T): void
     {
         if (!tag || tag === "tag") {
             throw new Error("illegal tag name");
@@ -195,7 +195,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
     /**
      * Removes all objects from the registry.
      */
-    clear()
+    clear(): void
     {
         const objects = this.cloneArray();
         objects.forEach(object => this.remove(object));
@@ -204,7 +204,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
     /**
      * Returns the total number of objects in the registry.
      */
-    get length() {
+    get length(): number {
         return this._objLists[this._rootTypeName].length;
     }
 
@@ -261,7 +261,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
      * @param nothrow If true, the method returns undefined if no instance was found.
      * By default, an error is thrown uf no instance is registered with the given class/class name.
      */
-    get<U extends T = T>(scope?: ObjectOrTypeOrName<U>, nothrow: boolean = false): U | undefined
+    get<U extends T = T>(scope?: ObjectOrTypeOrName<U>, nothrow = false): U | undefined
     {
         const className = this.getTypeName(scope);
         const objects = this._objLists[className];
@@ -323,7 +323,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    on<U extends T>(scope: ObjectOrTypeOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object)
+    on<U extends T>(scope: ObjectOrTypeOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object): void
     {
         super.on(this.getTypeName(scope), callback, context);
     }
@@ -334,7 +334,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    once<U extends T>(scope: ObjectOrTypeOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object)
+    once<U extends T>(scope: ObjectOrTypeOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object): void
     {
         super.once(this.getTypeName(scope), callback, context);
     }
@@ -345,7 +345,7 @@ export default class ObjectRegistry<T extends object> extends Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    off<U extends T>(scope: ObjectOrTypeOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object)
+    off<U extends T>(scope: ObjectOrTypeOrName<U>, callback: (event: IObjectEvent<U>) => void, context?: object): void
     {
         super.off(this.getTypeName(scope), callback, context);
     }

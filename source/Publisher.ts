@@ -31,6 +31,10 @@ export interface ITypedEvent<T extends string>
  */
 export default class Publisher
 {
+    /**
+     * Constructs a new [[Publisher]] instance.
+     * @param options knownEvents: if true, only known, i.e. previously added event types can be emitted. Default is true.
+     */
     constructor(options?: { knownEvents: boolean })
     {
         const knownEvents = options ? options.knownEvents : true;

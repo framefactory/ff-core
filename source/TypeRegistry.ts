@@ -10,7 +10,6 @@ import Publisher, { ITypedEvent } from "./Publisher";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
 export interface ITypeEvent extends ITypedEvent<"type">
 {
     add: boolean;
@@ -28,7 +27,7 @@ export default class TypeRegistry extends Publisher
         this.addEvent("type");
     }
 
-    add(type: Type | Type[])
+    add(type: Type | Type[]): void
     {
         if (Array.isArray(type)) {
             type.forEach(type => this.add(type));
@@ -48,7 +47,7 @@ export default class TypeRegistry extends Publisher
         this.emit<ITypeEvent>({ type: "type", add: true, remove: false, classType: type });
     }
 
-    remove(type: Type | Type[])
+    remove(type: Type | Type[]): void
     {
         if (Array.isArray(type)) {
             type.forEach(type => this.remove(type));
@@ -82,7 +81,7 @@ export default class TypeRegistry extends Publisher
         return this._dict[typeName];
     }
 
-    createInstance(typeHint: string | object | Type, ...args)
+    createInstance(typeHint: string | object | Type, ...args): unknown
     {
         const type = this.getType(typeHint);
         if (!type) {

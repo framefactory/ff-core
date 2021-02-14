@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-let _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 /**
  * Creates a base64 encoded globally unique identifier with a default length of 12 characters.
@@ -15,13 +15,13 @@ let _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
  * @param dictionary Optional object with ids. Function ensures generated id is not equal to a key of dictionary.
  * @returns Globally unique identifier
  */
-export default function uniqueId(length?: number, dictionary?: {})
+export default function uniqueId(length?: number, dictionary?: {}): string
 {
     if (!length || typeof length !== "number") {
         length = 12;
     }
 
-    let id;
+    let id: string;
 
     do {
         id = "";

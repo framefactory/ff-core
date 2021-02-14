@@ -17,7 +17,7 @@ class FormatError extends Error
 {
 }
 
-let format = function(template: string, ...args)
+const format = function(template: string, ...args)
 {
     const reFormat = /%\d/g;
     const matches = template.match(reFormat);
@@ -31,7 +31,7 @@ let format = function(template: string, ...args)
     return template;
 };
 
-let not = function(value: any, message: string)
+const not = function(value: any, message: string)
 {
     return String(value) + " " + Checker.messages.not + " " + message;
 };
@@ -49,7 +49,7 @@ class CheckObjectRecursive implements ICheck
 {
     constructor(private _template: { [id: string]: Checker | object }, private _maybeNull: boolean)
     {
-        for (let key in _template) {
+        for (const key in _template) {
             const propValue: any = _template[key];
 
             // for plain objects, wrap in template (is.like)
@@ -69,11 +69,12 @@ class CheckObjectRecursive implements ICheck
             throw new FormatError(not(value, Checker.messages.object));
         }
 
-        let result = {};
-        for (let key in this._template) {
+        const result = {};
+
+        for (const key in this._template) {
             const checker: Checker = this._template[key] as Checker;
             const sourceKey = checker._name ? checker._name : key;
-            const hasSourceKey = value.hasOwnProperty(sourceKey);
+            const hasSourceKey = Object.prototype.hasOwnProperty.call(value, sourceKey);
 
             try {
                 if (hasSourceKey || checker._required) {
@@ -133,8 +134,8 @@ class CheckArrayRecursive implements ICheck
     toString(indent?: number)
     {
         indent = indent || 0;
-        let prefix = " ".repeat(indent);
-        let checker = this._template[0];
+        const prefix = " ".repeat(indent);
+        const checker = this._template[0];
         return "an array [\n  " + prefix + "each element is " + checker.toString(indent + 2) + "\n" + prefix + "]";
     }
 }
@@ -179,7 +180,7 @@ class CheckNumber implements ICheck
 
     run(value: any)
     {
-        let type = typeof value;
+        const type = typeof value;
         if (type === "number" && !isNaN(value)) {
             return value;
         }
@@ -190,7 +191,7 @@ class CheckNumber implements ICheck
             }
 
             if (typeof value === "string") {
-                let result = parseFloat(value);
+                const result = parseFloat(value);
                 if (!isNaN(result)) {
                     return result;
                 }
@@ -212,7 +213,7 @@ class CheckBoolean implements ICheck
 
     run(value: any)
     {
-        let type = typeof value;
+        const type = typeof value;
         if (type === "boolean") {
             return value;
         }
@@ -223,7 +224,7 @@ class CheckBoolean implements ICheck
             }
 
             if (type === "string") {
-                let lc = value.toLowerCase();
+                const lc = value.toLowerCase();
                 if (lc === "true") {
                     return true;
                 }
@@ -248,7 +249,7 @@ class CheckString implements ICheck
 
     run(value: any)
     {
-        let type = typeof value;
+        const type = typeof value;
         if (type === "string") {
             return value;
         }
@@ -386,7 +387,7 @@ class CheckMin implements ICheck
 
     run(value: any)
     {
-        let min = this._min;
+        const min = this._min;
 
         if (typeof value !== "number") {
             throw new FormatError(Checker.messages.min.type);
@@ -414,7 +415,7 @@ class CheckMax implements ICheck
 
     run(value: any)
     {
-        let max = this._max;
+        const max = this._max;
 
         if (typeof value !== "number") {
             throw new FormatError(Checker.messages.max.type);
@@ -442,8 +443,8 @@ class CheckBetween implements ICheck
 
     run(value: any)
     {
-        let min = this._min;
-        let max = this._max;
+        const min = this._min;
+        const max = this._max;
 
         if (typeof value !== "number") {
             throw new FormatError(Checker.messages.between.type);
@@ -575,8 +576,6 @@ class CheckLengthBetween implements ICheck
 
 class CheckNotEmpty implements ICheck
 {
-    constructor() {}
-
     run(value: any)
     {
         if (typeof value !== "string" && !Array.isArray(value)) {
@@ -602,7 +601,7 @@ class CheckOneOf implements ICheck
 
     constructor(...args)
     {
-        let options = this._options = [];
+        const options = this._options = [];
         args.forEach(arg => {
             if (Array.isArray(arg)) {
                 arg.forEach(a => { options.push(a) });
@@ -615,7 +614,7 @@ class CheckOneOf implements ICheck
 
     run(value: any)
     {
-        let options = this._options;
+        const options = this._options;
         for (let i = 0; i < options.length; ++i) {
             if (value === options[i]) {
                 return value;
@@ -675,7 +674,7 @@ class CheckJson implements ICheck
 
     run(value: any)
     {
-        let type = typeof value;
+        const type = typeof value;
         if (this._convert && type === "object") {
             return JSON.stringify(value);
         }
@@ -773,7 +772,7 @@ class CheckPreset implements ICheck
     run(value: any)
     {
         if (value === undefined) {
-            let preset = this._preset;
+            const preset = this._preset;
             return preset && typeof preset === "function" ? preset() : preset;
         }
 
@@ -904,7 +903,7 @@ export class Checker
 
     private _add(checker: ICheck)
     {
-        let self = this._arg();
+        const self = this._arg();
         self._stack.push(checker);
         return self;
     }
@@ -938,36 +937,36 @@ export class Checker
             }, value);
     }
 
-    toString(indent?: number)
+    toString(indent?: number): string
     {
         indent = indent || 0;
         return this._stack.map(checker => checker.toString(indent)).join(", ");
     }
 
-    preset(presetValue: any) : Checker
+    preset(presetValue: any): Checker
     {
-        let self = this._arg();
+        const self = this._arg();
         self._hasPreset = true;
         return self._add(new CheckPreset(presetValue));
     }
 
     from(name: string) : Checker
     {
-        let self = this._arg();
+        const self = this._arg();
         self._name = name;
         return self;
     }
 
     get required() : Checker
     {
-        let self = this._arg();
+        const self = this._arg();
         self._required = true;
         return self;
     }
 
     get optional() : Checker
     {
-        let self = this._arg();
+        const self = this._arg();
         self._required = false;
         return self;
     }
@@ -981,14 +980,14 @@ export class Checker
 
     get is() : Checker
     {
-        let self = this._arg();
+        const self = this._arg();
         self._convert = false;
         return self;
     }
 
     get to() : Checker
     {
-        let self = this._arg();
+        const self = this._arg();
         self._convert = true;
         return self;
     }
@@ -1115,7 +1114,7 @@ export class Checker
         return this._add(new CheckMaxLength(maxLength, this._convert));
     }
 
-    lengthBetween(minLength: number, maxLength: number)
+    lengthBetween(minLength: number, maxLength: number): Checker
     {
         return this._add(new CheckLengthBetween(minLength, maxLength, this._convert));
     }
@@ -1125,17 +1124,17 @@ export class Checker
         return this._add(new CheckNotEmpty());
     }
 
-    oneOf(...args)
+    oneOf(...args: any[]): Checker
     {
         return this._add(new CheckOneOf(...args));
     }
 
-    match(pattern: RegExp) : Checker
+    match(pattern: RegExp): Checker
     {
         return this._add(new CheckMatch(pattern));
     }
 
-    map(map: (value: any) => any)
+    map(map: (value: any) => any): Checker
     {
         return this._add(new CheckMap(map));
     }

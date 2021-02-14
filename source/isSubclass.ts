@@ -7,7 +7,7 @@
 
 import { Constructor } from "./types";
 
-export default function isSubclass(derived: Constructor, base: Constructor)
+export default function isSubclass(derived: Constructor, base: Constructor): boolean
 {
     if (!derived || !base) {
         return false;

@@ -25,7 +25,7 @@ export default class SortedArray<T>
         this.items = [];
     }
 
-    get length()
+    get length(): number
     {
         return this.items.length;
     }
@@ -40,7 +40,7 @@ export default class SortedArray<T>
         return values;
     }
 
-    clear()
+    clear(): void
     {
         this.items.length = 0;
     }
@@ -50,30 +50,30 @@ export default class SortedArray<T>
         return !this.items.length;
     }
 
-    itemAtBefore(key: number)
+    itemAtBefore(key: number): ISortedArrayItem<T> | undefined
     {
         const index = this.indexAtBefore(key);
         return index < 0 ? undefined : this.items[index];
     }
 
-    insertItem(item: ISortedArrayItem<T>)
+    insertItem(item: ISortedArrayItem<T>): void
     {
         const i = this.indexAtBefore(item.key);
         this.items.splice(i + 1, 0, item);
     }
 
-    insertAt(key: number, value: T)
+    insertAt(key: number, value: T): void
     {
         const i = this.indexAtBefore(key);
         this.items.splice(i + 1, 0, { key, value });
     }
 
-    removeItem(item: ISortedArrayItem<T>)
+    removeItem(item: ISortedArrayItem<T>): boolean
     {
         return this.removeAt(item.key);
     }
 
-    removeAt(key: number)
+    removeAt(key: number): boolean
     {
         const i = this.indexAt(key);
         if (i < 0) {
@@ -107,7 +107,7 @@ export default class SortedArray<T>
         return items.splice(startIndex, endIndex - startIndex + 1);
     }
 
-    findItem(item: ISortedArrayItem<T>)
+    findItem(item: ISortedArrayItem<T>): ISortedArrayItem<T>
     {
         return this.findAt(item.key);
     }
@@ -148,7 +148,7 @@ export default class SortedArray<T>
      * @param {number} key
      * @returns {number} Index of an element of the items array, -1 if not found.
      */
-    indexAt(key: number)
+    indexAt(key: number): number
     {
         const items = this.items;
 
@@ -178,7 +178,7 @@ export default class SortedArray<T>
      * @param {number} key
      * @returns {number} Index of an element of the items array.
      */
-    indexAtBefore(key: number)
+    indexAtBefore(key: number): number
     {
         const items = this.items;
 

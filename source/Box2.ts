@@ -26,7 +26,15 @@ export default class Box2 implements IBox2
         this.max = new Vector2(maxX, maxY);
     }
 
-    set(minX: number, minY: number, maxX: number, maxY: number)
+    get sizeX(): number {
+        return this.max.x - this.min.x;
+    }
+
+    get sizeY(): number {
+        return this.max.y - this.min.y;
+    }
+
+    set(minX: number, minY: number, maxX: number, maxY: number): this
     {
         this.min.set(minX, minY);
         this.max.set(maxX, maxY);
@@ -34,7 +42,7 @@ export default class Box2 implements IBox2
         return this;
     }
 
-    setFromPoints(min: IVector2, max: IVector2)
+    setFromPoints(min: IVector2, max: IVector2): this
     {
         this.min.copy(min);
         this.max.copy(max);
@@ -42,7 +50,7 @@ export default class Box2 implements IBox2
         return this;
     }
 
-    setEmpty()
+    setEmpty(): this
     {
         this.min.set(Infinity, Infinity);
         this.max.set(-Infinity, -Infinity);
@@ -56,7 +64,19 @@ export default class Box2 implements IBox2
             && isFinite(this.max.y - this.min.y));
     }
 
-    uniteWith(other: IBox2)
+    contains(x: number, y: number): boolean
+    {
+        return x >= this.min.x && x < this.max.x
+            && y >= this.min.y && y < this.max.y;
+    }
+
+    containsPoint(point: IVector2): boolean
+    {
+        return point.x >= this.min.x && point.x < this.max.x
+            && point.y >= this.min.y && point.y < this.max.y;
+    }
+
+    uniteWith(other: IBox2): this
     {
         const p0 = this.min, p1 = this.max;
 
@@ -66,7 +86,7 @@ export default class Box2 implements IBox2
         return this;
     }
 
-    intersectWith(other: IBox2)
+    intersectWith(other: IBox2): this
     {
         const min = this.min, max = this.max;
 
@@ -76,7 +96,7 @@ export default class Box2 implements IBox2
         return this;
     }
 
-    include(x: number, y: number)
+    include(x: number, y: number): this
     {
         const min = this.min, max = this.max;
 
@@ -89,7 +109,7 @@ export default class Box2 implements IBox2
         return this;
     }
 
-    includePoint(point: IVector2)
+    includePoint(point: IVector2): this
     {
         const min = this.min, max = this.max;
 
@@ -102,7 +122,7 @@ export default class Box2 implements IBox2
         return this;
     }
 
-    normalize()
+    normalize(): this
     {
         const min = this.min, max = this.max;
 

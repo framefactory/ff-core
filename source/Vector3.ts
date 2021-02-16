@@ -128,7 +128,7 @@ export default class Vector3 implements IVector3
      * Copies the components of the given vector to this.
      * @param vector
      */
-    copy(vector: IVector3): Vector3
+    copy(vector: IVector3): this
     {
         this.x = vector.x;
         this.y = vector.y;
@@ -142,7 +142,7 @@ export default class Vector3 implements IVector3
      * @param y
      * @param z
      */
-    set(x: number, y: number, z: number): Vector3
+    set(x: number, y: number, z: number): this
     {
         this.x = x;
         this.y = y;
@@ -154,7 +154,7 @@ export default class Vector3 implements IVector3
      * Sets each component to the given scalar value.
      * @param scalar
      */
-    setFromScalar(scalar: number): Vector3
+    setFromScalar(scalar: number): this
     {
         this.x = scalar;
         this.y = scalar;
@@ -167,7 +167,7 @@ export default class Vector3 implements IVector3
      * @param array
      * @param offset Optional start index of the array. Default is 0.
      */
-    setFromArray(array: number[], offset = 0): Vector3
+    setFromArray(array: number[], offset = 0): this
     {
         this.x = array[offset];
         this.y = array[offset + 1];
@@ -178,7 +178,7 @@ export default class Vector3 implements IVector3
     /**
      * Sets all components to zero.
      */
-    setZeros(): Vector3
+    setZeros(): this
     {
         this.x = 0;
         this.y = 0;
@@ -189,7 +189,7 @@ export default class Vector3 implements IVector3
     /**
      * Sets all components to one.
      */
-    setOnes(): Vector3
+    setOnes(): this
     {
         this.x = 1;
         this.y = 1;
@@ -200,7 +200,7 @@ export default class Vector3 implements IVector3
     /**
      * Makes this a unit vector parallel to the X axis.
      */
-    setUnitX(): Vector3
+    setUnitX(): this
     {
         this.x = 1;
         this.y = 0;
@@ -211,7 +211,7 @@ export default class Vector3 implements IVector3
     /**
      * Makes this a unit vector parallel to the Y axis.
      */
-    setUnitY(): Vector3
+    setUnitY(): this
     {
         this.x = 0;
         this.y = 1;
@@ -222,7 +222,7 @@ export default class Vector3 implements IVector3
     /**
      * Makes this a unit vector parallel to the Z axis.
      */
-    setUnitZ(): Vector3
+    setUnitZ(): this
     {
         this.x = 0;
         this.y = 0;
@@ -231,10 +231,30 @@ export default class Vector3 implements IVector3
     }
 
     /**
+     * Swaps this and other vector.
+     */
+    swap(other: IVector3): this
+    {
+        const x = this.x;
+        this.x = other.x;
+        other.x = x;
+
+        const y = this.y;
+        this.y = other.y;
+        other.y = y;
+
+        const z = this.z;
+        this.z = other.z;
+        other.z = z;
+
+        return this;
+    }
+
+    /**
      * Adds the given vector to this.
      * @param other
      */
-    add(other: IVector3): Vector3
+    add(other: IVector3): this
     {
         this.x += other.x;
         this.y += other.y;
@@ -246,7 +266,7 @@ export default class Vector3 implements IVector3
      * Subtracts the given vector from this.
      * @param other
      */
-    subtract(other: IVector3): Vector3
+    subtract(other: IVector3): this
     {
         this.x -= other.x;
         this.y -= other.y;
@@ -258,7 +278,7 @@ export default class Vector3 implements IVector3
      * Multiplies each component with the corresponding component of the given vector.
      * @param other
      */
-    multiply(other: IVector3): Vector3
+    multiply(other: IVector3): this
     {
         this.x *= other.x;
         this.y *= other.y;
@@ -270,7 +290,7 @@ export default class Vector3 implements IVector3
      * Divides each component by the corresponding component of the given vector.
      * @param other
      */
-    divideBy(other: IVector3): Vector3
+    divideBy(other: IVector3): this
     {
         this.x /= other.x;
         this.y /= other.y;
@@ -282,7 +302,7 @@ export default class Vector3 implements IVector3
      * Adds the given scalar to each component.
      * @param scalar
      */
-    addScalar(scalar: number): Vector3
+    addScalar(scalar: number): this
     {
         this.x += scalar;
         this.y += scalar;
@@ -294,7 +314,7 @@ export default class Vector3 implements IVector3
      * Subtracts the given scalar from each component.
      * @param scalar
      */
-    subtractScalar(scalar: number): Vector3
+    subtractScalar(scalar: number): this
     {
         this.x -= scalar;
         this.y -= scalar;
@@ -306,7 +326,7 @@ export default class Vector3 implements IVector3
      * Multiplies each component with the given scalar.
      * @param scalar
      */
-    multiplyScalar(scalar: number): Vector3
+    multiplyScalar(scalar: number): this
     {
         this.x *= scalar;
         this.y *= scalar;
@@ -318,7 +338,7 @@ export default class Vector3 implements IVector3
      * Divides each component by the given scalar.
      * @param scalar
      */
-    divideByScalar(scalar: number): Vector3
+    divideByScalar(scalar: number): this
     {
         this.x /= scalar;
         this.y /= scalar;
@@ -332,7 +352,7 @@ export default class Vector3 implements IVector3
      * @param ty
      * @param tz
      */
-    translate(tx: number, ty: number, tz: number): Vector3
+    translate(tx: number, ty: number, tz: number): this
     {
         this.x += tx;
         this.y += ty;
@@ -344,7 +364,7 @@ export default class Vector3 implements IVector3
      * Rotates the vector by the given angle about the x-axis.
      * @param angle rotation angle in radians.
      */
-    rotateX(angle: number): Vector3
+    rotateX(angle: number): this
     {
         const co = Math.cos(angle);
         const si = Math.sin(angle);
@@ -359,7 +379,7 @@ export default class Vector3 implements IVector3
      * Rotates the vector by the given angle about the y-axis.
      * @param angle rotation angle in radians.
      */
-    rotateY(angle: number): Vector3
+    rotateY(angle: number): this
     {
         const co = Math.cos(angle);
         const si = Math.sin(angle);
@@ -374,7 +394,7 @@ export default class Vector3 implements IVector3
      * Rotates the vector by the given angle about the z-axis.
      * @param angle rotation angle in radians.
      */
-    rotateZ(angle: number): Vector3
+    rotateZ(angle: number): this
     {
         const co = Math.cos(angle);
         const si = Math.sin(angle);
@@ -391,7 +411,7 @@ export default class Vector3 implements IVector3
      * @param sy
      * @param sz
      */
-    scale(sx: number, sy: number, sz: number): Vector3
+    scale(sx: number, sy: number, sz: number): this
     {
         this.x *= sx;
         this.y *= sy;
@@ -402,7 +422,7 @@ export default class Vector3 implements IVector3
     /**
      * Inverts each component of this, e.g. x = 1 / x, ...
      */
-    invert(): Vector3
+    invert(): this
     {
         this.x = 1 / this.x;
         this.y = 1 / this.y;
@@ -413,7 +433,7 @@ export default class Vector3 implements IVector3
     /**
      * Negates each component of this, e.g. x = -x, ...
      */
-    negate(): Vector3
+    negate(): this
     {
         this.x = -this.x;
         this.y = -this.y;
@@ -424,7 +444,7 @@ export default class Vector3 implements IVector3
     /**
      * Normalizes the vector, making it a unit vector.
      */
-    normalize(): Vector3
+    normalize(): this
     {
         const f = 1 / Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         this.x *= f;
@@ -436,7 +456,7 @@ export default class Vector3 implements IVector3
     /**
      * Makes this vector homogeneous by dividing all components by the z component.
      */
-    homogenize(): Vector3
+    homogenize(): this
     {
         if (this.z != 0) {
             this.x /= this.z;
@@ -459,7 +479,7 @@ export default class Vector3 implements IVector3
      * Assigns to this the cross product between this and the given vector.
      * @param other
      */
-    cross(other: IVector3): Vector3
+    cross(other: IVector3): this
     {
         const x = this.y * other.z - this.z * other.y;
         const y = this.z * other.x - this.x * other.z;
@@ -605,14 +625,12 @@ export default class Vector3 implements IVector3
 
     /**
      * Returns a [[Vector2]] with the x and y components of this.
-     * @param vector Optional destination vector.
+     * @param result Optional destination vector.
      */
-    toVector2(vector?: IVector2): IVector2
+    toVector2(result?: Vector2): Vector2
     {
-        if (vector) {
-            vector.x = this.x;
-            vector.y = this.y;
-            return vector;
+        if (result) {
+            return result.set(this.x, this.y);
         }
 
         return new Vector2(this.x, this.y);

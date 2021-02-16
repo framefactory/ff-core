@@ -10,6 +10,15 @@ import Vector4, { IVector4 } from "./Vector4";
 
 ////////////////////////////////////////////////////////////////////////////////
 
+function _hue2rgb(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+}
+
 export { Vector3, IVector3, Vector4, IVector4 };
 
 /**
@@ -37,7 +46,7 @@ export default class Color implements IVector4
 
     length: 4;
 
-    constructor(red: number | number[] | string | Color = 0, green: number = 0, blue: number = 0, alpha: number = 1)
+    constructor(red: number | number[] | string | Color = 0, green = 0, blue = 0, alpha = 1)
     {
         if (red instanceof Color) {
             this.x = red.x;
@@ -62,35 +71,44 @@ export default class Color implements IVector4
         }
     }
 
-    get r() { return this.x; }
-    get g() { return this.y; }
-    get b() { return this.z; }
-    get a() { return this.w; }
-
     set r(value: number) { this.x = value; }
-    set g(value: number) { this.y = value; }
-    set b(value: number) { this.z = value; }
-    set a(value: number) { this.w = value; }
+    get r(): number { return this.x; }
 
-    get red(): number { return this.x; }
-    get green(): number { return this.y; }
-    get blue(): number { return this.z; }
-    get alpha(): number { return this.w; }
+    set g(value: number) { this.y = value; }
+    get g(): number { return this.y; }
+
+    set b(value: number) { this.z = value; }
+    get b(): number { return this.z; }
+
+    set a(value: number) { this.w = value; }
+    get a(): number { return this.w; }
+
 
     set red(value: number) { this.x = value; }
-    set green(value: number) { this.y = value; }
-    set blue(value: number) { this.z = value; }
-    set alpha(value: number) { this.w = value; }
+    get red(): number { return this.x; }
 
-    get redByte(): number { return Math.floor(this.x * 255); }
-    get greenByte(): number { return Math.floor(this.y * 255); }
-    get blueByte(): number { return Math.floor(this.z * 255); }
-    get alphaByte(): number { return Math.floor(this.w * 255); }
+    set green(value: number) { this.y = value; }
+    get green(): number { return this.y; }
+
+    set blue(value: number) { this.z = value; }
+    get blue(): number { return this.z; }
+
+    set alpha(value: number) { this.w = value; }
+    get alpha(): number { return this.w; }
+
 
     set redByte(value: number) { this.x = value / 255.0; }
+    get redByte(): number { return Math.floor(this.x * 255); }
+
     set greenByte(value: number) { this.y = value / 255.0; }
+    get greenByte(): number { return Math.floor(this.y * 255); }
+
     set blueByte(value: number) { this.z = value / 255.0; }
+    get blueByte(): number { return Math.floor(this.z * 255); }
+
     set alphaByte(value: number) { this.w = value / 255.0; }
+    get alphaByte(): number { return Math.floor(this.w * 255); }
+
 
     inverseMultiply(factor: number): Color
     {
@@ -110,12 +128,13 @@ export default class Color implements IVector4
         return this;
     }
 
-    copy(color: Color)
+    copy(color: Color): this
     {
         this.x = color.x;
         this.y = color.y;
         this.z = color.z;
         this.w = color.w;
+        return this;
     }
 
     clone() : Color
@@ -123,7 +142,7 @@ export default class Color implements IVector4
         return new Color(this.x, this.y, this.z, this.w);
     }
     
-    set(red: number, green: number, blue: number, alpha?: number)
+    set(red: number, green: number, blue: number, alpha?: number): this
     {
         this.x = red;
         this.y = green;
@@ -133,7 +152,7 @@ export default class Color implements IVector4
         return this;
     }
 
-    setBytes(red: number, green: number, blue: number, alpha?: number)
+    setBytes(red: number, green: number, blue: number, alpha?: number): this
     {
         this.x = red / 255;
         this.y = green / 255;
@@ -143,7 +162,7 @@ export default class Color implements IVector4
         return this;
     }
 
-    setUInt24RGB(x: number)
+    setUInt24RGB(x: number): this
     {
         this.x = (x >> 16) & 0xff;
         this.y = (x >> 8) & 0xff;
@@ -153,7 +172,7 @@ export default class Color implements IVector4
         return this;
     }
 
-    setUInt32RGBA(x: number)
+    setUInt32RGBA(x: number): this
     {
         this.x = (x >> 24) & 0xff;
         this.y = (x >> 16) & 0xff;
@@ -212,7 +231,7 @@ export default class Color implements IVector4
         return this;
     }
 
-    setHSV(hue: number | IVector3 | IVector4, saturation: number = 1, value: number = 1, alpha?: number): Color
+    setHSV(hue: number | IVector3 | IVector4, saturation = 1, value = 1, alpha?: number): Color
     {
         if (typeof hue === "object") {
             saturation = hue.y;
@@ -248,7 +267,7 @@ export default class Color implements IVector4
         return this;
     }
 
-    setHSL(hue: number | IVector3 | IVector4, saturation: number = 1, luminance: number = 1, alpha?: number): Color
+    setHSL(hue: number | IVector3 | IVector4, saturation = 1, luminance = 1, alpha?: number): Color
     {
         if (typeof hue === "object") {
             saturation = hue.y;
@@ -263,21 +282,12 @@ export default class Color implements IVector4
         else {
             hue /= 360;
 
-            function hue2rgb(p, q, t) {
-                if (t < 0) t += 1;
-                if (t > 1) t -= 1;
-                if (t < 1/6) return p + (q - p) * 6 * t;
-                if (t < 1/2) return q;
-                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                return p;
-            }
+            const q = luminance < 0.5 ? luminance * (1 + saturation) : luminance + saturation - luminance * saturation;
+            const p = 2 * luminance - q;
 
-            var q = luminance < 0.5 ? luminance * (1 + saturation) : luminance + saturation - luminance * saturation;
-            var p = 2 * luminance - q;
-
-            this.x = hue2rgb(p, q, hue + 1/3);
-            this.y = hue2rgb(p, q, hue);
-            this.z = hue2rgb(p, q, hue - 1/3);
+            this.x = _hue2rgb(p, q, hue + 1/3);
+            this.y = _hue2rgb(p, q, hue);
+            this.z = _hue2rgb(p, q, hue - 1/3);
         }
 
         if (alpha !== undefined) {
@@ -287,15 +297,17 @@ export default class Color implements IVector4
         return this;
     }
 
-    fromArray(arr: number[])
+    fromArray(arr: number[]): this
     {
         this.x = arr[0] || 0;
         this.y = arr[1] || 0;
         this.z = arr[2] || 0;
         this.w = arr[3] !== undefined ? arr[3] : 1;
+
+        return this;
     }
 
-    setString(color: string, alpha: number = 1, throws: boolean = true): Color
+    setString(color: string, alpha = 1, throws = true): this
     {
         color = color.trim().toLowerCase();
         color = Color.presets[color] || color;
@@ -345,7 +357,7 @@ export default class Color implements IVector4
         }
 
         if (color.indexOf("hsl") === 0) {
-            let result: any = color.match(/(\d+(\.\d+)?)/g);
+            const result: any = color.match(/(\d+(\.\d+)?)/g);
             if (result) {
                 this.setHSL(
                     Number.parseFloat(result[0]),
@@ -406,14 +418,14 @@ export default class Color implements IVector4
 
     toHSV(hsv?: IVector3): IVector3
     {
-        let r = this.x, g = this.y, b = this.z;
+        const r = this.x, g = this.y, b = this.z;
 
-        let min = Math.min(r, g, b);
-        let max = Math.max(r, g, b);
-        let d = max - min;
+        const min = Math.min(r, g, b);
+        const max = Math.max(r, g, b);
+        const d = max - min;
         let h = 0;
-        let s = max === 0 ? 0 : d / max;
-        let v = max;
+        const s = max === 0 ? 0 : d / max;
+        const v = max;
 
         if (d !== 0) {
             h = (r === max ? (g - b) / d + (g < b ? 6 : 0) : (g === max ? (b - r) / d + 2 : (r - g) / d + 4)) * 60;
@@ -431,12 +443,13 @@ export default class Color implements IVector4
 
     toHSL(hsl?: IVector3): IVector3
     {
-        let r = this.x, g = this.y, b = this.z;
+        const r = this.x, g = this.y, b = this.z;
 
-        let min = Math.min(r, g, b);
-        let max = Math.max(r, g, b);
-        let d = max - min;
-        let h = 0, s = 0, l = (max + min) * 0.5;
+        const min = Math.min(r, g, b);
+        const max = Math.max(r, g, b);
+        const d = max - min;
+        let h = 0, s = 0;
+        const l = (max + min) * 0.5;
 
         if (d !== 0) {
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -453,7 +466,7 @@ export default class Color implements IVector4
         return new Vector3(h, s, l);
     }
 
-    toRGBArray(arr?: number[])
+    toRGBArray(arr?: number[]): number[]
     {
         if (arr) {
             arr[0] = this.r;
@@ -465,7 +478,7 @@ export default class Color implements IVector4
         return [ this.r, this.g, this.b ];
     }
 
-    toRGBAArray(arr?: number[])
+    toRGBAArray(arr?: number[]): number[]
     {
         if (arr) {
             arr[0] = this.r;
@@ -478,7 +491,7 @@ export default class Color implements IVector4
         return [ this.r, this.g, this.b, this.a ];
     }
 
-    toString(includeAlpha: boolean = true): string
+    toString(includeAlpha = true): string
     {
         if (includeAlpha && this.w < 1) {
             return `rgba(${this.redByte}, ${this.greenByte}, ${this.blueByte}, ${this.w})`;

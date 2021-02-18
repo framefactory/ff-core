@@ -1,21 +1,30 @@
 {
-    "name": "ff-core",
-    "version": "1.0.0",
+    "name": "@framefactory/core",
+    "version": "2.0.0",
     "description": "FF Core Typescript Foundation Library",
+    "keywords": [
+        "typescript",
+        "math",
+        "color",
+        "graphics",
+        "animation"
+    ],
+    "type": "commonjs",
+    "exports": {
+        "./": "./dist/exports/"
+    },
     "scripts": {
-        "build": "tsc -p source",
-        "test": "tsc -p test; mocha -c --ui tdd node_modules/@ff/test/core/test.js || exit 0"
+        "build": "tsc",
+        "clean": "(rimraf dist && mkdirp dist) || exit 1",
+        "test": "tsc -b test; mocha -c --ui tdd dist/test/test.js || exit 0"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/framefactory/ff-core.git"
     },
-    "keywords": [
-        "typescript",
-        "react"
-    ],
     "author": {
         "name": "Ralph Wiedemeier",
+        "email": "opensource@framefactory.ch",
         "url": "https://github.com/framefactory"
     },
     "license": "MIT",
@@ -24,11 +33,13 @@
     },
     "homepage": "https://github.com/framefactory/ff-core#readme",
     "devDependencies": {
-        "@types/chai": "^4.2.14",
-        "@types/mocha": "^8.2.0",
-        "chai": "^4.2.0",
-        "mocha": "^8.2.1",
+        "@types/chai": "^4.2.15",
+        "@types/mocha": "^8.2.1",
+        "chai": "^4.3.0",
+        "mkdirp": "^1.0.4",
+        "mocha": "^8.3.0",
         "module-alias": "^2.2.2",
-        "typescript": "^4.1.3"
+        "rimraf": "^3.0.2",
+        "typescript": "^4.1.5"
     }
 }

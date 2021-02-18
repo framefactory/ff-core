@@ -1,6 +1,6 @@
 /**
  * FF Typescript/React Foundation Library
- * Copyright 2019 Ralph Wiedemeier, Frame Factory GmbH
+ * Copyright 2021 Ralph Wiedemeier, Frame Factory GmbH
  *
  * License: MIT
  */
@@ -60,12 +60,12 @@ export default () => {
         test("add/sub/mul/div", () => {
             assertApproxEqual(new Vector3(0.5, 1.5, 2.5).add(new Vector3(1, 2, 3)), 1.5, 3.5, 5.5, "add");
             assertApproxEqual(new Vector3(1.1, 2.2, 3.3).addScalar(3.3), 4.4, 5.5, 6.6, "addScalar");
-            assertApproxEqual(new Vector3(5, 7, 9).sub(new Vector3(1.1, 2.2, 3.3)), 3.9, 4.8, 5.7, "sub");
-            assertApproxEqual(new Vector3(3.3, 4.4, 5.5).subScalar(1.1), 2.2, 3.3, 4.4, "subScalar");
-            assertApproxEqual(new Vector3(4, 8, 12).mul(new Vector3(0.5, 2, 0.25)), 2, 16, 3, "mul");
-            assertApproxEqual(new Vector3(3.5, 5.5, 2).mulScalar(2), 7, 11, 4, "mulScalar");
-            assertApproxEqual(new Vector3(5, 7, 9).div(new Vector3(2, 10, 3)), 2.5, 0.7, 3, "div");
-            assertApproxEqual(new Vector3(6, 9, 12).divScalar(20), 0.3, 0.45, 0.6, "divScalar");
+            assertApproxEqual(new Vector3(5, 7, 9).subtract(new Vector3(1.1, 2.2, 3.3)), 3.9, 4.8, 5.7, "subtract");
+            assertApproxEqual(new Vector3(3.3, 4.4, 5.5).subtractScalar(1.1), 2.2, 3.3, 4.4, "subtractScalar");
+            assertApproxEqual(new Vector3(4, 8, 12).multiply(new Vector3(0.5, 2, 0.25)), 2, 16, 3, "multiply");
+            assertApproxEqual(new Vector3(3.5, 5.5, 2).multiplyScalar(2), 7, 11, 4, "multiplyScalar");
+            assertApproxEqual(new Vector3(5, 7, 9).divideBy(new Vector3(2, 10, 3)), 2.5, 0.7, 3, "divideBy");
+            assertApproxEqual(new Vector3(6, 9, 12).divideByScalar(20), 0.3, 0.45, 0.6, "divideByScalar");
         });
         test("translate/rotate/scale", () => {
             assertApproxEqual(new Vector3(4, 6, -3).translate(0.5, -0.5, 3), 4.5, 5.5, 0, "translate");

@@ -599,6 +599,22 @@ export default class Vector3 implements IVector3
     }
 
     /**
+     * Returns a plain object with the components of this.
+     * @param obj 
+     */
+    toObject(obj?: IVector3): IVector3
+    {
+        if (obj) {
+            obj.x = this.x;
+            obj.y = this.y;
+            obj.z = this.z;
+            return obj;
+        }
+
+        return { x: this.x, y: this.y, z: this.z };
+    }
+
+    /**
      * Returns an array with the components of this.
      * @param array Optional destination array.
      * @param offset Optional start index of the array. Default is 0.

@@ -19,6 +19,12 @@ export interface IPropertyGroupChangeEvent extends ITypedEvent<"change">
 
 export default class PropertyGroup extends Publisher
 {
+    static fromTemplates<U>(templates: U, index?: number): PropertyGroup & PropertiesFromTemplates<U>
+    {
+        const group = new PropertyGroup();
+        return group.createProperties(templates, index);
+    }
+
     properties: Property[];
 
     constructor()

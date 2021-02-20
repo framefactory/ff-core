@@ -452,6 +452,23 @@ export default class Vector4
     }
 
     /**
+     * Returns a plain object with the components of this.
+     * @param obj 
+     */
+    toObject(obj?: IVector4): IVector4
+    {
+        if (obj) {
+            obj.x = this.x;
+            obj.y = this.y;
+            obj.z = this.z;
+            obj.w = this.w;
+            return obj;
+        }
+
+        return { x: this.x, y: this.y, z: this.z, w: this.w };
+    }
+
+    /**
      * Returns an array with the components of this.
      * @param array Optional destination array.
      * @param offset Optional start index of the array. Default is 0.

@@ -30,7 +30,8 @@ export default class Property<T = unknown> extends Publisher
     readonly schema: IPropertySchema<T>;
     readonly length: number;
 
-    private _value: T;
+    value: T;
+
     private _group: PropertyGroup;
     private _key: string;
     private _path: string;
@@ -50,21 +51,13 @@ export default class Property<T = unknown> extends Publisher
         this.schema = schema;
         this.length = Array.isArray(preset) ? preset.length : 1;
 
-        this._value = undefined;
+        this.value = undefined;
+
         this._group = null;
         this._key = "";
         this._path = path;
 
         this.resetValue();
-    }
-
-    get value(): T {
-        return this._value;
-    }
-
-    set value(value: T) {
-        this._value = value;
-        this.emit<IPropertyChangeEvent>({ type: "change", property: this });
     }
 
     get group(): PropertyGroup {
@@ -86,7 +79,7 @@ export default class Property<T = unknown> extends Publisher
     setValue(value?: T, silent?: boolean): void
     {
         if (value !== undefined) {
-            this._value = value;
+            this.value = value;
         }
 
         if (!silent) {
@@ -128,11 +121,21 @@ export default class Property<T = unknown> extends Publisher
         if (!this.schema.options) {
             throw new TypeError("not an option property");
         }
-
-        const value = this.schema.options.indexOf(option) as unknown;
-        if (value >= 0) {
-            this.setValue(value as T, silent);
+        if (option) {
+            const value = this.schema.options.indexOf(option) as unknown;
+            if (value >= 0) {
+                this.setValue(value as T, silent);
+            }
         }
+    }
+
+    getOption(): string
+    {
+        if (!this.schema.options) {
+            throw new TypeError("not an option property");
+        }
+
+        return this.schema.options[this.value as any] || "";
     }
 
     isArray(): boolean

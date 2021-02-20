@@ -482,6 +482,21 @@ export default class Vector2 implements IVector2
     }
 
     /**
+     * Returns a plain object with the components of this.
+     * @param obj 
+     */
+    toObject(obj?: IVector2): IVector2
+    {
+        if (obj) {
+            obj.x = this.x;
+            obj.y = this.y;
+            return obj;
+        }
+
+        return { x: this.x, y: this.y };
+    }
+
+    /**
      * Returns an array with the components of this.
      * @param array Optional destination array.
      * @param offset Optional start index of the array. Default is 0.

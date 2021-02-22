@@ -167,7 +167,7 @@ export class PropertyGroup extends Publisher
         return group.createProperties(templates, index);
     }
 
-    properties: Property[];
+    properties: Property[] = [];
 
     constructor()
     {

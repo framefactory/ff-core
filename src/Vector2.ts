@@ -77,7 +77,7 @@ export default class Vector2 implements IVector2
      * Returns a new vector with components set from the values of the given array.
      * @param array
      */
-    static makeFromArray(array: number[]): Vector2
+    static makeFromArray(array: number[] | [number, number]): Vector2
     {
         return new Vector2(array[0], array[1]);
     }
@@ -148,7 +148,7 @@ export default class Vector2 implements IVector2
      * @param array
      * @param offset Optional start index of the array. Default is 0.
      */
-    setFromArray(array: number[], offset = 0): this
+    setFromArray(array: number[] | [number, number], offset = 0): this
     {
         this.x = array[offset];
         this.y = array[offset + 1];

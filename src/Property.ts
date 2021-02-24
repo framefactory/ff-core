@@ -146,6 +146,22 @@ export default class Property<T = unknown> extends Publisher
         return Array.isArray(this.schema.preset);
     }
 
+    isPreset(): boolean
+    {
+        const preset: any = this.schema.preset;
+
+        if (this.isArray()) {
+            for (let i = 0, n = preset.length; i < n; ++i) {
+                if (this.value[i] !== preset[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return this.value === preset;
+    }
+
     protected clonePreset(): T
     {
         const preset = this.schema.preset;
@@ -238,6 +254,11 @@ export class PropertyGroup extends Publisher
 
         property["_group"] = null;
         property["_key"] = "";
+    }
+
+    resetAll(silent?: boolean): void
+    {
+        this.properties.forEach(prop => prop.resetValue(silent));
     }
 
     protected onPropertyChange(event: IPropertyChangeEvent): void

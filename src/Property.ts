@@ -76,11 +76,14 @@ export default class Property<T = unknown> extends Publisher
         return this._path.split(".").pop();
     }
 
-    setValue(value?: T, silent?: boolean): void
+    set(): void
     {
-        if (value !== undefined) {
-            this.value = value;
-        }
+        this.emit<IPropertyChangeEvent>({ type: "change", property: this });
+    }
+
+    setValue(value: T, silent?: boolean): void
+    {
+        this.value = value;
 
         if (!silent) {
             this.emit<IPropertyChangeEvent>({ type: "change", property: this });

@@ -34,6 +34,14 @@ export default class Box2 implements IBox2
         return this.max.y - this.min.y;
     }
 
+    get centerX(): number {
+        return (this.min.x + this.max.x) * 0.5;
+    }
+
+    get centerY(): number {
+        return (this.min.y + this.max.y) * 0.5;
+    }
+
     set(minX: number, minY: number, maxX: number, maxY: number): this
     {
         this.min.set(minX, minY);

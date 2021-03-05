@@ -143,4 +143,20 @@ export default class Box2 implements IBox2
 
         return this;
     }
+
+    getSize(): Vector2;
+    getSize<T extends IVector2>(result: T): T;
+    getSize(result?: IVector2): IVector2
+    {
+        const sx = this.max.x - this.min.x;
+        const sy = this.max.y - this.min.y;
+
+        if (result) {
+            result.x = sx;
+            result.y = sy;
+            return result;
+        }
+
+        return new Vector2(sx, sy);
+    }
 }

@@ -15,8 +15,22 @@ export interface IBox2
     max: IVector2;
 }
 
+/**
+ * 2-dimensional, axis aligned box.
+ * The box is defined by a set of minimum and a set of maximum coordinates.
+ */
 export default class Box2 implements IBox2
 {
+    static makeFromPoints(min: IVector2, max: IVector2): Box2
+    {
+        return new Box2(min.x, min.y, max.x, max.y);
+    }
+
+    static makeInvalid(): Box2
+    {
+        return new Box2(Infinity, Infinity, -Infinity, -Infinity);
+    }
+
     min: Vector2;
     max: Vector2;
 
@@ -42,6 +56,38 @@ export default class Box2 implements IBox2
         return (this.min.y + this.max.y) * 0.5;
     }
 
+    getSize(): Vector2;
+    getSize<T extends IVector2>(result: T): T;
+    getSize(result?: IVector2): IVector2
+    {
+        const sx = this.max.x - this.min.x;
+        const sy = this.max.y - this.min.y;
+
+        if (result) {
+            result.x = sx;
+            result.y = sy;
+            return result;
+        }
+
+        return new Vector2(sx, sy);
+    }
+
+    getCenter(): Vector2;
+    getCenter<T extends IVector2>(result: T): T;
+    getCenter(result?: IVector2): IVector2
+    {
+        const cx = (this.min.x + this.max.x) * 0.5;
+        const cy = (this.min.y + this.max.y) * 0.5;
+
+        if (result) {
+            result.x = cx;
+            result.y = cy;
+            return result;
+        }
+
+        return new Vector2(cx, cy);
+    }
+
     set(minX: number, minY: number, maxX: number, maxY: number): this
     {
         this.min.set(minX, minY);
@@ -58,7 +104,11 @@ export default class Box2 implements IBox2
         return this;
     }
 
-    setEmpty(): this
+    /**
+     * Invalidates the box by setting minimum coordinates to positive infinity,
+     * and maximum coordinates to negative infinity.
+     */
+    invalidate(): this
     {
         this.min.set(Infinity, Infinity);
         this.max.set(-Infinity, -Infinity);
@@ -66,10 +116,13 @@ export default class Box2 implements IBox2
         return this;
     }
 
-    isEmpty(): boolean
+    /**
+     * Returns true if both minimum and maximum coordinates are finite.
+     */
+    isValid(): boolean
     {
-        return !(isFinite(this.max.x - this.min.x)
-            && isFinite(this.max.y - this.min.y));
+        return isFinite(this.max.x - this.min.x)
+            && isFinite(this.max.y - this.min.y);
     }
 
     contains(x: number, y: number): boolean
@@ -142,21 +195,5 @@ export default class Box2 implements IBox2
         }
 
         return this;
-    }
-
-    getSize(): Vector2;
-    getSize<T extends IVector2>(result: T): T;
-    getSize(result?: IVector2): IVector2
-    {
-        const sx = this.max.x - this.min.x;
-        const sy = this.max.y - this.min.y;
-
-        if (result) {
-            result.x = sx;
-            result.y = sy;
-            return result;
-        }
-
-        return new Vector2(sx, sy);
     }
 }

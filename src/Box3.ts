@@ -15,8 +15,23 @@ export interface IBox3
     max: IVector3;
 }
 
+/**
+ * 3-dimensional, axis aligned box.
+ * The box is defined by a set of minimum and a set of maximum coordinates.
+ */
+
 export default class Box3 implements IBox3
 {
+    static makeFromPoints(min: IVector3, max: IVector3): Box3
+    {
+        return new Box3(min.x, min.y, min.z, max.x, max.y, max.z);
+    }
+
+    static makeInvalid(): Box3
+    {
+        return new Box3(Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity);
+    }
+
     min: Vector3;
     max: Vector3;
 
@@ -24,6 +39,66 @@ export default class Box3 implements IBox3
     {
         this.min = new Vector3(minX, minY, minZ);
         this.max = new Vector3(maxX, maxY, maxZ);
+    }
+
+    get sizeX(): number {
+        return this.max.x - this.min.x;
+    }
+
+    get sizeY(): number {
+        return this.max.y - this.min.y;
+    }
+
+    get sizeZ(): number {
+        return this.max.z - this.min.z;
+    }
+
+    get centerX(): number {
+        return (this.min.x + this.max.x) * 0.5;
+    }
+
+    get centerY(): number {
+        return (this.min.y + this.max.y) * 0.5;
+    }
+
+    get centerZ(): number {
+        return (this.min.z + this.max.z) * 0.5;
+    }
+
+    getSize(): Vector3;
+    getSize<T extends IVector3>(result: T): T;
+    getSize(result?: IVector3): IVector3
+    {
+        const sx = this.max.x - this.min.x;
+        const sy = this.max.y - this.min.y;
+        const sz = this.max.z - this.min.z;
+
+        if (result) {
+            result.x = sx;
+            result.y = sy;
+            result.z = sz;
+            return result;
+        }
+
+        return new Vector3(sx, sy, sz);
+    }
+
+    getCenter(): Vector3;
+    getCenter<T extends IVector3>(result: T): T;
+    getCenter(result?: IVector3): IVector3
+    {
+        const cx = (this.min.x + this.max.x) * 0.5;
+        const cy = (this.min.y + this.max.y) * 0.5;
+        const cz = (this.min.z + this.max.z) * 0.5;
+
+        if (result) {
+            result.x = cx;
+            result.y = cy;
+            result.z = cz;
+            return result;
+        }
+
+        return new Vector3(cx, cy, cz);
     }
 
     set(minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number)
@@ -42,7 +117,11 @@ export default class Box3 implements IBox3
         return this;
     }
 
-    setEmpty()
+    /**
+     * Invalidates the box by setting minimum coordinates to positive infinity,
+     * and maximum coordinates to negative infinity.
+     */
+    invalidate(): this
     {
         this.min.set(Infinity, Infinity, Infinity);
         this.max.set(-Infinity, -Infinity, -Infinity);
@@ -50,11 +129,28 @@ export default class Box3 implements IBox3
         return this;
     }
 
-    isEmpty(): boolean
+    /**
+     * Returns true if both minimum and maximum coordinates are finite.
+     */
+    isValid(): boolean
     {
-        return !(isFinite(this.max.x - this.min.x)
+        return isFinite(this.max.x - this.min.x)
             && isFinite(this.max.y - this.min.y)
-            && isFinite(this.max.z - this.min.z));
+            && isFinite(this.max.z - this.min.z);
+    }
+
+    contains(x: number, y: number, z: number): boolean
+    {
+        return x >= this.min.x && x < this.max.x
+            && y >= this.min.y && y < this.max.y
+            && z >= this.min.z && z < this.max.z;
+    }
+
+    containsPoint(point: IVector3): boolean
+    {
+        return point.x >= this.min.x && point.x < this.max.x
+            && point.y >= this.min.y && point.y < this.max.y
+            && point.z >= this.min.z && point.z < this.max.z;
     }
 
     uniteWith(other: IBox3)

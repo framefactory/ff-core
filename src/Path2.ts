@@ -5,9 +5,11 @@
  * License: MIT
  */
 
-import { IVector2 } from "./Vector2";
+import Vector2, { IVector2 } from "./Vector2";
 
 ////////////////////////////////////////////////////////////////////////////////
+
+const _vec2 = new Vector2();
 
 export enum ESegmentType
 {
@@ -44,26 +46,26 @@ export default class Path2
         return new Path2().addSvgLine(x1, y1, x2, y2);
     }
 
-    protected static readonly rePath = /([mlhvcsqt]|-?[\d\.]*)[,\s]?/gmi;
+    private static readonly _rePath = /([mlhvcsqt]|-?[\d\.]*)[,\s]?/gmi;
 
-    protected static next(d: string): string | null
+    private static _reNext(d: string): string | null
     {
-        const match = Path2.rePath.exec(d);
+        const match = Path2._rePath.exec(d);
         return match && match[1];
     }
 
-    protected static nextNumber(d: string): number
+    private static _reNextNumber(d: string): number
     {
-        const match = Path2.next(d);
+        const match = Path2._reNext(d);
         return match ? parseFloat(match) : NaN;
     }
 
-    protected static nextNumbers(count: number, d: string): number[]
+    private static _reNextNumbers(count: number, d: string): number[]
     {
         const result = [];
 
         for (let i = 0; i < count; ++i) {
-            const v = Path2.nextNumber(d);
+            const v = Path2._reNextNumber(d);
             if (!isFinite(v)) {
                 return null;
             }
@@ -74,15 +76,54 @@ export default class Path2
         return result;
     }
 
-    protected static reset()
+    private static _reReset()
     {
-        Path2.rePath.lastIndex = 0;
+        Path2._rePath.lastIndex = 0;
     }
 
     segments: ISegment2[] = [];
 
     get lastSegment(): ISegment2 {
         return this.segments[this.segments.length - 1];
+    }
+
+    get start(): IVector2 {
+        const seg = this.segments[0];
+        return seg ? seg.p : null;
+    }
+
+    get end(): IVector2 {
+        const seg = this.lastSegment;
+        return seg ? seg.p : null;
+    }
+
+    get length(): number {
+        const segs = this.segments;
+        let length = 0;
+        let prev = segs[0];
+
+        for (let i = 1, n = segs.length; i < n; ++i) {
+            const seg = segs[i];
+
+            switch(seg.type) {
+                case ESegmentType.Line: {
+                    length += _vec2.copy(prev.p).distanceTo(seg.p);
+                    break;
+                }
+                case ESegmentType.Bezier: {
+                    const ll = _vec2.copy(prev.p).distanceTo(seg.p);
+                    const lc0 = _vec2.distanceTo(seg.cp0);
+                    const lc1 = _vec2.copy(seg.cp1).distanceTo(seg.cp0);
+                    const lc2 = _vec2.distanceTo(seg.p);
+                    length += (ll + lc0 + lc1 + lc2) * 0.5;
+                    break;
+                }
+            }
+
+            prev = seg;
+        }
+
+        return length;
     }
 
     clear(): this
@@ -156,82 +197,82 @@ export default class Path2
 
     addSvgPathD(d: string): this
     {
-        Path2.reset();
+        Path2._reReset();
 
         while(true) {
             const ls = this.lastSegment;
 
-            const e = Path2.next(d);
+            const e = Path2._reNext(d);
             if (!e) {
                 break;
             }
 
             switch(e) {
                 case "M": {
-                    const v = Path2.nextNumbers(2, d);
+                    const v = Path2._reNextNumbers(2, d);
                     if (v) {
                         this.moveTo(v[0], v[1]);
                     }
                     break;
                 }
                 case "m": {
-                    const v = Path2.nextNumbers(2, d);
+                    const v = Path2._reNextNumbers(2, d);
                     if (v) {
                         this.moveTo(ls.p.x + v[0], ls.p.y + v[1]);
                     }
                     break;
                 }
                 case "L": {
-                    const v = Path2.nextNumbers(2, d);
+                    const v = Path2._reNextNumbers(2, d);
                     if (v) {
                         this.lineTo(v[0], v[1]);
                     }
                     break;
                 }
                 case "l": {
-                    const v = Path2.nextNumbers(2, d);
+                    const v = Path2._reNextNumbers(2, d);
                     if (v) {
                         this.lineTo(ls.p.x + v[0], ls.p.y + v[1]);
                     }
                     break;
                 }
                 case "H": {
-                    const value = Path2.nextNumber(d);
+                    const value = Path2._reNextNumber(d);
                     if (isFinite(value)) {
                         this.lineTo(value, ls.p.y);
                     }
                     break;
                 }
                 case "h": {
-                    const value = Path2.nextNumber(d);
+                    const value = Path2._reNextNumber(d);
                     if (isFinite(value)) {
                         this.lineTo(ls.p.x + value, ls.p.y);
                     }
                     break;
                 }
                 case "V": {
-                    const value = Path2.nextNumber(d);
+                    const value = Path2._reNextNumber(d);
                     if (isFinite(value)) {
                         this.lineTo(ls.p.x, value);
                     }
                     break;
                 }
                 case "v": {
-                    const value = Path2.nextNumber(d);
+                    const value = Path2._reNextNumber(d);
                     if (isFinite(value)) {
                         this.lineTo(ls.p.x, ls.p.y + value);
                     }
                     break;
                 }
                 case "C": {
-                    const v = Path2.nextNumbers(6, d);
+                    const v = Path2._reNextNumbers(6, d);
                     if (v) {
                         this.bezierTo(v[0], v[1], v[2], v[3], v[4], v[5]);
                     }
                     break;
                 }
                 case "c": {
-                    const v = Path2.nextNumbers(6, d);
+                    const v = Path2._reNextNumbers(6, d);
                     if (v) {
                         this.bezierTo(
                             ls.p.x + v[0], ls.p.y + v[1],

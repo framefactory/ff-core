@@ -55,21 +55,27 @@ const math = {
         if (radB - radA > math.PI) {
             radA += math.DOUBLE_PI;
         }
+        else if (radA - radB > math.PI) {
+            radB += math.DOUBLE_PI;
+        }
 
-        return radB - radA;
+        return Math.abs(radB - radA);
     },
 
     deltaDegrees: function(degA, degB) {
-        degA %= math.DOUBLE_PI;
-        degA = degA < 0 ? degA + math.DOUBLE_PI : degA;
-        degB %= math.DOUBLE_PI;
-        degB = degB < 0 ? degB + math.DOUBLE_PI : degB;
+        degA %= 360;
+        degA = degA < 0 ? degA + 360 : degA;
+        degB %= 360;
+        degB = degB < 0 ? degB + 360 : degB;
 
-        if (degB - degA > math.PI) {
-            degA += math.DOUBLE_PI;
+        if (degB - degA > 180) {
+            degA += 360;
+        }
+        else if (degA - degB > 180) {
+            degB += 360;
         }
 
-        return degB - degA;
+        return Math.abs(degB - degA);
     },
 
     curves: {

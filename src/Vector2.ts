@@ -421,10 +421,20 @@ export default class Vector2 implements IVector2
      * @param other
      * @returns angle in radians.
      */
-    angleTo(other: IVector2): number
+    angleBetween(other: IVector2): number
     {
         const x0 = this.x, y0 = this.y, x1 = other.x, y1 = other.y;
         return Math.acos((x0*x1 + y0*y1) / (Math.sqrt(x0*x0 + y0*y0) + Math.sqrt(x1*x1 + y1*y1)));
+    }
+
+    /**
+     * Returns the angle from this to the other vector in counter-clockwise direction.
+     * @param other 
+     * @returns angle in radians.
+     */
+    angleTo(other: IVector2): number
+    {
+        return Math.atan2(other.y, other.x) - Math.atan2(this.y, this.x);
     }
 
     /**

@@ -14,6 +14,10 @@ const math = {
     DEG2RAD: 0.01745329251994329576923690768489,
     RAD2DEG: 57.295779513082320876798154814105,
 
+    modulo: (n, m) => ((n % m) + m) % m,
+
+    equal: (a, b, eps = 1e-5) => Math.abs(b - a) < eps,
+
     limit: (v, min, max) => v < min ? min : (v > max ? max : v),
 
     limitInt: function(v, min, max) {
@@ -59,7 +63,7 @@ const math = {
             radB += math.DOUBLE_PI;
         }
 
-        return Math.abs(radB - radA);
+        return radB - radA;
     },
 
     deltaDegrees: function(degA, degB) {
@@ -75,7 +79,7 @@ const math = {
             degB += 360;
         }
 
-        return Math.abs(degB - degA);
+        return degB - degA;
     },
 
     curves: {

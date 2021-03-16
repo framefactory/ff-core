@@ -106,6 +106,7 @@ export default class Path2
             const seg = segs[i];
 
             switch(seg.type) {
+                case ESegmentType.Move: 
                 case ESegmentType.Line: {
                     length += _vec2.copy(prev.p).distanceTo(seg.p);
                     break;
@@ -144,19 +145,27 @@ export default class Path2
         return this.moveToPoint(point);
     }
 
-    moveTo(x: number, y: number): this
+    moveTo(x: number, y: number, eps = 1e-5): this
     {
-        this.segments.push({
-            type: ESegmentType.Move,
-            p: { x, y },
-        });
+        const end = this.end;
+
+        // avoid no-op moves
+        if (!end || Math.abs(end.x - x) + Math.abs(end.y - y) > eps) {
+            if (end) {
+                console.info("[Path2.moveTo] inserted", Math.abs(end.x - x) + Math.abs(end.y - y));
+            }
+            this.segments.push({
+                type: ESegmentType.Move,
+                p: { x, y },
+            });
+        }
 
         return this;
     }
 
-    moveToPoint(point: IVector2): this
+    moveToPoint(point: IVector2, eps = 1e-5): this
     {
-        return this.moveTo(point.x, point.y);
+        return this.moveTo(point.x, point.y, eps);
     }
 
     lineTo(x: number, y: number): this
@@ -297,6 +306,81 @@ export default class Path2
         this.moveTo(parseFloat(x1 as string), parseFloat(y1 as string));
         this.lineTo(parseFloat(x2 as string), parseFloat(y2 as string));
         return this;
+    }
+
+    addPath(path: Path2, eps = 1e-5): this
+    {
+        const segs = path.segments;
+ 
+        for (let i = 0, n = segs.length; i < n; ++i) {
+            const seg = segs[i];
+            switch(seg.type) {
+                case ESegmentType.Move:
+                    this.moveTo(seg.p.x, seg.p.y, eps);
+                    break;
+                case ESegmentType.Line:
+                    this.lineTo(seg.p.x, seg.p.y);
+                    break;
+                case ESegmentType.Bezier:
+                    this.bezierTo(seg.cp0.x, seg.cp0.y, seg.cp1.x, seg.cp1.y, seg.p.x, seg.p.y);
+                    break;
+            }
+        }
+
+        return this;
+    }
+
+    addReversePath(path: Path2, eps = 1e-5): this
+    {
+        const segs = path.segments;
+        
+        if (segs.length > 0) {
+            this.moveToPoint(path.end, eps);
+
+            for (let i = segs.length - 1; i > 0; --i) {
+                const p = segs[i - 1].p;
+                const seg = segs[i];
+                switch(seg.type) {
+                    case ESegmentType.Move:
+                        this.moveToPoint(p, eps);
+                        break;
+                    case ESegmentType.Line:
+                        this.lineToPoint(p);
+                        break;
+                    case ESegmentType.Bezier:
+                        this.bezierToPoint(seg.cp1, seg.cp0, p);
+                        break;
+                }
+            }
+        }
+
+        return this;
+    }
+
+    getReversed<T extends Path2>(result: T): T
+    {
+        const segs = this.segments;
+
+        if (segs.length > 0) {
+            result.moveToPoint(this.end);
+            for (let i = segs.length - 1; i > 0; --i) {
+                const p = segs[i - 1].p;
+                const seg = segs[i];
+                switch(seg.type) {
+                    case ESegmentType.Move:
+                        result.moveToPoint(p);
+                        break;
+                    case ESegmentType.Line:
+                        result.lineToPoint(p);
+                        break;
+                    case ESegmentType.Bezier:
+                        result.bezierToPoint(seg.cp1, seg.cp0, p);
+                        break;
+                }
+            }
+        }
+
+        return result;
     }
 
     toSvgPathD(): string

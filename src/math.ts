@@ -16,7 +16,9 @@ const math = {
 
     modulo: (n, m) => ((n % m) + m) % m,
 
-    equal: (a, b, eps = 1e-5) => Math.abs(b - a) < eps,
+    equal: (a, b, eps = 1e-5) => Math.abs(b - a) <= eps,
+
+    lerp: (a, b, t) => a * (1 - t) + b * t,
 
     limit: (v, min, max) => v < min ? min : (v > max ? max : v),
 
@@ -51,15 +53,10 @@ const math = {
     },
 
     deltaRadians: function(radA, radB) {
-        radA %= math.DOUBLE_PI;
-        radA = radA < 0 ? radA + math.DOUBLE_PI : radA;
-        radB %= math.DOUBLE_PI;
-        radB = radB < 0 ? radB + math.DOUBLE_PI : radB;
-
-        if (radB - radA > math.PI) {
+        while (radB - radA > math.PI) {
             radA += math.DOUBLE_PI;
         }
-        else if (radA - radB > math.PI) {
+        while (radA - radB > math.PI) {
             radB += math.DOUBLE_PI;
         }
 
@@ -67,15 +64,10 @@ const math = {
     },
 
     deltaDegrees: function(degA, degB) {
-        degA %= 360;
-        degA = degA < 0 ? degA + 360 : degA;
-        degB %= 360;
-        degB = degB < 0 ? degB + 360 : degB;
-
-        if (degB - degA > 180) {
+        while (degB - degA > 180) {
             degA += 360;
         }
-        else if (degA - degB > 180) {
+        while (degA - degB > 180) {
             degB += 360;
         }
 

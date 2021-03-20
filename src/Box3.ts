@@ -35,7 +35,11 @@ export default class Box3 implements IBox3
     min: Vector3;
     max: Vector3;
 
-    constructor(minX?: number, minY?: number, minZ?: number, maxX?: number, maxY?: number, maxZ?: number)
+    /**
+     * Creates a new Box3 object, initialized with the given minimum and maximum coordinates.
+     * If no values are provided, minimum and maximum are set to zero.
+     */
+     constructor(minX?: number, minY?: number, minZ?: number, maxX?: number, maxY?: number, maxZ?: number)
     {
         this.min = new Vector3(minX, minY, minZ);
         this.max = new Vector3(maxX, maxY, maxZ);
@@ -153,7 +157,7 @@ export default class Box3 implements IBox3
             && point.z >= this.min.z && point.z < this.max.z;
     }
 
-    uniteWith(other: IBox3)
+    uniteWith(other: IBox3): this
     {
         const p0 = this.min, p1 = this.max;
 
@@ -163,7 +167,7 @@ export default class Box3 implements IBox3
         return this;
     }
 
-    intersectWith(other: IBox3)
+    intersectWith(other: IBox3): this
     {
         const min = this.min, max = this.max;
 
@@ -173,7 +177,7 @@ export default class Box3 implements IBox3
         return this;
     }
 
-    include(x: number, y: number, z: number)
+    include(x: number, y: number, z: number): this
     {
         const min = this.min, max = this.max;
 
@@ -188,7 +192,7 @@ export default class Box3 implements IBox3
         return this;
     }
 
-    includePoint(point: IVector3)
+    includePoint(point: IVector3): this
     {
         const min = this.min, max = this.max;
 
@@ -203,7 +207,11 @@ export default class Box3 implements IBox3
         return this;
     }
 
-    normalize()
+    /**
+     * Ensures minimum coordinates are smaller than maximum coordinates.
+     * Swaps coordinates if necessary.
+     */
+    normalize(): this
     {
         const min = this.min, max = this.max;
 
@@ -218,5 +226,10 @@ export default class Box3 implements IBox3
         }
 
         return this;
+    }
+
+    toString(): string
+    {
+        return `min: ${this.min.toString()}, max: ${this.max.toString()}`;
     }
 }

@@ -34,6 +34,10 @@ export default class Box2 implements IBox2
     min: Vector2;
     max: Vector2;
 
+    /**
+     * Creates a new Box2 object, initialized with the given minimum and maximum coordinates.
+     * If no values are provided, minimum and maximum are set to zero.
+     */
     constructor(minX?: number, minY?: number, maxX?: number, maxY?: number)
     {
         this.min = new Vector2(minX, minY);
@@ -183,6 +187,10 @@ export default class Box2 implements IBox2
         return this;
     }
 
+    /**
+     * Ensures minimum coordinates are smaller than maximum coordinates.
+     * Swaps coordinates if necessary.
+     */
     normalize(): this
     {
         const min = this.min, max = this.max;
@@ -195,5 +203,10 @@ export default class Box2 implements IBox2
         }
 
         return this;
+    }
+
+    toString(): string
+    {
+        return `min: ${this.min.toString()}, max: ${this.max.toString()}`;
     }
 }

@@ -357,6 +357,45 @@ export default class Path2
         return this;
     }
 
+    translate(tx: number, ty: number): this
+    {
+        const segs = this.segments;
+
+        for (let i = 0, n = segs.length; i < n; ++i) {
+            const seg = segs[i];
+            seg.p.x += tx;
+            seg.p.y += ty;
+            if (seg.type === ESegmentType.Bezier) {
+                seg.cp0.x += tx;
+                seg.cp0.y += ty;
+                seg.cp1.x += tx;
+                seg.cp1.y += ty;
+            }
+        }
+
+        return this;
+    }
+
+    scale(sx: number, sy: number)
+    {
+        const segs = this.segments;
+
+        for (let i = 0, n = segs.length; i < n; ++i) {
+            const seg = segs[i];
+            seg.p.x *= sx;
+            seg.p.y *= sy;
+            if (seg.type === ESegmentType.Bezier) {
+                seg.cp0.x *= sx;
+                seg.cp0.y *= sy;
+                seg.cp1.x *= sx;
+                seg.cp1.y *= sy;
+            }
+        }
+
+        return this;
+
+    }
+
     getReversed<T extends Path2>(result: T): T
     {
         const segs = this.segments;

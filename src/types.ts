@@ -53,6 +53,19 @@ export type Record<K extends keyof any, T> = { [P in K]: T; };
 
 export type Enum<E> = Record<keyof E, number | string> & { [k: number]: string };
 
+export type TypedArray = ArrayLike<number> & {
+    BYTES_PER_ELEMENT: number;
+    set(array: ArrayLike<number>, offset?: number): void;
+    slice(start?: number, end?: number): TypedArray;
+};
+
+export type TypedArrayConstructor<T extends TypedArray> = {
+    new (): T;
+    new (size: number): T;
+    new (buffer: ArrayBuffer): T;
+    BYTES_PER_ELEMENT: number;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // ENUM HELPER FUNCTIONS
 

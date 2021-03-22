@@ -55,8 +55,10 @@ export type Enum<E> = Record<keyof E, number | string> & { [k: number]: string }
 
 export type TypedArray = ArrayLike<number> & {
     BYTES_PER_ELEMENT: number;
+    byteLength: number;
     set(array: ArrayLike<number>, offset?: number): void;
     slice(start?: number, end?: number): TypedArray;
+    [Symbol.toStringTag]: any;
 };
 
 export type TypedArrayConstructor<T extends TypedArray> = {

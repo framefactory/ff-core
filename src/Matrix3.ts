@@ -460,6 +460,11 @@ export default class Matrix3
         return this;
     }
 
+    translateByVector(vector: IVector2): this
+    {
+        return this.translate(vector.x, vector.y);
+    }
+
     /**
      * Applies a rotation transform to this matrix
      * by pre-multiplying the matrix with the rotation transform.
@@ -495,6 +500,11 @@ export default class Matrix3
         e[0] *= sx; e[3] *= sx; e[6] *= sx;
         e[1] *= sy; e[4] *= sy; e[7] *= sy;
         return this;
+    }
+
+    scaleByVector(vector: IVector2): this
+    {
+        return this.scale(vector.x, vector.y);
     }
 
     /**

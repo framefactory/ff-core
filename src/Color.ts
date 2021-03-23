@@ -110,7 +110,7 @@ export default class Color implements IVector4
     get alphaByte(): number { return Math.floor(this.w * 255); }
 
 
-    inverseMultiply(factor: number): Color
+    inverseMultiply(factor: number): this
     {
         this.x = this.x * (1 - factor) + factor;
         this.y = this.y * (1 - factor) + factor;
@@ -119,11 +119,22 @@ export default class Color implements IVector4
         return this;
     }
 
-    multiply(factor: number): Color
+    multiply(factor: number): this
     {
         this.x *= factor;
         this.y *= factor;
         this.z *= factor;
+
+        return this;
+    }
+
+    mix(color: Color, factor: number): this
+    {
+        const invFactor = 1 - factor;
+        this.x = invFactor * this.x + factor * color.x;
+        this.y = invFactor * this.y + factor * color.y;
+        this.z = invFactor * this.z + factor * color.z;
+        this.w = invFactor * this.w + factor * color.w;
 
         return this;
     }

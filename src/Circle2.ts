@@ -16,7 +16,7 @@ export default class Circle2
 
     constructor(x = 0, y = 0, r = 1)
     {
-        this.p.set(x, y);
+        this.p = new Vector2(x, y);
         this.r = r;
     }
 

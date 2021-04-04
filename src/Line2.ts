@@ -11,13 +11,13 @@ import Vector2, { IVector2 } from "./Vector2";
 
 export default class Line2
 {
-    p0 = new Vector2(0, 0);
-    p1 = new Vector2(1, 0);
+    p0: Vector2;
+    p1: Vector2;
 
     constructor(x0 = 0, y0 = 0, x1 = 1, y1 = 0)
     {
-        this.p0.set(x0, y0);
-        this.p1.set(x1, y1);
+        this.p0 = new Vector2(x0, y0);
+        this.p1 = new Vector2(x1, y1);
     }
 
     setPointAngle(point: IVector2, angle: number, length = 1): this

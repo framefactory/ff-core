@@ -20,6 +20,8 @@ const math = {
 
     lerp: (a, b, t) => a * (1 - t) + b * t,
 
+    clamp: v => v < 0 ? 0 : (v > 1 ? 1 : v),
+
     limit: (v, min, max) => v < min ? min : (v > max ? max : v),
 
     limitInt: function(v, min, max) {

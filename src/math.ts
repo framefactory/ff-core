@@ -16,6 +16,8 @@ const math = {
 
     modulo: (n, m) => ((n % m) + m) % m,
 
+    roundToNext: (v, m) => v + m - ((v + m - 1) % m) - 1,
+
     equal: (a, b, eps = 1e-5) => Math.abs(b - a) <= eps,
 
     lerp: (a, b, t) => a * (1 - t) + b * t,

@@ -68,9 +68,3 @@ export type TypedArrayConstructor<T extends TypedArray> = {
     BYTES_PER_ELEMENT: number;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// ENUM HELPER FUNCTIONS
-
-export const enumToArray = function(e: object): string[] {
-    return Object.keys(e).filter(key => isNaN(Number(key)));
-};

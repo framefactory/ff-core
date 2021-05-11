@@ -24,10 +24,12 @@ export default function mixin(targetClass: any, sourceClass: any | any[])
     else {
         // prototype properties (members)
         Object.getOwnPropertyNames(sourceClass.prototype).forEach(property => {
-            if (targetClass.prototype[property]) {
-                console.warn(`mixin - overriding member property '${property}'`);
+            if (property !== "constructor") {
+                if (targetClass.prototype[property]) {
+                    console.warn(`mixin - overriding member property '${property}'`);
+                }
+                targetClass.prototype[property] = sourceClass.prototype[property];    
             }
-            targetClass.prototype[property] = sourceClass.prototype[property];
         });
         // constructor function properties (statics)
         Object.keys(sourceClass).forEach(key => {

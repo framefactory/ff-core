@@ -78,6 +78,10 @@ const math = {
         return degB - degA;
     },
 
+    random: function(min: number, max: number) {
+        return min + Math.random() * (max - min);
+    },
+
     curves: {
         linear: t => t,
 

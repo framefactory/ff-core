@@ -1,19 +1,19 @@
 /**
  * FF Typescript Foundation Library
- * Copyright 2021 Ralph Wiedemeier, Frame Factory GmbH
+ * Copyright 2022 Ralph Wiedemeier, Frame Factory GmbH
  *
  * License: MIT
  */
 
-export const timed = function<T>(promise: Promise<T>, timeout: number, timeoutMessage?: string) {
-    return Promise.race<Promise<T>>([
-        promise,
-        new Promise((_resolve, reject) => setTimeout(
-            () => reject(new Error(timeoutMessage || "timeout")),
-            timeout,
-        )),
-    ]);
-}
+// export const timed = function<T>(promise: Promise<T>, timeout: number, timeoutMessage?: string) {
+//     return Promise.race<Promise<T>>([
+//         promise,
+//         new Promise((_resolve, reject) => setTimeout(
+//             () => reject(new Error(timeoutMessage || "timeout")),
+//             timeout,
+//         )),
+//     ]);
+// }
 
 export type SettlementState = "pending" | "resolved" | "rejected";
 

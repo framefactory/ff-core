@@ -1,11 +1,12 @@
 /**
  * FF Typescript Foundation Library
- * Copyright 2021 Ralph Wiedemeier, Frame Factory GmbH
+ * Copyright 2022 Ralph Wiedemeier, Frame Factory GmbH
  *
  * License: MIT
  */
 
-import { PropOf, enumToArray, Dictionary } from "./types";
+import { PropOf, Dictionary } from "./types";
+import { enumToArray } from "./enum";
 
 ////////////////////////////////////////////////////////////////////////////////
 

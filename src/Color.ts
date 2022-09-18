@@ -5,8 +5,11 @@
  * License: MIT
  */
 
-import Vector3, { IVector3 } from "./Vector3";
-import Vector4, { IVector4 } from "./Vector4";
+import Vector3, { type IVector3 } from "./Vector3";
+import Vector4, { type IVector4 } from "./Vector4";
+
+export { Vector3, type IVector3 };
+export { Vector4, type IVector4 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -18,8 +21,6 @@ function _hue2rgb(p, q, t) {
     if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
     return p;
 }
-
-export { Vector3, IVector3, Vector4, IVector4 };
 
 /**
  * RGB color with alpha channel. The class is compatible with Vector4,

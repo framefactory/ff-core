@@ -6,8 +6,8 @@
  */
 
 import { assert } from "chai";
-import math from "@ff/core/math";
-import Vector3 from "@ff/core/Vector3";
+import math from "#lib/math";
+import Vector3 from "#lib/Vector3";
 
 const eps = 1e-6;
 

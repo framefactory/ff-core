@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import { Constructor } from "./types";
+import { Constructor } from "./types.js";
 
 export default function isSubclass(derived: Constructor, base: Constructor): boolean
 {

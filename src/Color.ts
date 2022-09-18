@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import Vector3, { type IVector3 } from "./Vector3";
-import Vector4, { type IVector4 } from "./Vector4";
+import Vector3, { type IVector3 } from "./Vector3.js";
+import Vector4, { type IVector4 } from "./Vector4.js";
 
 export { Vector3, type IVector3 };
 export { Vector4, type IVector4 };

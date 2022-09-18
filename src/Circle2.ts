@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Vector2, { IVector2 } from "./Vector2";
+import Vector2, { IVector2 } from "./Vector2.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

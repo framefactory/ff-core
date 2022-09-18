@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import { Type } from "./types";
+import { Type } from "./types.js";
 
 export default function extend(derivedClass: Type, baseClass: Type): void
 {

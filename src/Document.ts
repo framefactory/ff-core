@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import Publisher, { ITypedEvent } from "./Publisher";
-import uniqueId from "./uniqueId";
+import Publisher, { ITypedEvent } from "./Publisher.js";
+import uniqueId from "./uniqueId.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

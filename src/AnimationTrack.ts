@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import SortedArray from "./SortedArray";
+import SortedArray from "./SortedArray.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -6,7 +6,7 @@
  */
 
 import { assert } from "chai";
-import SplineTrack, { InterpolationType } from "@ff/core/SplineTrack";
+import SplineTrack, { InterpolationType } from "#lib/SplineTrack";
 
 ////////////////////////////////////////////////////////////////////////////////
 // SPLINE TRACK CLASS - TEST SUITE

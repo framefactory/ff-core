@@ -5,9 +5,9 @@
  * License: MIT
  */
 
-import Vector3, { IVector3 } from "./Vector3";
-import Vector4, { IVector4 } from "./Vector4";
-import Quaternion, { IQuaternion } from "./Quaternion";
+import Vector3, { IVector3 } from "./Vector3.js";
+import Vector4, { IVector4 } from "./Vector4.js";
+import Quaternion, { IQuaternion } from "./Quaternion.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

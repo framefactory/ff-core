@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import { normalize } from "./text";
+import { normalize } from "./text.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

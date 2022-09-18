@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Publisher from "./Publisher";
+import Publisher from "./Publisher.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import Publisher from "./Publisher";
-import Command, { ICommand, ICommandProps } from "./Command";
+import Publisher from "./Publisher.js";
+import Command, { ICommand, ICommandProps } from "./Command.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import { PropOf, Dictionary } from "./types";
-import { enumToArray } from "./enum";
+import { PropOf, Dictionary } from "./types.js";
+import { enumToArray } from "./enum.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

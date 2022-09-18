@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import { Dictionary, MaybeIdentifiable } from "./types";
-import Publisher, { ITypedEvent } from "./Publisher";
+import { Dictionary, MaybeIdentifiable } from "./types.js";
+import Publisher, { ITypedEvent } from "./Publisher.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

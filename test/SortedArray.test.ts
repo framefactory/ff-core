@@ -6,7 +6,7 @@
  */
 
 import { assert } from "chai";
-import SortedArray from "@ff/core/SortedArray";
+import SortedArray from "#lib/SortedArray";
 
 ////////////////////////////////////////////////////////////////////////////////
 // SORTED ARRAY CLASS - TEST SUITE

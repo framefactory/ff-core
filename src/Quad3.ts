@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import Vector3, { IVector3 } from "./Vector3";
-import Matrix3 from "./Matrix3";
+import Vector3, { IVector3 } from "./Vector3.js";
+import Matrix3 from "./Matrix3.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -1,16 +1,17 @@
 {
-    "compilerOptions": {
-        "target": "ES6",
-        "module": "CommonJS",
-        "experimentalDecorators": true,
-        "sourceMap": true,
+    "extends": "../tsconfig.base.json",
 
-        "outDir": "../dist/test",
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "NodeNext",
+
+        "outDir": "../build/test",
         "rootDir": ".",
 
         "baseUrl": ".",
         "paths": {
-            "@ff/core/*": [ "../src/*" ]
+            "#lib/*": [ "../src/*.ts" ]
         }
     },
     "include": [

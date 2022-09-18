@@ -5,9 +5,9 @@
  * License: MIT
  */
 
-import { ReturnType } from "./types";
-import Publisher, { ITypedEvent } from "./Publisher";
-import Commander from "./Commander";
+import { ReturnType } from "./types.js";
+import Publisher, { ITypedEvent } from "./Publisher.js";
+import Commander from "./Commander.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

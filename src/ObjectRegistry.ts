@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import { Dictionary, TypeOf } from "./types";
-import Publisher, { ITypedEvent } from "./Publisher";
+import { Dictionary, TypeOf } from "./types.js";
+import Publisher, { ITypedEvent } from "./Publisher.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

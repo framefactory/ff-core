@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import math from "./math";
-import AnimationTrack, { IKey, IKeyPair } from "./AnimationTrack";
+import math from "./math.js";
+import AnimationTrack, { IKey, IKeyPair } from "./AnimationTrack.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

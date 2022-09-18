@@ -5,9 +5,9 @@
  * License: MIT
  */
 
-import Publisher, { ITypedEvent } from "./Publisher";
-import { schemas, types, IPropertySchema, IPropertyTemplate } from "./propertyTypes";
-//import PropertyGroup from "./PropertyGroup";
+import Publisher, { ITypedEvent } from "./Publisher.js";
+import { schemas, types, IPropertySchema, IPropertyTemplate } from "./propertyTypes.js";
+//import PropertyGroup from "./PropertyGroup.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 

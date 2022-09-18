@@ -6,7 +6,7 @@
  */
 
 import { assert } from "chai";
-import { is, to } from "@ff/core/check";
+import { is, to } from "#lib/check";
 
 ////////////////////////////////////////////////////////////////////////////////
 // CHECK FUNCTION - TEST SUITE

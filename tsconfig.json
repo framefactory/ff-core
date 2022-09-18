@@ -1,15 +1,18 @@
 {
-    "compilerOptions": {
-        "composite": true,
-        "target": "ES2020",
-        "module": "CommonJS",
-        "experimentalDecorators": true,
-        "sourceMap": true,
+    "extends": "./tsconfig.base.json",
 
-        "outDir": "dist/exports",
-        "rootDir": "src"
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "NodeNext",
+
+        "outDir": "./build/js/",
+        "declarationDir": "./build/types/",
+        "rootDir": "./src",
+
+        "composite": true
     },
     "include": [
-        "src/**/*"
-    ]
+        "./src/**/*"
+    ],
 }

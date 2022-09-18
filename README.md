@@ -22,8 +22,9 @@ This library is part of the Frame Factory Typescript foundation libraries. It pr
 
 ## Usage
 
-- `source` contains the TypeScript source code
-- `built/export` contains JavaScript code with type annotations (`*.d.ts` files)
+- `src` contains the TypeScript source code
+- `build/js` contains transpiled JavaScript modules
+- `build/types` contains TypeScript type annotations and maps
 - `build/test` contains compiled test code
 
 ```

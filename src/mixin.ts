@@ -13,7 +13,7 @@
  * @param targetClass constructor function of the target class.
  * @param {any | any[]} sourceClass A single mixin constructor or an array of mixin constructors.
  */
-export default function mixin(targetClass: any, sourceClass: any | any[])
+export function mixin(targetClass: any, sourceClass: any | any[])
 {
     // if sourceClass is an array, call mixin for each array element
     if (Array.isArray(sourceClass)) {

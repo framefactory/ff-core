@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Vector2, { IVector2 } from "./Vector2.js";
+import { Vector2, IVector2 } from "./Vector2.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -19,7 +19,7 @@ export interface IBox2
  * 2-dimensional, axis aligned box.
  * The box is defined by a set of minimum and a set of maximum coordinates.
  */
-export default class Box2 implements IBox2
+export class Box2 implements IBox2
 {
     static makeFromPoints(min: IVector2, max: IVector2): Box2
     {

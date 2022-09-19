@@ -5,11 +5,11 @@
  * License: MIT
  */
 
-import Vector2, { IVector2 } from "./Vector2.js";
+import { Vector2, IVector2 } from "./Vector2.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export default class Circle2
+export class Circle2
 {
     p: Vector2;
     r: number;

@@ -1,12 +1,12 @@
 /**
- * FF Typescript/React Foundation Library
+ * FF Typescript Foundation Library
  * Copyright 2022 Ralph Wiedemeier, Frame Factory GmbH
  *
  * License: MIT
  */
 
 import { assert } from "chai";
-import SortedArray from "#lib/SortedArray";
+import { SortedArray } from "#lib/SortedArray";
 
 ////////////////////////////////////////////////////////////////////////////////
 // SORTED ARRAY CLASS - TEST SUITE

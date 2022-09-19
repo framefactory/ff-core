@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import math from "./math.js";
-import AnimationTrack, { IKey, IKeyPair } from "./AnimationTrack.js";
+import { math } from "./math.js";
+import { AnimationTrack, IKey, IKeyPair } from "./AnimationTrack.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -34,7 +34,7 @@ export interface ISplineKeyPair extends IKeyPair<ISplineKey>
 {
 }
 
-export default class SplineTrack extends AnimationTrack<number, ISplineKey>
+export class SplineTrack extends AnimationTrack<number, ISplineKey>
 {
     interval: ISplineKeyPair;
 

@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import Vector3, { type IVector3 } from "./Vector3.js";
-import Vector4, { type IVector4 } from "./Vector4.js";
+import { Vector3, type IVector3 } from "./Vector3.js";
+import { Vector4, type IVector4 } from "./Vector4.js";
 
 export { Vector3, type IVector3 };
 export { Vector4, type IVector4 };
@@ -28,7 +28,7 @@ function _hue2rgb(p, q, t) {
  *
  * Source for RGB/HSL/HSV conversions: https://gist.github.com/mjackson/5311256
  */
-export default class Color implements IVector4
+export class Color implements IVector4
 {
     static fromString(color: string): Color
     {

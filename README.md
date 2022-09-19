@@ -23,7 +23,8 @@ This library is part of the Frame Factory Typescript foundation libraries. It pr
 ## Usage
 
 - `src` contains the TypeScript source code
-- `build/js` contains transpiled JavaScript modules
+- `build/cjs` contains transpiled CommonJS files
+- `build/mjs` contains transpiled ECMAScript module files
 - `build/types` contains TypeScript type annotations and maps
 - `build/test` contains compiled test code
 

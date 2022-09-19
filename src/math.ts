@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-const math = {
+export const math = {
 
     PI: 3.1415926535897932384626433832795,
     DOUBLE_PI: 6.283185307179586476925286766559,
@@ -102,5 +102,3 @@ const math = {
         easeQuart: t => t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t
     }
 };
-
-export default math;

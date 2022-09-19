@@ -3,11 +3,13 @@
 
     "compilerOptions": {
         "target": "ES2022",
-        "module": "ESNext",
+        "module": "CommonJS",
         "moduleResolution": "NodeNext",
 
-        "outDir": "./build/js/",
-        "declarationDir": "./build/types/",
+        "declaration": true,
+        "declarationMap": true,
+        "declarationDir": "./build/types",
+        "outDir": "./build/cjs",
         "rootDir": "./src",
 
         "composite": true

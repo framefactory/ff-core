@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-export default function merge<T, S>(objA: T, objB: S): T & S
+export function merge<T, S>(objA: T, objB: S): T & S
 {
     let result: any = {};
 

@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Vector3, { IVector3 } from "./Vector3.js";
+import { Vector3, IVector3 } from "./Vector3.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,7 +20,7 @@ export interface IBox3
  * The box is defined by a set of minimum and a set of maximum coordinates.
  */
 
-export default class Box3 implements IBox3
+export class Box3 implements IBox3
 {
     static makeFromPoints(min: IVector3, max: IVector3): Box3
     {

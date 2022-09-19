@@ -7,7 +7,7 @@
 
 import { Type } from "./types.js";
 
-export default function extend(derivedClass: Type, baseClass: Type): void
+export function extend(derivedClass: Type, baseClass: Type): void
 {
     // create prototype chain
     const derivedPrototype = Object.create(baseClass.prototype);

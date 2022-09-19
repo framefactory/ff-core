@@ -5,9 +5,9 @@
  * License: MIT
  */
 
-import Vector3, { IVector3 } from "./Vector3.js";
-import Vector4, { IVector4 } from "./Vector4.js";
-import Quaternion, { IQuaternion } from "./Quaternion.js";
+import { Vector3, IVector3 } from "./Vector3.js";
+import { Vector4, IVector4 } from "./Vector4.js";
+import { Quaternion, IQuaternion } from "./Quaternion.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -21,7 +21,7 @@ export interface IMatrix4
 /**
  * 4 by 4 matrix.
  */
-export default class Matrix4
+export class Matrix4
 {
     static readonly zeros = new Matrix4().makeZeros();
     static readonly ones = new Matrix4().makeOnes();

@@ -16,7 +16,7 @@ const fourDigits = function() {
  * xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
  * @returns {string} Globally unique identifier
  */
-export default function uuid(): string
+export function uuid(): string
 {
     return fourDigits() + fourDigits() + '-' + fourDigits() + '-' + fourDigits() + '-' +
         fourDigits() + '-' + fourDigits() + fourDigits() + fourDigits();

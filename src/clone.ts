@@ -12,7 +12,7 @@
  * @param source {any} The source object.
  * @returns {any} A deep clone of the source object.
  */
-export default function clone<T>(source: T): T
+export function clone<T>(source: T): T
 {
     // null, undefined, primitive values and functions
     if (source === null || typeof(source) !== "object") {

@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import SortedArray from "./SortedArray.js";
+import { SortedArray } from "./SortedArray.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -24,7 +24,7 @@ export interface IKeyPair<K extends IKey>
 /**
  * Base class for a track containing keyframes
  */
-export default class AnimationTrack<T = any, K extends IKey<T> = IKey<T>>
+export class AnimationTrack<T = any, K extends IKey<T> = IKey<T>>
 {
     readonly keys: SortedArray<K>;
 

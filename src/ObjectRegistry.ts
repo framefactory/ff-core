@@ -6,7 +6,7 @@
  */
 
 import { Dictionary, TypeOf } from "./types.js";
-import Publisher, { ITypedEvent } from "./Publisher.js";
+import { Publisher, ITypedEvent } from "./Publisher.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -33,7 +33,7 @@ export interface ITagEvent<T extends object = object> extends ITypedEvent<string
 /**
  * Registry of object instances, grouped by their classes and base classes.
  */
-export default class ObjectRegistry<T extends object> extends Publisher
+export class ObjectRegistry<T extends object> extends Publisher
 {
     static getTypeName(scope: ObjectOrTypeOrName): string
     {

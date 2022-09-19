@@ -16,7 +16,7 @@
  * @param {boolean} matchTypes If true, types of properties must match
  * @returns {T} The resulting object, conforming to the template.
  */
-export default function conform<T>(source: any, template: T, matchTypes: boolean = true): T
+export function conform<T>(source: any, template: T, matchTypes: boolean = true): T
 {
     const sourceType = typeof source;
 

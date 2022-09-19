@@ -14,7 +14,7 @@
  * @param {boolean} matchTypes If true, types of properties must match
  * @returns {Partial<T>} The resulting object, conforming to a partial of the template.
  */
-export default function restrict<T>(source: any, template: T, matchTypes: boolean = true): Partial<T>
+export function restrict<T>(source: any, template: T, matchTypes: boolean = true): Partial<T>
 {
     if (typeof source !== "object" || source === null) {
         source = {};

@@ -1,12 +1,12 @@
 /**
- * FF Typescript/React Foundation Library
+ * FF Typescript Foundation Library
  * Copyright 2022 Ralph Wiedemeier, Frame Factory GmbH
  *
  * License: MIT
  */
 
 import { assert } from "chai";
-import clone from "#lib/clone";
+import { clone } from "#lib/clone";
 
 ////////////////////////////////////////////////////////////////////////////////
 // CLONE FUNCTION - TEST SUITE

@@ -6,7 +6,7 @@
  */
 
 import { Dictionary, Type } from "./types.js";
-import Publisher, { ITypedEvent } from "./Publisher.js";
+import { Publisher, ITypedEvent } from "./Publisher.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +17,7 @@ export interface ITypeEvent extends ITypedEvent<"type">
     classType: Type;
 }
 
-export default class TypeRegistry extends Publisher
+export class TypeRegistry extends Publisher
 {
     protected _dict: Dictionary<Type> = {};
 

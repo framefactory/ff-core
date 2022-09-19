@@ -1,13 +1,13 @@
 /**
- * FF Typescript/React Foundation Library
+ * FF Typescript Foundation Library
  * Copyright 2022 Ralph Wiedemeier, Frame Factory GmbH
  *
  * License: MIT
  */
 
 import { assert } from "chai";
-import math from "#lib/math";
-import Vector2 from "#lib/Vector2";
+import { math } from "#lib/math";
+import { Vector2 } from "#lib/Vector2";
 
 const eps = 1e-6;
 

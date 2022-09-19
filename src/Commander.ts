@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import Publisher from "./Publisher.js";
-import Command, { ICommand, ICommandProps } from "./Command.js";
+import { Publisher } from "./Publisher.js";
+import { Command, ICommand, ICommandProps } from "./Command.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -15,7 +15,7 @@ export interface ICommandDispatcher
     dispatch: () => void;
 }
 
-export default class Commander extends Publisher
+export class Commander extends Publisher
 {
     protected static readonly defaultCapacity = 30;
 

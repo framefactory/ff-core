@@ -6,7 +6,7 @@
  */
 
 import { Dictionary, MaybeIdentifiable } from "./types.js";
-import Publisher, { ITypedEvent } from "./Publisher.js";
+import { Publisher, ITypedEvent } from "./Publisher.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -27,7 +27,7 @@ export interface ICollectionUpdateEvent<T extends MaybeIdentifiable> extends ITy
  *
  * Updates to the collection are published via [[ICollectionUpdateEvent]] events.
  */
-export default class UnorderedCollection<T extends MaybeIdentifiable> extends Publisher
+export class UnorderedCollection<T extends MaybeIdentifiable> extends Publisher
 {
     private _dict: Dictionary<T>;
 

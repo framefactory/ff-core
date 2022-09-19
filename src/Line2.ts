@@ -5,11 +5,11 @@
  * License: MIT
  */
 
-import Vector2, { IVector2 } from "./Vector2.js";
+import { Vector2, IVector2 } from "./Vector2.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export default class Line2
+export class Line2
 {
     p0: Vector2;
     p1: Vector2;

@@ -16,7 +16,7 @@ export interface IVector2
 /**
  * 2-dimensional vector.
  */
-export default class Vector2 implements IVector2
+export class Vector2 implements IVector2
 {
     static readonly zeros = new Vector2(0, 0);
     static readonly ones = new Vector2(1, 1);

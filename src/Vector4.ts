@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Vector3, { IVector3 } from "./Vector3.js";
+import { Vector3, IVector3 } from "./Vector3.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,7 +20,7 @@ export interface IVector4
 /**
  * 4-dimensional vector.
  */
-export default class Vector4
+export class Vector4
 {
     static readonly zeros = new Vector4(0, 0, 0, 0);
     static readonly ones = new Vector4(1, 1, 1, 1);

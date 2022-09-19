@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Publisher, { ITypedEvent } from "./Publisher.js";
+import { Publisher, ITypedEvent } from "./Publisher.js";
 import { schemas, types, IPropertySchema, IPropertyTemplate } from "./propertyTypes.js";
 //import PropertyGroup from "./PropertyGroup.js";
 
@@ -24,7 +24,7 @@ export interface IPropertyChangeEvent extends ITypedEvent<"change">
     property: Property;
 }
 
-export default class Property<T = unknown> extends Publisher
+export class Property<T = unknown> extends Publisher
 {
     readonly type: ValueType;
     readonly schema: IPropertySchema<T>;

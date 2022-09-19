@@ -1,10 +1,11 @@
 {
     "name": "@framefactory/core",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "license": "MIT",
     "description": "FF Core Typescript Foundation Library",
     "keywords": [
         "typescript",
+        "types",
         "math",
         "color",
         "graphics",
@@ -23,34 +24,32 @@
     "bugs": {
         "url": "https://github.com/framefactory/ff-core/issues"
     },
-    "type": "module",
     "files": [
-        "build/js/**/*",
-        "build/types/**/*",
+        "build/esm/**/*",
+        "build/cjs/**/*",
         "src/**/*"
     ],
     "exports": {
-        "./*.js": {
-            "default": {
-                "types": "./build/types/*.d.ts",
-                "default": "./build/js/*.js"
-            }
-        },
-        "./*": "./src/*"
+        "./*": {
+            "types": "./build/types/*.d.ts",
+            "import": "./build/esm/*.js",
+            "require": "./build/cjs/*.js"
+        }
     },
     "imports": {
-        "#lib/*": "./build/js/*.js"
+        "#lib/*": "./build/cjs/*.js"
     },
     "scripts": {
-        "build": "npm run clean && tsc",
+        "build": "npm run clean && npm run build:esm && npm run build:cjs",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "build:cjs": "tsc -p tsconfig.json",
         "clean": "rm -rf ./build",
-        "test": "tsc -b test; mocha -c --ui tdd build/test/test.js || exit 0"
+        "test": "rm -rf ./build/test && tsc -b test && mocha -c --ui tdd build/test/test.js"
     },
     "devDependencies": {
         "@types/chai": "^4.3.3",
         "@types/mocha": "^9.1.1",
         "chai": "^4.3.6",
-        "mocha": "^10.0.0",
-        "module-alias": "^2.2.2"
+        "mocha": "^10.0.0"
     }
 }

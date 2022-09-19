@@ -7,7 +7,7 @@
 
 export type StatePath = string | (string | number)[];
 
-export default class StateTransaction<T = any>
+export class StateTransaction<T = any>
 {
     protected current: T;
     protected next: T;

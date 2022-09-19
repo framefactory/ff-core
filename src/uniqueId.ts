@@ -15,7 +15,7 @@ const _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
  * @param dictionary Optional object with ids. Function ensures generated id is not equal to a key of dictionary.
  * @returns Globally unique identifier
  */
-export default function uniqueId(length?: number, dictionary?: {}): string
+export function uniqueId(length?: number, dictionary?: {}): string
 {
     if (!length || typeof length !== "number") {
         length = 12;

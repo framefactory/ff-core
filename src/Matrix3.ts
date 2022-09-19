@@ -6,7 +6,7 @@
  */
 
 import { IVector2 } from "./Vector2.js";
-import Vector3, { IVector3 } from "./Vector3.js";
+import { Vector3, IVector3 } from "./Vector3.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -18,7 +18,7 @@ export interface IMatrix3
 /**
  * 3 by 3 matrix.
  */
-export default class Matrix3
+export class Matrix3
 {
     static readonly zeros = new Matrix3().makeZeros();
     static readonly ones = new Matrix3().makeOnes();

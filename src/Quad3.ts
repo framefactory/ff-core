@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import Vector3, { IVector3 } from "./Vector3.js";
-import Matrix3 from "./Matrix3.js";
+import { Vector3, IVector3 } from "./Vector3.js";
+import { Matrix3 } from "./Matrix3.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -15,7 +15,7 @@ export interface IQuad3
     points: IVector3[];    
 }
 
-export default class Quad3 implements IQuad3
+export class Quad3 implements IQuad3
 {
     points: Vector3[] = [];
 

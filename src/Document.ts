@@ -5,8 +5,8 @@
  * License: MIT
  */
 
-import Publisher, { ITypedEvent } from "./Publisher.js";
-import uniqueId from "./uniqueId.js";
+import { Publisher, ITypedEvent } from "./Publisher.js";
+import { uniqueId } from "./uniqueId.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,7 +20,7 @@ export interface IDocumentDisposeEvent<T extends Document = Document> extends IT
     document: T;
 }
 
-export default class Document<T extends any = any, U = T> extends Publisher
+export class Document<T extends any = any, U = T> extends Publisher
 {
     static generateId()
     {

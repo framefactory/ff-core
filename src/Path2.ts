@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Vector2, { IVector2 } from "./Vector2.js";
+import { Vector2, IVector2 } from "./Vector2.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -32,7 +32,7 @@ export interface ISegment2
 /**
  * Describes a 2-dimensional path, composed from individual segments.
  */
-export default class Path2
+export class Path2
 {
     static precision = 4;
 

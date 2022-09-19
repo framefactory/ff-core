@@ -28,7 +28,7 @@ export interface ICommandProps<T extends Function>
     name?: string;
 }
 
-export default class Command<T extends Function = Function> implements ICommand
+export class Command<T extends Function = Function> implements ICommand
 {
     private _props: ICommandProps<T>;
     private _args: any[];

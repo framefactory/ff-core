@@ -3,7 +3,7 @@
 
     "compilerOptions": {
         "target": "ES2022",
-        "module": "ESNext",
+        "module": "CommonJS",
         "moduleResolution": "NodeNext",
 
         "outDir": "../build/test",
@@ -18,6 +18,6 @@
         "**/*"
     ],
     "references": [
-        { "path": ".." }
+        { "path": "../tsconfig.json" }
     ]
 }

@@ -16,7 +16,7 @@ export interface ISortedArrayItem<T>
  * The sortable property must be of type number, the property name can be specified
  * in the constructor. The default name of the sortable property is "value".
  */
-export default class SortedArray<T>
+export class SortedArray<T>
 {
     readonly items: ISortedArrayItem<T>[];
 

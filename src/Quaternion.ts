@@ -15,7 +15,7 @@ export interface IQuaternion
     w: number;
 }
 
-export default class Quaternion implements IQuaternion
+export class Quaternion implements IQuaternion
 {
     x: number;
     y: number;

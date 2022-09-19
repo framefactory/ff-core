@@ -29,7 +29,7 @@ export interface ITypedEvent<T extends string>
 /**
  * Provides subscription services for events.
  */
-export default class Publisher
+export class Publisher
 {
     /**
      * Constructs a new [[Publisher]] instance.

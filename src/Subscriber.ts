@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import Publisher from "./Publisher.js";
+import { Publisher } from "./Publisher.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -14,7 +14,7 @@ import Publisher from "./Publisher.js";
  * Subscription can be started and stopped for all registered publishers at once.
  * Events are untyped and event arguments are not delivered.
  */
-export default class Subscriber
+export class Subscriber
 {
     private _type: string;
     private _callback: (e: any) => void;

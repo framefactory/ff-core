@@ -6,15 +6,15 @@
  */
 
 import { ReturnType } from "./types.js";
-import Publisher, { ITypedEvent } from "./Publisher.js";
-import Commander from "./Commander.js";
+import { Publisher, ITypedEvent } from "./Publisher.js";
+import { Commander } from "./Commander.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
 export { Commander, ITypedEvent };
 export type Actions<T extends Controller<any>> = ReturnType<T["createActions"]>;
 
-export default abstract class Controller<T extends Controller<any>> extends Publisher
+export abstract class Controller<T extends Controller<any>> extends Publisher
 {
     public readonly actions: Actions<Controller<T>>;
 

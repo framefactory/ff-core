@@ -11,10 +11,10 @@
  * If matchType is true, source properties also must have the same type as their corresponding
  * properties in the template, otherwise the template properties are copied. Operation is performed
  * recursively (deep conform).
- * @param {any} source The source object
- * @param {T} template The template object
- * @param {boolean} matchTypes If true, types of properties must match
- * @returns {T} The resulting object, conforming to the template.
+ * @param source The source object
+ * @param template The template object
+ * @param matchTypes If true, types of properties must match
+ * @returns The resulting object, conforming to the template.
  */
 export function conform<T>(source: any, template: T, matchTypes: boolean = true): T
 {

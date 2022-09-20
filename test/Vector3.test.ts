@@ -6,8 +6,9 @@
  */
 
 import { assert } from "chai";
-import { math } from "#lib/math";
-import { Vector3 } from "#lib/Vector3";
+
+import { math } from "@ffweb/core/math.js";
+import { Vector3 } from "@ffweb/core/Vector3.js";
 
 const eps = 1e-6;
 
@@ -26,8 +27,10 @@ const assertApproxEqual = (vector: Vector3, x: number, y: number, z: number, mes
     assert.approximately(vector.z, z, eps, `${message} (z)`);
 };
 
-export default () => {
-    suite("Vector3", () => {
+export function Vector3_test()
+{
+    suite("Vector3", function()
+    {
         test("constructors", () => {
             assertEqual(new Vector3(), 0, 0, 0, "without values");
             assertEqual(new Vector3(NaN, NaN, NaN), 0, 0, 0, "with NaN");
@@ -41,6 +44,7 @@ export default () => {
             assertEqual(Vector3.makeUnitY(), 0, 1, 0, "makeUnitY");
             assertEqual(Vector3.makeUnitZ(), 0, 0, 1, "makeUnitZ");
         });
+
         test("set/copy/clone", () => {
             assertEqual(new Vector3().set(11, 12, 13), 11, 12, 13, "set");
             assertEqual(new Vector3().setFromScalar(3.21), 3.21, 3.21, 3.21, "setFromScalar");
@@ -57,6 +61,7 @@ export default () => {
             new Vector3(5, 8, -2).toArray(arr);
             assert.deepEqual(arr, [5, 8, -2], "toArray - array supplied");
         });
+
         test("add/sub/mul/div", () => {
             assertApproxEqual(new Vector3(0.5, 1.5, 2.5).add(new Vector3(1, 2, 3)), 1.5, 3.5, 5.5, "add");
             assertApproxEqual(new Vector3(1.1, 2.2, 3.3).addScalar(3.3), 4.4, 5.5, 6.6, "addScalar");
@@ -67,16 +72,19 @@ export default () => {
             assertApproxEqual(new Vector3(5, 7, 9).divideBy(new Vector3(2, 10, 3)), 2.5, 0.7, 3, "divideBy");
             assertApproxEqual(new Vector3(6, 9, 12).divideByScalar(20), 0.3, 0.45, 0.6, "divideByScalar");
         });
+
         test("translate/rotate/scale", () => {
             assertApproxEqual(new Vector3(4, 6, -3).translate(0.5, -0.5, 3), 4.5, 5.5, 0, "translate");
             assertApproxEqual(new Vector3(1, 0, 0).rotateZ(90 * math.DEG2RAD), 0, 1, 0, "rotate");
             assertApproxEqual(new Vector3(0, 3, 4).rotateX(270 * math.DEG2RAD), 0, 4, -3, "rotate");
             assertApproxEqual(new Vector3(8, 12, -3).scale(0.5, 3, 2), 4, 36, -6, "scale");
         });
+
         test("invert/negate", () => {
             assertApproxEqual(new Vector3(2, 4, 8).invert(), 0.5, 0.25, 0.125, "invert");
             assertApproxEqual(new Vector3(-5, 3, 1).negate(), 5, -3, -1, "negate");
         });
+
         test("normalize/homogenize/dot/length", () => {
             const length = new Vector3(3, 5, 7).length();
             assertApproxEqual(new Vector3(3, 5, 7).normalize(), 3 / length, 5 / length, 7 / length, "normalize");
@@ -85,9 +93,11 @@ export default () => {
             assert.approximately(new Vector3(-3, 3.4, 4).length(), Math.sqrt(9 + 3.4 * 3.4 + 16), eps, "length");
             assert.equal(new Vector3(2, 7, 3).lengthSquared(), 62, "lengthSquared");
         });
+
         test("distance/cross", () => {
             assert.equal(new Vector3(5, 8, 2).distanceTo(new Vector3(-3, 3, 1)), Math.sqrt(8*8 + 5*5 + 1), "distanceTo");
         });
+
         test("min/max/zero", () => {
             assert.equal(new Vector3(-4, 7, -6).min(), -6, "min #1");
             assert.equal(new Vector3(3, 1, 7).min(), 1, "min #2");

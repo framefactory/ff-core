@@ -6,13 +6,16 @@
  */
 
 import { assert } from "chai";
-import { conform } from "#lib/conform";
+
+import { conform } from "@ffweb/core/conform.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 // CONFORM FUNCTION - TEST SUITE
 
-export default function() {
-    suite("conform", function() {
+export function conform_test()
+{
+    suite("conform", function()
+    {
         test("basics", function() {
             const source: any = { a: 4.51, b: "abc" };
             assert.deepEqual(source, conform(source, { a: 0, b: "" }, true));

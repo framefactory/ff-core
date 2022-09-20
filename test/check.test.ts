@@ -6,13 +6,16 @@
  */
 
 import { assert } from "chai";
-import { is, to } from "#lib/check";
+
+import { is, to } from "@ffweb/core/check.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 // CHECK FUNCTION - TEST SUITE
 
-export default function() {
-    suite("check", function() {
+export function check_test()
+{
+    suite("check", function()
+    {
         test("is.number", function() {
             assert.strictEqual(is.number.check(45), 45, "45");
             assert.strictEqual(is.number.check(Number.NEGATIVE_INFINITY), Number.NEGATIVE_INFINITY);

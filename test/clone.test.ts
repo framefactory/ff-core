@@ -6,7 +6,8 @@
  */
 
 import { assert } from "chai";
-import { clone } from "#lib/clone";
+
+import { clone } from "@ffweb/core/clone.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 // CLONE FUNCTION - TEST SUITE
@@ -16,8 +17,10 @@ class _CustomType {
     b: string = "Hello";
 }
 
-export default function() {
-    suite("clone", function() {
+export function clone_test()
+{
+    suite("clone", function()
+    {
         test("clone primitive types", function() {
             const a = 4.51;
             assert.strictEqual(clone(a), a, "number");

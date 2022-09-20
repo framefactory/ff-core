@@ -6,13 +6,16 @@
  */
 
 import { assert } from "chai";
-import { SortedArray } from "#lib/SortedArray";
+
+import { SortedArray } from "@ffweb/core/SortedArray.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 // SORTED ARRAY CLASS - TEST SUITE
 
-export default function() {
-    suite("SortedArray", function() {
+export function SortedArray_test()
+{
+    suite("SortedArray", function()
+    {
         test("insert", function() {
             const items = [
                 { key: 1, value: 0 },

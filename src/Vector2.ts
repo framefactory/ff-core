@@ -88,7 +88,7 @@ export class Vector2 implements IVector2
      */
     static toString(vector: IVector2): string
     {
-        return `[${vector.x}, ${vector.y}]`;
+        return `[${vector.x}, ${vector.y}]`; // test test
     }
 
     /** The vector's x component. */

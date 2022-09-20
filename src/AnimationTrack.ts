@@ -5,9 +5,11 @@
  * License: MIT
  */
 
-import { SortedArray } from "./SortedArray.js";
+import { SortedArray, ISortedArrayItem } from "./SortedArray.js";
 
 ////////////////////////////////////////////////////////////////////////////////
+
+export type IKeyItem<T> = ISortedArrayItem<T>;
 
 export interface IKey<T = any>
 {
@@ -90,7 +92,7 @@ export class AnimationTrack<T = any, K extends IKey<T> = IKey<T>>
         return item ? item.value.value : this.defaultValue;
     }
 
-    keysAround(time: number, result?: IKeyPair<K>)
+    keysAround(time: number, result?: IKeyPair<K>): IKeyPair<K>
     {
         const keys = this.keys;
         const index = keys.indexAtBefore(time);
@@ -104,7 +106,7 @@ export class AnimationTrack<T = any, K extends IKey<T> = IKey<T>>
         return result;
     }
 
-    leftKey(time: number)
+    leftKey(time: number): K
     {
         const keys = this.keys;
         const index = keys.indexAtBefore(time);

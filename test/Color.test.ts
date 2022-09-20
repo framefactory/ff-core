@@ -6,19 +6,18 @@
  */
 
 import { assert } from "chai";
-import { Color } from "#lib/Color";
+
+import { Color } from "@ffweb/core/Color.js";
 
 const eps = 1e-6;
 
 ////////////////////////////////////////////////////////////////////////////////
 // COLOR CLASS - TEST SUITE
 
-export default function() {
-    suite("Color", function() {
-        suiteSetup(function() {
-
-        });
-
+export function Color_test()
+{
+    suite("Color", function()
+    {
         test("fromString - static constructor from 6-digit hex string #4d7e09", function() {
             const c = Color.fromString("#4d7e09");
             assert.approximately(c.x, 0x4d / 255, eps, "red");

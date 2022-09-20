@@ -3,21 +3,13 @@
 
     "compilerOptions": {
         "target": "ES2022",
-        "module": "CommonJS",
+        "module": "NodeNext",
         "moduleResolution": "NodeNext",
 
         "outDir": "../build/test",
         "rootDir": ".",
-
-        "baseUrl": ".",
-        "paths": {
-            "#lib/*": [ "../src/*.ts" ]
-        }
     },
-    "include": [
-        "**/*"
-    ],
-    "references": [
-        { "path": "../tsconfig.json" }
+    "files": [
+        "index.ts"
     ]
 }

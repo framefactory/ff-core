@@ -9,8 +9,8 @@
  * Returns a deep clone of the given object. Handles plain objects, arrays, typed arrays,
  * dates, functions. Custom objects with default constructors are copied as well, without warranty.
  * Functions are copied by reference only.
- * @param source {any} The source object.
- * @returns {any} A deep clone of the source object.
+ * @param source The source object.
+ * @returns A deep clone of the source object.
  */
 export function clone<T>(source: T): T
 {

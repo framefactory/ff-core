@@ -6,13 +6,16 @@
  */
 
 import { assert } from "chai";
-import { SplineTrack, InterpolationType } from "#lib/SplineTrack";
+
+import { SplineTrack, InterpolationType } from "@ffweb/core/SplineTrack.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 // SPLINE TRACK CLASS - TEST SUITE
 
-export default function() {
-    suite("SplineTrack", function() {
+export function SplineTrack_test()
+{
+    suite("SplineTrack", function()
+    {
         test("insert", function() {
             const track = new SplineTrack();
             assert.isTrue(track.empty());

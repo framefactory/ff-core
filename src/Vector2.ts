@@ -300,6 +300,18 @@ export class Vector2 implements IVector2
     }
 
     /**
+     * Multiplies the given vector by factor and adds the result to this.
+     * @param other 
+     * @param factor 
+     */
+    multiplyAdd(other: IVector2, factor: number): this
+    {
+        this.x += other.x * factor;
+        this.y += other.y * factor;
+        return this;
+    }
+
+    /**
      * Translates the vector by the given offsets.
      * @param tx
      * @param ty

@@ -6,7 +6,7 @@
  */
 
 import { IVector2 } from "./Vector2.js";
-import { Vector3, IVector3 } from "./Vector3.js";
+import { IVector3 } from "./Vector3.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -357,13 +357,27 @@ export class Matrix3
         return this;
     }
 
-    multiplyVector<T extends IVector3>(vector: T): T
+    transformVector<T extends IVector3>(vector: T): T
     {
         const e = this.elements;
         const x = vector.x, y = vector.y, z = vector.z;
         vector.x = e[0] * x + e[3] * y + e[6] * z;
         vector.y = e[1] * x + e[4] * y + e[7] * z;
         vector.z = e[2] * x + e[5] * y + e[8] * z;
+        return vector;
+    }
+
+    transformVector2<T extends IVector2>(vector: T, z = 1): T
+    {
+        const e = this.elements;
+        const x = vector.x, y = vector.y;
+        vector.x = e[0] * x + e[3] * y + e[6] * z;
+        vector.y = e[1] * x + e[4] * y + e[7] * z;
+        const vz = e[2] * x + e[5] * y + e[8] * z;
+        if (vz !== 0.0) {
+            vector.x /= vz;
+            vector.y /= vz;
+        }
         return vector;
     }
 

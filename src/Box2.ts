@@ -6,6 +6,7 @@
  */
 
 import { Vector2, IVector2 } from "./Vector2.js";
+import { Matrix3 } from "./Matrix3.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -202,6 +203,13 @@ export class Box2 implements IBox2
             const t = min.y; min.y = max.y; max.y = t;
         }
 
+        return this;
+    }
+
+    transform(matrix: Matrix3): this
+    {
+        matrix.transformVector2(this.min);
+        matrix.transformVector2(this.max);
         return this;
     }
 

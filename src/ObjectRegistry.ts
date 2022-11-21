@@ -66,8 +66,8 @@ export class ObjectRegistry<T extends object> extends Publisher
 
     /**
      * Adds an object to the registry. The object is registered under its actual class
-     * and all base classes in its prototype chain. An [[IObjectEvent]] is emitted
-     * for each class in the object's prototype chain.
+     * and all base classes in its prototype chain up to and including the root type.
+     * An {@link IObjectEvent} is emitted for each class in the object's prototype chain.
      * @param object
      */
     add(object: T): void

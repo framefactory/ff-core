@@ -1,6 +1,6 @@
 # FF Core Typescript Foundation Library
 
-Copyright 2022 [Frame Factory GmbH](https://framefactory.ch), [Ralph Wiedemeier](https://about.me/ralphw)
+Copyright 2023 [Frame Factory GmbH](https://framefactory.ch), [Ralph Wiedemeier](https://about.me/ralphw)
 
 ## Overview
 
@@ -12,7 +12,7 @@ This library is part of the Frame Factory Typescript foundation libraries. It pr
 - Utilities for handling objects (cloning, inheritance, mixin, type checking, etc.)
 - Publisher base class for event broadcasting
 - Dynamic type registration
-- Rich color type with support for RGB and HSV with alpha channel. Converts to/from web color strings and float arrays (WebGL).
+- Rich color type with support for RGB and HSV with alpha channel. Converts to/from web color strings and float arrays (WebGL/WebGPU).
 - Core math utilities
 - Generators for unique ids
 - Linear algebra types for graphics (vectors and matrices)
@@ -20,23 +20,20 @@ This library is part of the Frame Factory Typescript foundation libraries. It pr
 - Animation support (tweening, keyframe tracks with cubic spline support, etc.)
 - Support for state machines and properties
 
-## Usage
+## Structure
 
 - `src` contains the TypeScript source code
-- `build/cjs` contains transpiled CommonJS files
-- `build/mjs` contains transpiled ECMAScript module files
-- `build/types` contains TypeScript type annotations and maps
-- `build/test` contains compiled test code
+- `build` contains transpiled ECMAScript module files
 
 ```
 # clean build directory
-npm run clean
+pnpm run clean
 
 # build the library
-npm run build
+pnpm run build
 
 # build and run the tests
-npm run test
+pnpm run test
 ```
 
 ## License

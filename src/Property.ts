@@ -125,7 +125,7 @@ export class Property<T = unknown> extends Publisher
             throw new TypeError("not an option property");
         }
         if (option) {
-            const value = this.schema.options.indexOf(option) as unknown;
+            const value = this.schema.options.indexOf(option) as number;
             if (value >= 0) {
                 this.setValue(value as T, silent);
             }

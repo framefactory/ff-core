@@ -5,7 +5,7 @@
  * License: MIT
  */
 
-import { normalize } from "./text.js";
+import { toTitleCase } from "./text.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -43,7 +43,7 @@ export class Command<T extends Function = Function> implements ICommand
     }
 
     get name() {
-        return this._props.name || normalize(this._props.do.name);
+        return this._props.name || toTitleCase(this._props.do.name);
     }
 
     do()

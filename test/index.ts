@@ -1,14 +1,14 @@
 /**
  * FF Typescript Foundation Library
- * Copyright 2023 Ralph Wiedemeier, Frame Factory GmbH
+ * Copyright 2024 Ralph Wiedemeier, Frame Factory GmbH
  *
  * License: MIT
  */
 
 // define vars on node global object (usually done by Webpack)
-global["ENV_DEVELOPMENT"] = false;
-global["ENV_PRODUCTION"] = true;
-global["ENV_VERSION"] = "Test";
+// global["ENV_DEVELOPMENT"] = false;
+// global["ENV_PRODUCTION"] = true;
+// global["ENV_VERSION"] = "Test";
 
 import { Vector2_test } from "./Vector2.test.js";
 import { Vector3_test } from "./Vector3.test.js";

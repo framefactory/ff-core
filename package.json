@@ -25,7 +25,7 @@
     "url": "https://github.com/framefactory/ff-core/issues"
   },
   "type": "module",
-  "packageManager": "pnpm@9.11.0",
+  "packageManager": "pnpm@9.12.1",
   "files": [
     "build/types/**/*",
     "build/esm/**/*",
@@ -47,10 +47,10 @@
     "test": "rm -rf ./build/test && tsc -b test && mocha -c --ui tdd build/test/index.js"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.19",
-    "@types/mocha": "^10.0.8",
+    "@types/chai": "^5.0.0",
+    "@types/mocha": "^10.0.9",
     "chai": "^5.1.1",
     "mocha": "^10.7.3",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   }
 }

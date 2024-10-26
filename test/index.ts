@@ -6,9 +6,9 @@
  */
 
 // define vars on node global object (usually done by Webpack)
-// global["ENV_DEVELOPMENT"] = false;
-// global["ENV_PRODUCTION"] = true;
-// global["ENV_VERSION"] = "Test";
+globalThis["ENV_DEVELOPMENT"] = false;
+globalThis["ENV_PRODUCTION"] = true;
+globalThis["ENV_VERSION"] = "Test";
 
 import { Vector2_test } from "./Vector2.test.js";
 import { Vector3_test } from "./Vector3.test.js";

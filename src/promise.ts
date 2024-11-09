@@ -15,8 +15,51 @@
 //     ]);
 // }
 
+/**
+ * Returns a promise that resolves after the given number of seconds.
+ * @param seconds The number of seconds to wait.
+ */
+export const delay = async function(seconds: number): Promise<void>
+{
+    return new Promise((resolve, reject) => {
+        setTimeout(() => resolve(), seconds * 1000);
+    });
+}
+
+/**
+ * Filters the given array of PromiseSettledResult objects for those that are fulfilled
+ * and returns their values.
+ * @param results An array of PromiseSettledResult objects.
+ * @returns An array of values of fulfilled promises.
+ */
+export const filterResolvedPromises = function<T>(results: PromiseSettledResult<T>[]): T[]
+{
+    return results
+        .filter(result => result.status === "fulfilled")
+        .map((result: PromiseFulfilledResult<T>) => result.value);
+}
+
+/**
+ * Filters the given array of PromiseSettledResult objects for those that are rejected
+ * and returns their reasons.
+ * @param results An array of PromiseSettledResult objects.
+ * @returns An array of reasons of rejected promises.
+ */
+export const filterRejectedPromises = function(results: PromiseSettledResult<any>[]): any[]
+{
+    return results
+        .filter(result => result.status === "rejected")
+        .map((result: PromiseRejectedResult) => result.reason);
+}
+
 export type SettlementState = "pending" | "resolved" | "rejected";
 
+/**
+ * A promise for future value T that can be resolved or rejected from the outside.
+ * The promise is created when the Settlement object is created or reset.
+ * The promise is resolved or rejected by calling the resolve or reject method.
+ * The state of the promise can be queried using the state property.
+ */
 export class Settlement<T>
 {
     private _promise: Promise<T>;
@@ -29,14 +72,17 @@ export class Settlement<T>
         this.reset();
     }
 
+    /** The promise that is resolved or rejected by calling the resolve or reject method. */
     get promise(): Promise<T> {
         return this._promise;
     }
 
+    /** The current state of the promise. */
     get state(): SettlementState {
         return this._state;
     }
 
+    /** Resets the promise to a new pending state. */
     reset(): this
     {
         if (this._state !== "pending") {
@@ -50,6 +96,7 @@ export class Settlement<T>
         return this;
     }
 
+    /** Resolves the promise with the given value. */
     resolve(arg?: T): this
     {
         if (this._state === "pending") {
@@ -60,6 +107,7 @@ export class Settlement<T>
         return this;
     }
 
+    /** Rejects the promise with the given reason. */
     reject(reason?: any): this
     {
         if (this._state === "pending") {

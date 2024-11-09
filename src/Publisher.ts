@@ -47,8 +47,8 @@ export class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    on<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: unknown): void;
-    on(type: string | string[] | Record<string, unknown>, callback: (event: unknown) => void, context?: unknown): void;
+    on<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any): void;
+    on(type: string | string[] | Record<string, any>, callback: (event: any) => void, context?: any): void;
     on(type, callback, context?)
     {
         if (Array.isArray(type)) {
@@ -93,8 +93,8 @@ export class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    once<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: unknown): void;
-    once(type: string | string[] | Record<string, unknown>, callback: (event: unknown) => void, context?: unknown): void;
+    once<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any): void;
+    once(type: string | string[] | Record<string, any>, callback: (event: any) => void, context?: any): void;
     once(type, callback, context?)
     {
         if (Array.isArray(type)) {
@@ -121,8 +121,8 @@ export class Publisher
      * @param callback Callback function, invoked when the event is emitted.
      * @param context Optional: this context for the callback invocation.
      */
-    off<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback?: (event: T) => void, context?: unknown): void;
-    off(type: string | string[] | Record<string, unknown>, callback?: (event: unknown) => void, context?: unknown): void;
+    off<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback?: (event: T) => void, context?: any): void;
+    off(type: string | string[] | Record<string, any>, callback?: (event: any) => void, context?: any): void;
     off(type, callback?, context?)
     {
         if (typeof type === "object") {

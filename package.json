@@ -1,6 +1,6 @@
 {
   "name": "@ffweb/core",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "license": "MIT",
   "description": "FF Core Typescript Foundation Library",
   "keywords": [
@@ -47,10 +47,10 @@
     "test": "rm -rf ./build/test && tsc -b test && mocha -c --ui tdd build/test/index.js"
   },
   "devDependencies": {
-    "@types/chai": "^5.0.0",
-    "@types/mocha": "^10.0.9",
-    "chai": "^5.1.1",
-    "mocha": "^10.7.3",
-    "typescript": "^5.6.3"
+    "@types/chai": "^5.0.1",
+    "@types/mocha": "^10.0.10",
+    "chai": "^5.1.2",
+    "mocha": "^11.0.1",
+    "typescript": "^5.7.2"
   }
 }

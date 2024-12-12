@@ -1,6 +1,6 @@
 {
   "name": "@ffweb/core",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "license": "MIT",
   "description": "FF Core Typescript Foundation Library",
   "keywords": [
@@ -25,7 +25,7 @@
     "url": "https://github.com/framefactory/ff-core/issues"
   },
   "type": "module",
-  "packageManager": "pnpm@9.12.1",
+  "packageManager": "pnpm@9.15.0",
   "files": [
     "build/types/**/*",
     "build/esm/**/*",

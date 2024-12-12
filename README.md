@@ -1,6 +1,6 @@
 # FF Core Typescript Foundation Library
 
-Copyright 2024 [Frame Factory GmbH](https://framefactory.ch), [Ralph Wiedemeier](https://about.me/ralphw)
+Copyright 2025 [Frame Factory GmbH](https://framefactory.ch), [Ralph Wiedemeier](https://about.me/ralphw)
 
 ## Overview
 

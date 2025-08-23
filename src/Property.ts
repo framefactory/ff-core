@@ -11,7 +11,8 @@ import { schemas, types, IPropertySchema, IPropertyTemplate } from "./propertyTy
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export { schemas, types, IPropertySchema, IPropertyTemplate };
+export { schemas, types }
+export type { IPropertySchema, IPropertyTemplate };
 
 export type ValueType = "number" | "boolean" | "string";
 

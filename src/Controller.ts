@@ -11,7 +11,7 @@ import { Commander } from "./Commander.js";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export { Commander, ITypedEvent };
+export { Commander, type ITypedEvent };
 export type Actions<T extends Controller<any>> = ReturnType<T["createActions"]>;
 
 export abstract class Controller<T extends Controller<any>> extends Publisher

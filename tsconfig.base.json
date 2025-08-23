@@ -1,11 +1,14 @@
 {
     "compilerOptions": {
         //"strict": true,
-        "forceConsistentCasingInFileNames": true,
-        "checkJs": true,
         "allowJs": true,
+        "checkJs": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
         "allowSyntheticDefaultImports": true,
+        "noUncheckedSideEffectImports": true,
         "useDefineForClassFields": false,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "isolatedModules": true,
     }
 }

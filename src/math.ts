@@ -82,6 +82,10 @@ export const math = {
         return min + Math.random() * (max - min);
     },
 
+    isPowerOf2: function(v: number) {
+        return v > 0 && (v & (v - 1)) === 0;
+    },
+
     curves: {
         linear: t => t,
 

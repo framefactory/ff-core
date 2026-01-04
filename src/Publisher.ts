@@ -265,6 +265,43 @@ export class Publisher
     }
 
     /**
+     * Counts the number of subscribers for a specific event.
+     * @param name Name of the event type.
+     * @returns the number of subscribers for the event type.
+     */
+    countSubscribers(name: string): number
+    {
+        const subscribers = this[_pd][name];
+        return subscribers ? subscribers.length : 0;
+    }
+
+    /**
+     * Tests whether a specific subscriber is registered for an event.
+     * @param type Type name of the event or an array of type names of events.
+     * @param callback Callback function, invoked when the event is emitted.
+     * @param context Optional: this context for the callback invocation.
+     * @returns true if the subscriber is registered for the event.
+     */
+    hasSubscriber<T extends ITypedEvent<string>>(type: T["type"] | T["type"][], callback: (event: T) => void, context?: any): void;
+    hasSubscriber(type: string, callback: (event: any) => void, context?: any): void;
+    hasSubscriber(type, callback, context?)
+    {
+        const subscribers = this[_pd][type];
+        if (!subscribers) {
+            return false;
+        }
+
+        for (let i = 0, n = subscribers.length; i < n; ++i) {
+            const subscriber = subscribers[i];
+            if (callback === subscriber.callback && context === subscriber.context) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Lists all registered event types.
      * @returns an array with the names of all added event types.
      */
